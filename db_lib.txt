@@ -1,0 +1,11 @@
+USER :
+get_all_users
+get_all_profile
+get_user_by_id
+get_user_by_username
+add_user
+update_user
+
+NOTIFS (invites, connections, remove_invites, messages) :
+HISTORIC (me view other profiles) :
+MESSAGES :

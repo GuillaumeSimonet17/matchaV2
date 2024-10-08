@@ -1,0 +1,14 @@
+/* custom.css */
+
+:root {
+    --bs-primary: #59C2FF;
+    --bs-secondary: #ffa602;
+}
+
+* {
+    color: var(--bs-primary);
+}
+
+::-webkit-scrollbar {
+    display: none; /* Pour Chrome, Safari et Edge */
+}
