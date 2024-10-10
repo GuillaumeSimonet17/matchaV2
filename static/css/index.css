@@ -1,0 +1,34 @@
+:root {
+    --bs-primary: #59C2FF;
+    --bs-secondary: #f3d291;
+}
+
+::-webkit-scrollbar {
+    display: none; /* Pour Chrome, Safari et Edge */
+}
+
+* {
+    color: var(--bs-primary);
+}
+
+a {
+    text-decoration: none;
+}
+
+nav .active {
+    color: var(--bs-secondary);
+}
+
+.active-chat {
+    background: var(--bs-secondary);
+
+}
+
+.active-chat p {
+    color: white;
+}
+
+.my-msg {
+    background: var(--bs-secondary);
+    color: #171717 !important    ;
+}

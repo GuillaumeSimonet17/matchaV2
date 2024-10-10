@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block content %}
+    <section id="profile" class="mb-5  {{ 'active' if request.path == '/' else '' }}">
+        <div class="mt-3 container">
+            <div class="">
+              <img src="../static/img/boat.png" class="d-block w-100" alt="...">
+            </div>
+            <h2 class="pt-3">BOAT NAME</h2>
+            <div class="pt-2 ps-2">
+                <p>Age</p>
+                <p>Shape</p>
+                <p>...</p>
+            </div>
+            <div class="col-12">
+                <button class="btn btn-outline-primary col-8 col-md-4" type="button">Invite</button>
+<!--                        <button class="btn btn-outline-primary col-8" type="button">Uninvite</button>-->
+                <button class="btn btn-outline-primary col-2 col-md-1" type="button"><i class="bi bi-ban"></i> </button>
+            </div>
+    </div>
+    </section>
+{% endblock %}
