@@ -1,11 +1,45 @@
-USER :
-get_all_users
-get_all_profile
-get_user_by_id
-get_user_by_username
+PUBLIC PROFILE:
+get_all_profile_cards #only image profile and name
+get_public_profile_by_id #all public infos of a user by his id
+get_public_profile_by_username #all public infos of a user by his username
+
+PRIVATE PROFILE:
+get_private_profile_infos #get profile infos of the current user, so with his password, email...
+update_private_profile_infos #update user infos like email, name...
 add_user
 update_user
 
-NOTIFS (invites, connections, remove_invites, messages) :
-HISTORIC (me view other profiles) :
-MESSAGES :
+FRIENDSHIP :
+get_friendship_invitations_received_by_user_id
+get_friendship_invitations_send_by_user_id
+get_friendship_uninvitations_received_by_user_id
+get_friendship_uninvitations_send_by_user_id
+get_friendship_connections_by_user_id
+get_friendship_by_user_ids : prend une liste de 2 user_ids et return l'état de la relationship si elle existe
+post_friendship : prend user_ids from et to
+update_friendship_by_user_ids : prend une liste de 2 user_ids from et to
+
+VIEW est une table avec From | To
+post_view #post a view from user_id A to user_id B
+get_views_by_user_ids : prend liste user_ids from et to (en appellant la fonction 2 fois en inversant les ids) et return bool si relation existe (dans l'ordre from to)
+get_list_who_viewed_my_profile_by_user_id #prend l'id du current user et return une liste d'id qui ont vu le profile du current user
+get_list_which_profiles_ive_seen_by_user_id #prend l'id du current user et return une liste d'id vu par current user
+
+BLOCK est une table avec From | To
+post_block #post a block from user_id A to user_id B
+get_block_by_ids #prend une liste de 2 user_id: from et to et return un bool
+
+NOTIF est une table senderId | state
+get_notifs_by_user_id : return un dict de userId: state (invitation, uninvitation, connection, message)
+post_notif_by_user_id : post une ligne notif avec le senderId et le state
+
+CHANNEL est une table avec user_id_a, user_id_b, list_messages
+Un channel est attribué dès que connection se fait (et désattribué), deux users connectés partageront le même channel_id
+donc un user a une liste de channel_id
+get_channels_by_user_id : prend current user id et récupère la liste des channels
+get_channel_by_user_ids : prend un liste de 2 user_ids et return bool si un channel entre eux existe
+
+MESSAGES auront from to channel_id content date readed
+post_message : post msg on channel_id
+get_messages_by_channel_id : prend le target_user_id, get_channel_by_user_ids puis return liste de messages
+get_message_by_id : get content by message_id
