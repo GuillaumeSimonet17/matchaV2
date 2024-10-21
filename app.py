@@ -1,6 +1,16 @@
+import os
 from flask import Flask, render_template
+from dotenv import load_dotenv
 
 app = Flask(__name__)
+
+load_dotenv()
+
+app.config['POSTGRES_DB'] = os.getenv('POSTGRES_DB')
+app.config['POSTGRES_USER'] = os.getenv('POSTGRES_USER')
+app.config['POSTGRES_PASSWORD'] = os.getenv('POSTGRES_PASSWORD')
+app.config['POSTGRES_HOST'] = os.getenv('POSTGRES_HOST')
+app.config['POSTGRES_PORT'] = os.getenv('POSTGRES_PORT')
 
 @app.route('/')
 def home():
