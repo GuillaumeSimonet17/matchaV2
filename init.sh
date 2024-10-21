@@ -39,4 +39,4 @@ echo "Init.sql done"
 
 # Lancer l'application Flask
 echo "Starting Flask application..."
-flask run
+flask run --debug
