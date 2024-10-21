@@ -1,6 +1,9 @@
 import os
-from flask import Flask, render_template
+from flask import Flask
 from dotenv import load_dotenv
+
+from ORM.database import init_db
+from routes import main as main_routes
 
 app = Flask(__name__)
 
@@ -12,30 +15,29 @@ app.config['POSTGRES_PASSWORD'] = os.getenv('POSTGRES_PASSWORD')
 app.config['POSTGRES_HOST'] = os.getenv('POSTGRES_HOST')
 app.config['POSTGRES_PORT'] = os.getenv('POSTGRES_PORT')
 
-@app.route('/')
-def home():
-    return render_template('search.html')
+init_db(app.config)
+from ORM.tables.user import User
 
-@app.route('/chat')
-def chat():
-    return render_template('chat.html')
+# user1 = User(None, 'usernae', 'last', 'firsty', 30, 'psd', 'ema', 'admiimgn', 'bio', 'gen', 'sexpr', fame_rate='fame')
+# user1_id = user1.create()
+# print('user1_id = ', user1_id[0])
 
-@app.route('/historic')
-def historic():
-    return render_template('historic.html')
+# found = User.find_by_id(user1_id[0])
+# print('found = ', found)
+# print('id ', found.id)
+# print('username = ', found.username)
+# print('last_name = ', found.last_name)
+# print('first_name = ', found.first_name)
+# print('age = ', found.age)
+# print('email = ', found.email)
+# print('img = ', found.profile_image)
+# print('bio = ', found.bio)
+# print('gender = ', found.gender)
+# print('gendpref', found.gender_pref)
+# print('fame_rate', found.fame_rate)
+# print('created_at', found.created_at)
 
-@app.route('/notifs')
-def notifs():
-    return render_template('notifs.html')
-
-@app.route('/profile')
-def profile():
-    return render_template('profile.html')
-
-@app.route('/user')
-def user():
-    return render_template('user.html')
-
+app.register_blueprint(main_routes)
 
 if __name__ == '__main__':
     app.run(debug=True)
