@@ -33,6 +33,10 @@ while ! pg_isready -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" > /dev/null 2>&1; do
 done
 echo "PostgreSQL is ready!"
 
+echo "Init.sql run"
+cat init.sql | psql -h localhost -p 5432 -U guillaume matcha
+echo "Init.sql done"
+
 # Lancer l'application Flask
 echo "Starting Flask application..."
 flask run
