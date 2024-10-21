@@ -1,5 +1,5 @@
 
-CREATE TABLE "user" (
+CREATE TABLE IF NOT EXISTS app_user (
     id SERIAL PRIMARY KEY,
     username VARCHAR(100) UNIQUE NOT NULL,
     last_name VARCHAR(100) NOT NULL,
@@ -17,71 +17,71 @@ CREATE TABLE "user" (
 
 CREATE VIEW profile AS
 SELECT id, username, last_name, first_name, age, profile_image, bio, gender, gender_pref, fame_rate
-FROM "user";
+FROM app_user;
 
 -- TAGS Many2many -----------------------------------------------------------------------------------
-CREATE TABLE tag (
+CREATE TABLE IF NOT EXISTS tag (
   id SERIAL PRIMARY KEY,
   name VARCHAR(45)
 );
 
-CREATE TABLE users_tag (
+CREATE TABLE IF NOT EXISTS user_tag (
     id SERIAL PRIMARY KEY,
     user_id INTEGER,
     tag_id INTEGER,
-    CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES "user"(id) ON DELETE CASCADE,
+    CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES app_user(id) ON DELETE CASCADE,
     CONSTRAINT fk_tag FOREIGN KEY(tag_id) REFERENCES tag(id) ON DELETE CASCADE
 );
 
 -- FRIENDSHIP One2many -----------------------------------------------------------------------------------
-CREATE TABLE friendship (
+CREATE TABLE IF NOT EXISTS friendship (
     id SERIAL PRIMARY KEY,
     state VARCHAR(255) NOT NULL,
     sender_id INTEGER NOT NULL,
     receiver_id INTEGER NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_sender FOREIGN KEY(sender_id) REFERENCES "user"(id) ON DELETE CASCADE,
-    CONSTRAINT fk_receiver FOREIGN KEY(receiver_id) REFERENCES "user"(id) ON DELETE CASCADE,
+    CONSTRAINT fk_sender FOREIGN KEY(sender_id) REFERENCES app_user(id) ON DELETE CASCADE,
+    CONSTRAINT fk_receiver FOREIGN KEY(receiver_id) REFERENCES app_user(id) ON DELETE CASCADE,
     CONSTRAINT unique_friendship UNIQUE(sender_id, receiver_id)
 );
 
 -- VIEW One2many -----------------------------------------------------------------------------------
-CREATE TABLE profile_view (
+CREATE TABLE IF NOT EXISTS profile_view (
     id SERIAL PRIMARY KEY,
     sender_id INTEGER NOT NULL,
     receiver_id INTEGER NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_sender FOREIGN KEY(sender_id) REFERENCES "user"(id) ON DELETE CASCADE,
-    CONSTRAINT fk_receiver FOREIGN KEY(receiver_id) REFERENCES "user"(id) ON DELETE CASCADE,
+    CONSTRAINT fk_sender FOREIGN KEY(sender_id) REFERENCES app_user(id) ON DELETE CASCADE,
+    CONSTRAINT fk_receiver FOREIGN KEY(receiver_id) REFERENCES app_user(id) ON DELETE CASCADE,
     CONSTRAINT unique_profile_view UNIQUE(sender_id, receiver_id)
 );
 
 -- NOTIF One2many -----------------------------------------------------------------------------------
-CREATE TABLE notif (
+CREATE TABLE IF NOT EXISTS notif (
     id SERIAL PRIMARY KEY,
     state VARCHAR(255) NOT NULL,
     sender_id INTEGER NOT NULL,
     receiver_id INTEGER NOT NULL,
     read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_sender FOREIGN KEY(sender_id) REFERENCES "user"(id) ON DELETE CASCADE,
-    CONSTRAINT fk_receiver FOREIGN KEY(receiver_id) REFERENCES "user"(id) ON DELETE CASCADE,
+    CONSTRAINT fk_sender FOREIGN KEY(sender_id) REFERENCES app_user(id) ON DELETE CASCADE,
+    CONSTRAINT fk_receiver FOREIGN KEY(receiver_id) REFERENCES app_user(id) ON DELETE CASCADE,
     CONSTRAINT unique_notif UNIQUE(sender_id, receiver_id)
 );
 
 -- CHANNEL One2many -----------------------------------------------------------------------------------
-CREATE TABLE channel (
+CREATE TABLE IF NOT EXISTS channel (
     id SERIAL PRIMARY KEY,
     user_a INTEGER NOT NULL,
     user_b INTEGER NOT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT fk_sender FOREIGN KEY(user_a) REFERENCES "user"(id) ON DELETE CASCADE,
-    CONSTRAINT fk_receiver FOREIGN KEY(user_b) REFERENCES "user"(id) ON DELETE CASCADE,
+    CONSTRAINT fk_sender FOREIGN KEY(user_a) REFERENCES app_user(id) ON DELETE CASCADE,
+    CONSTRAINT fk_receiver FOREIGN KEY(user_b) REFERENCES app_user(id) ON DELETE CASCADE,
     CONSTRAINT unique_channel UNIQUE(user_a, user_b)
 );
 
 -- MESSAGE One2many -----------------------------------------------------------------------------------
-CREATE TABLE message (
+CREATE TABLE IF NOT EXISTS message (
     id SERIAL PRIMARY KEY,
     channel_id INTEGER NOT NULL,
     sender_id INTEGER NOT NULL,
@@ -89,5 +89,5 @@ CREATE TABLE message (
     read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_channel FOREIGN KEY(channel_id) REFERENCES channel(id) ON DELETE CASCADE,
-    CONSTRAINT fk_user FOREIGN KEY(sender_id) REFERENCES "user"(id) ON DELETE CASCADE
+    CONSTRAINT fk_user FOREIGN KEY(sender_id) REFERENCES app_user(id) ON DELETE CASCADE
 );
