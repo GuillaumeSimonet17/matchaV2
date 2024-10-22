@@ -1,14 +1,12 @@
 from typing import Any
-
 from ORM.model import Model
-from ORM.database import db
 
 
 class User(Model):
     table_name = 'app_user'
     column_names = ['id', 'username', 'last_name', 'first_name', 'age', 'password', 'email',
                     'profile_image', 'bio', 'gender', 'gender_pref', 'fame_rate', 'created_at']
-    
+
 
     def __init__(self, id, username, last_name, first_name, age, password,
                  email, profile_image, bio, gender, gender_pref, fame_rate=None, created_at=None):
@@ -36,10 +34,9 @@ class User(Model):
 
     # ------------------------------------ READ
     @classmethod
-    def _all(cls, col='*'):
+    def _all(cls):
         try:
             results = cls.get_all_dicts()
-            print('ICI = ', results)
             return [cls(**row) for row in results]
         except Exception as e:
             print(f"Erreur dans la methode all de User: {e}")
