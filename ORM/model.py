@@ -1,3 +1,4 @@
+from tkinter import BooleanVar
 from typing import Any
 from werkzeug.exceptions import NotFound
 from ORM.database import db
@@ -74,15 +75,21 @@ class Model:
         return data
 
     # ------------------------------------ UPDATE
-    def update(self, **kwargs):
-        print('UPDATE self.table_name = ', self.table_name)
-        set_clause = ', '.join([f"{key} = %s" for key in kwargs.keys() if key != 'id'])
+    def update(self, changes:dict[str, Any]) -> bool:
+        for k in changes.keys():
+            if k not in self.column_names:
+                raise NotFound(f'Column name {k} is not in columns of {self.table_name}')
+        set_clause = ', '.join([f"{key} = %s" for key in changes.keys() if key != 'id'])
         query = f"UPDATE {self.table_name} SET {set_clause} WHERE id = %s;"
-        values = tuple([v for k, v in kwargs.items() if k != 'id']) + (kwargs['id'],)
-        return db.execute(query, values)
+        values = tuple([v for k, v in changes.items() if k != 'id']) + (self.id,)
+        print(query)
+        print(values)
+        db.execute(query, values, False)
+        return True
 
     # ------------------------------------ DELETE
-    def delete(self, id):
+    def delete(self):
         print('DELETE self.table_name = ', self.table_name)
         query = f"DELETE FROM {self.table_name} WHERE id = %s;"
-        return db.execute(query, (id,))
+        db.execute(query, (self.id,), False)
+        return True
