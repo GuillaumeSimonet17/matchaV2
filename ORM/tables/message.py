@@ -4,6 +4,8 @@ from ORM.database import db
 
 class Message(Model):
     table_name = 'message'
+    column_names = ['id', 'channel_id', 'sender_id', 'content', 'read', 'created_at']
+
 
     def __init__(self, id, channel_id, sender_id, content, read, created_at):
         self.id = id

@@ -4,6 +4,8 @@ from ORM.database import db
 
 class Notif(Model):
     table_name = 'notif'
+    column_names = ['id', 'state', 'sender_id', 'receiver_id', 'read', 'created_at']
+
 
     def __init__(self, id, state, sender_id, receiver_id, read, created_at):
         self.id = id

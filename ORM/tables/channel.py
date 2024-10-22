@@ -1,9 +1,10 @@
 from ORM.model import Model
-from ORM.database import db
 
 
 class Channel(Model):
     table_name = 'channel'
+    column_names = ['id', 'user_a', 'user_b', 'created_at']
+
 
     def __init__(self, id, user_a, user_b, created_at=None):
         self.id = id
