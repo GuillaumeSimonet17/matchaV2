@@ -1,6 +1,7 @@
 from ORM.model import Model
 from ORM.database import db
 
+
 class User(Model):
     table_name = 'app_user'
 
