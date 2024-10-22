@@ -3,7 +3,7 @@ from ORM.database import db
 
 
 class Profile(Model):
-    table_name = 'profile'
+    table_name = 'app_profile'
 
     def __init__(self, id, username, last_name, first_name, age,
                  profile_image, bio, gender, gender_pref, fame_rate):

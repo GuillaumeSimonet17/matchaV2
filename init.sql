@@ -15,7 +15,7 @@ CREATE TABLE IF NOT EXISTS app_user (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE VIEW profile AS
+CREATE VIEW app_profile AS
 SELECT id, username, last_name, first_name, age, profile_image, bio, gender, gender_pref, fame_rate
 FROM app_user;
 
