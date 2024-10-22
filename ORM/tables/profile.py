@@ -1,9 +1,11 @@
 from ORM.model import Model
-from ORM.database import db
 
 
 class Profile(Model):
     table_name = 'app_profile'
+    column_names = ['id', 'username', 'last_name', 'first_name', 'age', 'profile_image',
+                    'bio', 'gender', 'gender_pref', 'fame_rate']
+
 
     def __init__(self, id, username, last_name, first_name, age,
                  profile_image, bio, gender, gender_pref, fame_rate):
@@ -17,3 +19,23 @@ class Profile(Model):
         self.gender = gender
         self.gender_pref = gender_pref
         self.fame_rate = fame_rate
+
+    # ------------------------------------ READ
+    @classmethod
+    def _all(cls):
+        try:
+            results = cls.get_all_dicts()
+            print('ICI = ', results)
+            return [cls(**row) for row in results]
+        except Exception as e:
+            print(f"Erreur dans la methode all de Profile: {e}")
+            return None
+
+    @classmethod
+    def _find_by_id(cls, id):
+        try:
+            res = cls.get_dict_by_id(id)
+            return cls(**res)
+        except Exception as e:
+            print(f"Erreur dans la methode find_by_id de Profile: {e}")
+            return None
