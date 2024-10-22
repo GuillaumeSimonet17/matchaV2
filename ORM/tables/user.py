@@ -50,24 +50,3 @@ class User(Model):
         except Exception as e:
             print(f"Erreur dans la methode find_by_id de User: {e}")
             return None
-
-    # ------------------------------------ UPDATE
-    def _update_infos(self, vals_dict):
-        try:
-            if 'id' not in vals_dict:
-                raise ValueError("L'ID doit être inclus dans vals_dict.")
-
-            super().update(**vals_dict)
-            return True
-        except Exception as e:
-            print(f"Erreur dans la methode update de User: {e}")
-            return None
-
-    # ------------------------------------ DELETE
-    def _delete(self, id):
-        try:
-            result = super().delete(id)
-            return result
-        except Exception as e:
-            print(f"Erreur dans la méthode delete de User: {e}")
-            return None
