@@ -13,10 +13,12 @@ class Database:
         print('Database connection established')
         self.cursor = self.connection.cursor()
 
-    def execute(self, query, params=None):
+    def execute(self, query, params=None, fetch=True):
         self.cursor.execute(query, params)
-        self.connection.commit()
-        return self.cursor.fetchall()
+        if fetch:
+            return self.cursor.fetchall()
+        else:
+            return self.connection.commit()
 
     # def close(self):
     #     self.cursor.close()
