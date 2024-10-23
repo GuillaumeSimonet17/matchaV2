@@ -16,6 +16,7 @@ class Database:
     def execute(self, query, params=None, fetch=True):
         self.cursor.execute(query, params)
         if fetch:
+            self.connection.commit()
             return self.cursor.fetchall()
         else:
             return self.connection.commit()

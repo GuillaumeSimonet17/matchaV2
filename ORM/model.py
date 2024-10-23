@@ -25,7 +25,7 @@ class Model:
         res = db.execute(query, values)
         return res[0]
 
-    # ------------------------------------ UTILS
+    # ------------------------------------ READ
     @classmethod
     def get_all_column_names(cls, columns: list[str] = None) -> list[str]:
         if columns:
@@ -34,7 +34,6 @@ class Model:
             raise NotFound(f'No column names provided')
         return cls.column_names
 
-    # ------------------------------------ READ
     @classmethod
     def get_all_values(cls, columns: list[str] = None) -> tuple:
         columns = cls.get_all_column_names(columns)
@@ -42,17 +41,20 @@ class Model:
         return db.execute(query)
     
     @classmethod
-    def get_all_dicts(cls, columns: list[str] = None) -> list[dict[str, Any]]:
-        columns = cls.get_all_column_names(columns)
-        res = cls.get_all_values(columns)
-        print(res)
+    def get_dicts_by_res(cls, res, columns: list[str] = None) -> list[dict[str, Any]]:
         datas = []
-        print(columns)
         for r in res:
             data = {}
             for idx, col_name in enumerate(columns):
                 data[col_name] = r[idx]
             datas.append(data)
+        return datas
+
+    @classmethod
+    def get_all_dicts(cls, columns: list[str] = None) -> list[dict[str, Any]]:
+        columns = cls.get_all_column_names(columns)
+        res = cls.get_all_values(columns)
+        datas = cls.get_dicts_by_res(res, columns)
         return datas
 
     @classmethod
@@ -68,7 +70,6 @@ class Model:
     def get_dict_by_id(cls, id: int, columns: list[str] = None) -> dict[str, Any]:
         columns = cls.get_all_column_names(columns)
         res = cls.get_values_by_id(id, columns)
-        print(res)
         data = {}
         for idx, col_name in enumerate(columns):
             data[col_name] = res[idx]
@@ -89,7 +90,7 @@ class Model:
 
     # ------------------------------------ DELETE
     def delete(self):
-        print('DELETE self.table_name = ', self.table_name)
+        print('DELETE self.table_name = ', self.id)
         query = f"DELETE FROM {self.table_name} WHERE id = %s;"
         db.execute(query, (self.id,), False)
         return True
