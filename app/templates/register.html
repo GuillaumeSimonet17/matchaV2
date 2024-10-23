@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+{% block index %}
+    <div class="col-12 col-md-5 border m-0">
+        <h1>Register</h1>
+        <form method="POST" action="/login">
+
+            <!-- Username -->
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <!-- Last Name -->
+            <div class="mb-3">
+                <label for="last_name" class="form-label">Last Name</label>
+                <input type="text" class="form-control" id="last_name" name="last_name" required>
+            </div>
+            <!-- First Name -->
+            <div class="mb-3">
+                <label for="first_name" class="form-label">First Name</label>
+                <input type="text" class="form-control" id="first_name" name="first_name" required>
+            </div>
+            <!-- Age -->
+            <div class="mb-3">
+                <label for="age" class="form-label">Age</label>
+                <input type="number" class="form-control" id="age" name="age" required>
+            </div>
+            <!-- Password -->
+            <div class="mb-3">
+                <label for="password" class="form-label">Password</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <!-- Confirm Password -->
+            <div class="mb-3">
+                <label for="confirm_password" class="form-label">Confirm Password</label>
+                <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+            </div>
+            <!-- Email -->
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <!-- Profile Image -->
+            <div class="mb-3">
+                <label for="profile_image" class="form-label">Profile Image URL</label>
+                <input type="url" class="form-control" id="profile_image" name="profile_image">
+            </div>
+            <!-- Bio -->
+            <div class="mb-3">
+                <label for="bio" class="form-label">Bio</label>
+                <textarea class="form-control" id="bio" name="bio" rows="3"></textarea>
+            </div>
+            <!-- Gender -->
+            <div class="mb-3">
+                <label for="gender" class="form-label">Gender</label>
+                <select class="form-select" id="gender" name="gender" required>
+                    <option value="" disabled selected>Select your gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <!-- Gender Preference -->
+            <div class="mb-3">
+                <label for="gender_pref" class="form-label">Gender Preference</label>
+                <select class="form-select" id="gender_pref" name="gender_pref" required>
+                    <option value="" disabled selected>Select your preference</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+            <!-- Submit Button -->
+            <div class="d-grid">
+                <button type="submit" class="btn btn-primary">Submit</button>
+            </div>
+        </form>
+    </div>
+{% endblock %}
