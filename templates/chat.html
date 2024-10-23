@@ -1,41 +1,40 @@
-{% extends "base.html" %}
+{% extends "index.html" %}
 {% block content %}
-        <section id="chat" class="col-9 col-md-10 {{ 'active' if request.path == '/chat' else '' }}">
-                <h2 class="mt-2 ms-2">Chat</h2>
-                    <div class="container p-0 rounded d-flex" style="height: 80vh;">
-                    <div class="col-3 col-md-3">
-                        <nav class="nav flex-column bg-light h-100 rounded-3 shadow sticky-top">
-                            <div class="nav-link d-flex justify-content-between align-items-center border-bottom
-                                {{ 'active-chat' if True else '' }}">
-                                <img style="width: 30px;" src="../static/img/airbnb.png" alt="Profile image"/>
-                                <p class="m-0 fw-bold">Pagbo</p>
-                            </div>
-                            <div class="nav-link d-flex justify-content-between align-items-center border-bottom
-                                {{ 'active-chat' if False else '' }}">
-                                <img style="width: 30px;" src="../static/img/airbnb.png" alt="Profile image"/>
-                                <p class="m-0 fw-bold">Yacht</p>
-                            </div>
-                            <div class="nav-link d-flex justify-content-between align-items-center border-bottom
-                                {{ 'active-chat' if False else '' }}">
-                                <img style="width: 30px;" src="../static/img/airbnb.png" alt="Profile image"/>
-                                <p class="m-0 fw-bold">Bateau de pêche</p>
-                            </div>
-                        </nav>
+    <section id="chat" class="border  col-12 col-md-10 {{ 'active' if request.path == '/chat' else '' }}" >
+        <div class="container border p-0 rounded d-flex" style="min-height: 90vh">
+            <div class="col-3 col-md-3">
+                <nav class="nav flex-column bg-light h-100 rounded-3 shadow sticky-top">
+                    <div class="nav-link d-flex justify-content-between align-items-center border-bottom
+                        {{ 'active-chat' if True else '' }}">
+                        <img style="width: 30px;" src="../static/img/airbnb.png" alt="Profile image"/>
+                        <p class="m-0 fw-bold">Pagbo</p>
                     </div>
-                    <div class="col-9 col-md-8 d-flex flex-column">
-                         <div class="p-4 bg-light h-100 d-flex flex-column align-items-center">
-                            <div class="d-inline-flex align-items-center rounded mt-1 me-auto my-msg" style="width: auto;">
-                                <p class="p-2 px-3 m-0 my-msg">yoooooooooo</p>
-                            </div>
-                            <div class="d-inline-flex align-items-center  rounded mt-1 bg-secondary ms-auto" style="width: auto;">
-                                <p class="p-2 px-3 m-0 text-end text-break">yoooooooooo ca dji koa</p>
-                            </div>
-                        </div>
-                        <div class="border-top d-flex justify-content-between bg-light">
-                            <input type="text" class="px-4 col-9 col-md-10 border-0">
-                            <button class="btn col-3 col-md-2">send</button>
-                        </div>
+                    <div class="nav-link d-flex justify-content-between align-items-center border-bottom
+                        {{ 'active-chat' if False else '' }}">
+                        <img style="width: 30px;" src="../static/img/airbnb.png" alt="Profile image"/>
+                        <p class="m-0 fw-bold">Yacht</p>
+                    </div>
+                    <div class="nav-link d-flex justify-content-between align-items-center border-bottom
+                        {{ 'active-chat' if False else '' }}">
+                        <img style="width: 30px;" src="../static/img/airbnb.png" alt="Profile image"/>
+                        <p class="m-0 fw-bold">Bateau de pêche</p>
+                    </div>
+                </nav>
+            </div>
+            <div class="col-9 col-md-9 d-flex flex-column">
+                 <div class="p-4 bg-light h-100 d-flex flex-column align-items-center">
+                    <div class="d-inline-flex align-items-center rounded mt-1 me-auto my-msg" style="width: auto;">
+                        <p class="p-2 px-3 m-0 my-msg">yoooooooooo</p>
+                    </div>
+                    <div class="d-inline-flex align-items-center rounded mt-1 bg-secondary ms-auto" style="width: auto;">
+                        <p class="p-2 px-3 m-0 text-end text-break">yoooooooooo ca dji koa</p>
                     </div>
                 </div>
-            </section>
+                <div class="border-top d-flex justify-content-between bg-light">
+                    <input type="text" class="px-4 col-9 col-md-10 border-0">
+                    <button class="btn col-3 col-md-2">send</button>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}

@@ -1,6 +1,7 @@
-{% extends "base.html" %}
+{% extends "index.html" %}
 {% block content %}
-    <section id="profile" class="mb-5  {{ 'active' if request.path == '/' else '' }}">
+    <section id="profile" class="mb-5 {{ 'active' if request.path == '/' else '' }}"
+        style="min-height: 90vh">
         <div class="mt-3 container">
             <div class="">
               <img src="../static/img/boat.png" class="d-block w-100" alt="...">

@@ -1,28 +1,28 @@
-{% extends "base.html" %}
+{% extends "index.html" %}
 {% block content %}
-    <section id="historic" class="mb-5 col-9 col-md-6 {{ 'active' if request.path == '/historic' else '' }}">
-                <h2 class="mt-2 ms-2">Historic</h2>
-                <div class="container-fluid">
-                    <div class="row flex-column">
-                        <div class="mb-4 border-0 border-bottom col-12 col-md-9 justify-content-between d-flex align-items-center">
-                            <a href="/profile" class="mb-1">Pagbo</a>
-                            <p class="m-0 text-muted">Yesterday - 9pm</p>
-                        </div>
-                        <div class="mb-4 border-0 border-bottom col-12 col-md-9 justify-content-between d-flex align-items-center">
-                            <a href="/profile" class="mb-1">Voilier</a>
-                            <p class="m-0 text-muted">Yesterday - 9pm</p>
-                        </div>
-                        <div class="mb-4 border-0 border-bottom col-12 col-md-9 justify-content-between d-flex align-items-center">
-                            <a href="/profile" class="mb-1">Pagbo</a>
-                            <p class="m-0 text-muted">Yesterday - 9pm</p>
-                        </div>
-                        <div class="mb-4 border-0 border-bottom col-12 col-md-9 justify-content-between d-flex align-items-center">
-                            <a href="/profile" class="mb-1">Barque</a>
-                            <p class="m-0 text-muted">Yesterday - 9pm</p>
-                        </div>
-                    </div>
+    <section id="historic" class="mt-5 col-12 col-md-7 justify-content-center {{ 'active' if request.path == '/historic' else '' }}"
+        style="min-height: 90vh">
+        <div class="container-fluid d-flex justify-content-center border border-dark rounded pt-3">
+            <div class="row flex-column col-12">
+                <div class="mb-4 border-0 border-bottom col-12 justify-content-between d-flex align-items-center">
+                    <a href="/profile" class="mb-1">Pagbo</a>
+                    <p class="m-0 text-muted">Yesterday - 9pm</p>
                 </div>
-            </section>
+                <div class="mb-4 border-0 border-bottom col-12 justify-content-between d-flex align-items-center">
+                    <a href="/profile" class="mb-1">Voilier</a>
+                    <p class="m-0 text-muted">Yesterday - 9pm</p>
+                </div>
+                <div class="mb-4 border-0 border-bottom col-12 justify-content-between d-flex align-items-center">
+                    <a href="/profile" class="mb-1">Pagbo</a>
+                    <p class="m-0 text-muted">Yesterday - 9pm</p>
+                </div>
+                <div class="mb-4 border-0 border-bottom col-12 justify-content-between d-flex align-items-center">
+                    <a href="/profile" class="mb-1">Barque</a>
+                    <p class="m-0 text-muted">Yesterday - 9pm</p>
+                </div>
+            </div>
+        </div>
+    </section>
 {% endblock %}
 
 

@@ -1,18 +1,18 @@
-{% extends "base.html" %}
+{% extends "index.html" %}
 {% block content %}
-    <section id="notifs" class="mb-5 col-7 {{ 'active' if request.path == '/' else '' }}">
-        <h2 class="m-2">Notifs</h2>
-        <div class="row flex-column">
-            <div class="ms-3 mb-4 border-0 border-bottom col-12 col-md-9 justify-content-between d-flex align-items-center">
+    <section id="notifs" class="mt-5 col-12 col-md-7 d-flex justify-content-center {{ 'active' if request.path == '/' else '' }}"
+        style="min-height: 90vh">
+        <div class="row flex-column col-12">
+            <div class="ms-3 mb-4 border-0 border-bottom col-10 justify-content-between d-flex align-items-center">
                 <button class="btn btn-outline-primary col-2 col-md-2" type="button">
                      <i class="bi bi-x-lg"></i>
                 </button>
-                  <div class="ms-5  col-10 col-md-6">
-                      <p class="mb-1"><a href="/profile">Pagbo</a> invited you</p>
+                <div class="ms-5  col-10 col-md-6">
+                    <p class="mb-1"><a href="/profile">Pagbo</a> invited you</p>
                     <p class="m-0 text-muted">Yesterday - 9pm</p>
                 </div>
             </div>
-            <div class="ms-3 mb-4 border-0 border-bottom col-12 col-md-9 justify-content-between d-flex align-items-center">
+            <div class="ms-3 mb-4 border-0 border-bottom col-10 justify-content-between d-flex align-items-center">
                 <button class="btn btn-outline-primary col-2 col-md-2" type="button">
                      <i class="bi bi-x-lg"></i>
                 </button>
@@ -21,7 +21,7 @@
                     <p class="m-0 text-muted">Yesterday - 9pm</p>
                 </div>
             </div>
-            <div class="ms-3 mb-4 border-0 border-bottom col-12 col-md-9 justify-content-between d-flex align-items-center">
+            <div class="ms-3 mb-4 border-0 border-bottom col-10 justify-content-between d-flex align-items-center">
                 <button class="btn btn-outline-primary col-2 col-md-2" type="button">
                      <i class="bi bi-x-lg"></i>
                 </button>
@@ -30,7 +30,7 @@
                     <p class="m-0 text-muted">Yesterday - 9pm</p>
                 </div>
             </div>
-            <div class="ms-3 mb-4 border-0 border-bottom col-12 col-md-9 justify-content-between d-flex align-items-center">
+            <div class="ms-3 mb-4 border-0 border-bottom col-10 justify-content-between d-flex align-items-center">
                     <button class="btn btn-outline-primary col-2 col-md-2" type="button">
                          <i class="bi bi-x-lg"></i>
                     </button>
