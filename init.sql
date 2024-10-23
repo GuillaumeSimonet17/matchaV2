@@ -63,7 +63,6 @@ CREATE TABLE IF NOT EXISTS notif (
     state VARCHAR(255) NOT NULL,
     sender_id INTEGER NOT NULL,
     receiver_id INTEGER NOT NULL,
-    read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_sender FOREIGN KEY(sender_id) REFERENCES app_user(id) ON DELETE CASCADE,
     CONSTRAINT fk_receiver FOREIGN KEY(receiver_id) REFERENCES app_user(id) ON DELETE CASCADE,
