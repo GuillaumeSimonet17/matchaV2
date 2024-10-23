@@ -24,14 +24,6 @@ class User(Model):
         self.fame_rate = fame_rate
         self.created_at = created_at
 
-    # ------------------------------------ CREATE
-    def _create(self):
-        try:
-            return super().create()
-        except Exception as e:
-            print(f"Erreur dans la methode create de User: {e}")
-            return None
-
     # ------------------------------------ READ
     @classmethod
     def _all(cls):
