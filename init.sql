@@ -45,6 +45,16 @@ CREATE TABLE IF NOT EXISTS friendship (
     CONSTRAINT unique_friendship UNIQUE(sender_id, receiver_id)
 );
 
+-- BLOCK One2many -----------------------------------------------------------------------------------
+CREATE TABLE IF NOT EXISTS block (
+    id SERIAL PRIMARY KEY,
+    sender_id INTEGER NOT NULL,
+    receiver_id INTEGER NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT fk_sender FOREIGN KEY(sender_id) REFERENCES app_user(id) ON DELETE CASCADE,
+    CONSTRAINT fk_receiver FOREIGN KEY(receiver_id) REFERENCES app_user(id) ON DELETE CASCADE,
+    CONSTRAINT unique_block UNIQUE(sender_id, receiver_id)
+);
 -- VIEW One2many -----------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS visit (
     id SERIAL PRIMARY KEY,
