@@ -7,6 +7,7 @@ from ORM.database import init_db
 from routes import main as main_routes
 
 app = Flask(__name__)
+app.secret_key = 'your_secret_key'
 
 load_dotenv()
 
