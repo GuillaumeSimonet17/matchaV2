@@ -4,16 +4,17 @@ from ORM.database import db
 
 class Notif(Model):
     table_name = 'notif'
-    column_names = ['id', 'state', 'sender_id', 'receiver_id', 'created_at']
+    column_names = ['id', 'state', 'sender_id', 'receiver_id', 'read', 'created_at']
     possible_states = ['message', 'invitation', 'connection', 'uninvitation', 'view']
 
-    def __init__(self, id, state, sender_id, receiver_id, created_at=None):
+    def __init__(self, id, state, sender_id, receiver_id, read, created_at=None):
         self.id = id
         if state not in self.possible_states:
             raise ValueError(f"State {state} is not valid")
         self.state = state
         self.sender_id = sender_id
         self.receiver_id = receiver_id
+        self.read = read
         self.created_at = created_at
 
     @classmethod
