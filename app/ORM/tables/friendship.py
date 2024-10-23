@@ -1,5 +1,4 @@
-from ORM.model import Model
-from ORM.database import db
+from app.app import Model
 
 
 class Friendship(Model):

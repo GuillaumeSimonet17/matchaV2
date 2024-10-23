@@ -1,5 +1,5 @@
-from ORM.model import Model
-from ORM.database import db
+from app.app import Model
+from app.app import db
 
 
 class Visit(Model):

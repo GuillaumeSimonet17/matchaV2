@@ -27,11 +27,18 @@ docker compose up -d
 
 # Attendre que la base de données PostgreSQL soit prête
 echo "Waiting for PostgreSQL to be ready..."
-echo "$POSTGRES_HOST" -p "$POSTGRES_PORT"
 while ! pg_isready -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" > /dev/null 2>&1; do
   sleep 1
 done
 echo "PostgreSQL is ready!"
+
+#echo "Creating database if it doesn't exist..."
+#if ! psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U guillaume -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'matcha'" | grep -q 1; then
+#  psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U guillaume -d postgres -c "CREATE DATABASE matcha;"
+#  echo "Database 'matcha' created."
+#else
+#  echo "Database 'matcha' already exists."
+#fi
 
 echo "Init.sql run"
 cat init.sql | psql -h localhost -p 5432 -U guillaume matcha
@@ -39,4 +46,5 @@ echo "Init.sql done"
 
 # Lancer l'application Flask
 echo "Starting Flask application..."
+cd app
 flask run --debug

@@ -1,6 +1,6 @@
 from typing import Any
 from werkzeug.exceptions import NotFound
-from ORM.database import db
+from app.app import db
 
 
 class Model:

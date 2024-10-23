@@ -1,5 +1,4 @@
-from typing import Any
-from ORM.model import Model
+from app.app import Model
 
 
 class User(Model):

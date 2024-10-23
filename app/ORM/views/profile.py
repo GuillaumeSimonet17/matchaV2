@@ -1,4 +1,4 @@
-from ORM.model import Model
+from app.app import Model
 
 
 class Profile(Model):
