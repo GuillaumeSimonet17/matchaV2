@@ -25,7 +25,6 @@ class Profile(Model):
     def _all(cls):
         try:
             results = cls.get_all_dicts()
-            print('ICI = ', results)
             return [cls(**row) for row in results]
         except Exception as e:
             print(f"Erreur dans la methode all de Profile: {e}")
