@@ -21,8 +21,10 @@ FROM app_user;
 
 -- TAGS Many2many -----------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS tag (
-  id SERIAL PRIMARY KEY,
-  name VARCHAR(45)
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(45),
+    CONSTRAINT unique_tag UNIQUE(name)
+
 );
 
 CREATE TABLE IF NOT EXISTS user_tag (
@@ -30,8 +32,20 @@ CREATE TABLE IF NOT EXISTS user_tag (
     user_id INTEGER,
     tag_id INTEGER,
     CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES app_user(id) ON DELETE CASCADE,
-    CONSTRAINT fk_tag FOREIGN KEY(tag_id) REFERENCES tag(id) ON DELETE CASCADE
+    CONSTRAINT fk_tag FOREIGN KEY(tag_id) REFERENCES tag(id) ON DELETE CASCADE,
+    CONSTRAINT unique_friendship UNIQUE(user_id, tag_id)
 );
+
+INSERT INTO tag (name)
+VALUES
+('Sailing'),
+('Yacht Racing'),
+('Shipbuilding'),
+('Maritime History'),
+('Nautical Navigation'),
+('Marine Biology'),
+('Boat Maintenance');
+
 
 -- FRIENDSHIP One2many -----------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS friendship (
