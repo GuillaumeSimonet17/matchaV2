@@ -1,15 +1,18 @@
 import os
 
 from flask import Flask
+from flask_socketio import SocketIO
 from dotenv import load_dotenv
 
 from ORM.database import init_db
 from routes import main as main_routes
 
 app = Flask(__name__)
-app.secret_key = 'your_secret_key'
+socketio = SocketIO(app)
 
 load_dotenv()
+
+app.secret_key = os.getenv('SECRET_KEY')
 
 app.config['POSTGRES_DB'] = os.getenv('POSTGRES_DB')
 app.config['POSTGRES_USER'] = os.getenv('POSTGRES_USER')
@@ -156,3 +159,4 @@ app.register_blueprint(main_routes)
 
 if __name__ == '__main__':
     app.run(debug=True)
+    socketio.run(app)
