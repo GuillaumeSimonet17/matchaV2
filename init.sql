@@ -110,6 +110,7 @@ CREATE TABLE IF NOT EXISTS message (
     id SERIAL PRIMARY KEY,
     channel_id INTEGER NOT NULL,
     sender_id INTEGER NOT NULL,
+    receiver_id INTEGER NOT NULL,
     content TEXT NOT NULL,
     read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
