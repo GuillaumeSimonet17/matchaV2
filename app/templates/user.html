@@ -1,34 +1,195 @@
 {% extends "index.html" %}
 {% block content %}
-  <section id="user" class="mb-5 {{ 'active' if request.path == '/' else '' }}" style="min-height: 90vh">
-        <h2 class="mt-2 ms-3 ">Username</h2>
-        <div class="row mx-1">
-            <div class="col-12 col-md-6 mb-2">
-                <img src="../static/img/boat.png" class="card-img-top" alt="..."></img>
-            </div>
-            <form class="col-12 col-md-6">
-                <div class="col-12">
-                    <input type="text" id="Username" placeholder="Username" class="form-control">
-                </div>
-                <div class="col-12 mt-2">
-                    <input type="text" id="Firstname" placeholder="Firstname" class="form-control">
-                </div>
-                <div class="col-12 mt-2">
-                    <input type="text" id="Lastname" placeholder="Lastname" class="form-control">
-                </div>
-                <div class="col-12 mt-2">
-                    <select class="form-select" aria-label="Default select example">
-                      <option selected>Open this select menu</option>
-                      <option value="1">M</option>
-                      <option value="2">F</option>
-                      <option value="3">O</option>
-                    </select>
-                </div>
+<section id="user" class="mb-5 d-flex justify-content-center align-items-center
+    {{ 'active' if request.path == '/' else '' }}" style="min-height: 90vh">
+    <form method="POST" enctype="multipart/form-data"
+          class="row col-12 col-md-8 d-flex justify-content-center align-items-center">
 
-                <button class="mt-2 col-6 col-md-6 btn btn-primary">Save</button>
-            </form>
+        <div class="col-12 col-md-5">
+
+            <!-- Username -->
+            <div class="mb-3">
+                <label for="username" class="form-label">Username</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+
+            <!-- Last Name -->
+            <div class="mb-3">
+                <label for="last_name" class="form-label">Last Name</label>
+                <input type="text" class="form-control" id="last_name" name="last_name" required>
+            </div>
+
+            <!-- First Name -->
+            <div class="mb-3">
+                <label for="first_name" class="form-label">First Name</label>
+                <input type="text" class="form-control" id="first_name" name="first_name" required>
+            </div>
+
+            <!-- Age -->
+            <div class="mb-3">
+                <label for="age" class="form-label">Age</label>
+                <input type="number" class="form-control" id="age" name="age" min="18" required>
+            </div>
+
+            <!-- Email -->
+            <div class="mb-3">
+                <label for="email" class="form-label">Email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+
+            <!-- Profile Image -->
+            <div class="mb-3">
+                <label for="profile_image" class="form-label">Profile Image</label>
+                <input type="file" class="form-control" id="profile_image" name="profile_image" accept="image/*"
+                       onchange="previewImage(event)">
+            </div>
+
+            <!-- Image preview -->
+            <div class="mb-3">
+                <img id="image_preview" src="" alt="Image Preview"
+                     style="display: none; max-width: 200px; max-height: 200px;">
+            </div>
+
+        </div>
+        <div class="col-12 col-md-5">
+
+            <!-- Bio -->
+            <div class="mb-3">
+                <label for="bio" class="form-label">Bio</label>
+                <textarea class="form-control" id="bio" name="bio" rows="3"></textarea>
+            </div>
+
+            <!-- Gender -->
+            <div class="mb-3">
+                <label for="gender" class="form-label">Gender</label>
+                <select class="form-select" id="gender" name="gender" required>
+                    <option value="">Select Gender</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
+            </div>
+
+            <!-- Gender Preference -->
+            <div class="mb-3">
+                <label for="gender_pref" class="form-label">Gender Preference</label>
+                <select class="form-select" id="gender_pref" name="gender_pref" required>
+                    <option value="">Select Preference</option>
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="any">Any</option>
+                </select>
+            </div>
+
+            <!-- Tags Accordion -->
+            <div class="accordion" id="tagsAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="headingTags">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse"
+                                data-bs-target="#collapseTags" aria-expanded="true" aria-controls="collapseTags">
+                            Select Tags (Interests)
+                        </button>
+                    </h2>
+                    <div id="collapseTags" class="accordion-collapse collapse" aria-labelledby="headingTags"
+                         data-bs-parent="#tagsAccordion">
+                        <div class="accordion-body">
+                            <!-- Example of tag checkboxes -->
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="tags[]" value="sailing"
+                                       id="tag_sailing">
+                                <label class="form-check-label" for="tag_sailing">
+                                    Sailing
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="tags[]" value="fishing"
+                                       id="tag_fishing">
+                                <label class="form-check-label" for="tag_fishing">
+                                    Fishing
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="tags[]" value="yachting"
+                                       id="tag_yachting">
+                                <label class="form-check-label" for="tag_yachting">
+                                    Yachting
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="tags[]" value="boating"
+                                       id="tag_boating">
+                                <label class="form-check-label" for="tag_boating">
+                                    Boating
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="tags[]" value="diving"
+                                       id="tag_diving">
+                                <label class="form-check-label" for="tag_diving">
+                                    Diving
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" name="tags[]" value="water_sports"
+                                       id="tag_water_sports">
+                                <label class="form-check-label" for="tag_water_sports">
+                                    Water Sports
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-    </section>
-{% endblock %}
+        <!-- Submit Button -->
+        <div class="d-flex justify-content-center mb-4">
+            <button type="submit" class="btn btn-primary col-12 col-md-3">Save</button>
+        </div>
+    </form>
 
+    <form method="POST" action="/change-password"
+          class="row col-12 col-md-4 d-flex justify-content-center align-items-center">
+        <div class="mb-3">
+            <label for="current_password" class="form-label">Current Password</label>
+            <input type="password" class="form-control" id="current_password" name="current_password" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="new_password" class="form-label">New Password</label>
+            <input type="password" class="form-control" id="new_password" name="new_password" required>
+        </div>
+
+        <div class="mb-3">
+            <label for="confirm_password" class="form-label">Confirm New Password</label>
+            <input type="password" class="form-control" id="confirm_password" name="confirm_password" required>
+        </div>
+
+        <div class="d-flex justify-content-center mb-4">
+            <button type="submit" class="btn btn-primary col-12 col-md-5">Save new password</button>
+        </div>
+    </form>
+
+
+    <script>
+        function previewImage(event) {
+            const input = event.target;
+            const preview = document.getElementById('image_preview');
+
+            if (input.files && input.files[0]) {
+                const reader = new FileReader();
+
+                reader.onload = function (e) {
+                    preview.src = e.target.result;
+                    preview.style.display = 'block';
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            } else {
+                preview.style.display = 'none';
+            }
+        }
+    </script>
+
+</section>
+{% endblock %}
