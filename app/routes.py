@@ -1,5 +1,7 @@
-from flask import Blueprint, render_template, session, redirect, url_for, request, abort
-
+from flask import Blueprint, flash, render_template, session, redirect, url_for, request, abort
+from user_management.auth.login import auth_login
+from user_management.auth.register import auth_register
+from user_management.user_update_infos import update_user_infos, change_password
 
 main = Blueprint('main', __name__)
 
@@ -7,27 +9,23 @@ main = Blueprint('main', __name__)
 @main.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        username = request.form['username']
-        password = request.form['password']
-
-        if username == 'admin' and password == 'psd':  # Remplacez par votre logique
-            session['username'] = username
+        if auth_login(request):
             return redirect(url_for('main.home'))
-
-        return 'Identifiants incorrects', 401  # Message d'erreur en cas d'échec
-
-    if request.method == 'GET':
-        if 'username' in session:
-            return redirect(url_for('main.home'))
-        return render_template('login.html')
+        flash('Ecris mieux stp', 'danger')
+    
+    if 'username' in session:
+        return redirect(url_for('main.home'))
+    return render_template('login.html')
 
 @main.route('/logout')
 def logout():
     session.pop('username', None)
     return redirect(url_for('main.login'))
 
-@main.route('/register')
+@main.route('/register', methods=['GET', 'POST'])
 def register():
+    if request.method == 'POST':
+        return auth_register(request)
     return render_template('register.html')
 
 @main.route('/')
@@ -61,11 +59,24 @@ def profile():
         return render_template('profile.html')
     return redirect(url_for('main.login'))
 
-@main.route('/user')
+@main.route('/user', methods=['GET', 'POST'])
 def user():
+    if 'username' not in session:
+        return redirect(url_for('main.login'))
+    
+    if request.method == 'POST':
+        return update_user_infos(request)
+        
     if 'username' in session:
         return render_template('user.html')
     return redirect(url_for('main.login'))
+
+@main.route('/change-password', methods=['POST'])
+def update_password():
+    if 'username' not in session:
+        return redirect(url_for('main.login'))
+    return change_password(request)
+
 
 @main.app_errorhandler(404)
 def page_not_found(e):
