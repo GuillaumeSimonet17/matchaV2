@@ -97,16 +97,22 @@ class Model:
         return True
     
     @classmethod
-    def update_mass(self, changes:dict[str, Any], ids: [int]) -> bool:
+    def update_mass(cls, changes:dict[str, Any], ids: [int]) -> bool:
         for k in changes.keys():
-            if k not in self.column_names:
-                raise NotFound(f'Column name {k} is not in columns of {self.table_name}')
+            if k not in cls.column_names:
+                raise NotFound(f'Column name {k} is not in columns of {cls.table_name}')
         set_clause = ', '.join([f"{key} = %s" for key in changes.keys() if key != 'id'])
-        query = f"UPDATE {self.table_name} SET {set_clause} WHERE id IN ({', '.join(str(id) for id in ids)});"
+        query = f"UPDATE {cls.table_name} SET {set_clause} WHERE id IN ({', '.join(str(id) for id in ids)});"
         values = tuple([v for k, v in changes.items() if k != 'id'])
         print('values = ', values)
         db.execute(query, values, False)
         return True
+    
+    @classmethod
+    def mark_as_read(cls, ids: [int]):
+        ids_str = ', '.join(map(str, ids))
+        query = f"UPDATE {cls.table_name} SET read = TRUE WHERE id IN ({ids_str});"
+        db.execute(query, fetch=False)
 
     # ------------------------------------ DELETE
     def delete(self):

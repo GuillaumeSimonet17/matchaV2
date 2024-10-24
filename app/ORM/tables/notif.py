@@ -40,5 +40,12 @@ class Notif(Model):
         return [cls(**results)]
 
     @classmethod
-    def find_notifs_by_user(cls, receiver_id: int, columns: list[str] = None):
+    def find_notifs_by_user(cls, receiver_id: int):
         return cls.find_x_by_y_id('receiver_id', receiver_id)
+
+    @classmethod
+    def mark_notifs_by_user_id_as_read(cls, user_id: int):
+        notifs = cls.find_notifs_by_user(user_id)
+        unread_notifs_ids = [notif.id for notif in notifs if not notif.read]
+        if unread_notifs_ids:
+            cls.mark_as_read(unread_notifs_ids)
