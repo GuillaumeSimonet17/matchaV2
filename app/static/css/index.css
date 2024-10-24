@@ -30,5 +30,6 @@ nav .active {
 
 .my-msg {
     background: var(--bs-secondary);
-    color: #171717 !important    ;
+    color: #171717 !important;
+    border-radius: 8px;
 }

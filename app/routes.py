@@ -18,7 +18,7 @@ def login():
 
     if request.method == 'GET':
         if 'username' in session:
-            return render_template('search.html')
+            return redirect(url_for('main.home'))
         return render_template('login.html')
 
 @main.route('/logout')
