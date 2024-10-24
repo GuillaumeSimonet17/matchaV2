@@ -10,10 +10,6 @@ class Model:
     # ------------------------------------ CREATE
     def create(self):
         if self.table_name == 'app_user':
-            # if 'id' in self.__dict__:
-            #     del self.__dict__['id']
-            # if 'created_at' in self.__dict__:
-            #     del self.__dict__['created_at']
             if 'fame_rate' in self.__dict__:
                 del self.__dict__['fame_rate']
         attrs = {key: value for key, value in self.__dict__.items() if key not in ['id', 'created_at']}
@@ -21,8 +17,12 @@ class Model:
         placeholders = ', '.join(['%s'] * len(attrs))
         query = f"INSERT INTO {self.table_name} ({columns}) VALUES ({placeholders}) RETURNING id;"
         values = tuple(attrs.values())
-        res = db.execute(query, values)
-        return res[0]
+        try:
+            res = db.execute(query, values)
+            return res[0]
+        except Exception as e:
+            print('Error while creating table:', e)
+            raise e
 
     # ------------------------------------ READ
     @classmethod
@@ -37,7 +37,10 @@ class Model:
     def get_all_values(cls, columns: list[str] = None) -> tuple:
         columns = cls.get_all_column_names(columns)
         query = f"SELECT {', '.join(columns)} FROM {cls.table_name}"
-        return db.execute(query)
+        try:
+            return db.execute(query)
+        except Exception as e:
+            raise e
     
     @classmethod
     def get_dicts_by_res(cls, res, columns: list[str] = None) -> list[dict[str, Any]]:
@@ -53,17 +56,22 @@ class Model:
     def get_all_dicts(cls, columns: list[str] = None) -> list[dict[str, Any]]:
         columns = cls.get_all_column_names(columns)
         res = cls.get_all_values(columns)
-        datas = cls.get_dicts_by_res(res, columns)
-        return datas
+        if res:
+            datas = cls.get_dicts_by_res(res, columns)
+            return datas
 
     @classmethod
     def get_values_by_id(cls, id: int, columns: list[str] = None) -> tuple:
         columns = cls.get_all_column_names(columns)
         query = f"SELECT {', '.join(columns)} FROM {cls.table_name} WHERE id = %s;"
-        res = db.execute(query, (id,))
-        if not res:
-            raise NotFound(f'id {id} not found')
-        return res[0]
+        try:
+            res = db.execute(query, (id,))
+            if res:
+                return res[0]
+        except Exception as e:
+            print(f"An error occurred: {e}")
+            raise e
+        raise NotFound(f'id {id} not found in {cls.table_name}')
 
     @classmethod
     def get_dict_by_id(cls, id: int, columns: list[str] = None) -> dict[str, Any]:
@@ -79,11 +87,14 @@ class Model:
         columns = cls.get_all_column_names(columns)
         query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
                  f"WHERE {y_name} = {y_id};")
-        res = db.execute(query)
-        if not res:
-            return None
-        datas = cls.get_dicts_by_res(res, columns)
-        return [cls(**row) for row in datas]
+        try:
+            res = db.execute(query)
+            if res:
+                datas = cls.get_dicts_by_res(res, columns)
+                return [cls(**row) for row in datas]
+        except Exception as e:
+            raise NotFound(f'id {id} not found in {cls.table_name}')
+        return None
 
     # ------------------------------------ UPDATE
     def update(self, changes:dict[str, Any]) -> bool:
@@ -93,8 +104,12 @@ class Model:
         set_clause = ', '.join([f"{key} = %s" for key in changes.keys() if key != 'id'])
         query = f"UPDATE {self.table_name} SET {set_clause} WHERE id = %s;"
         values = tuple([v for k, v in changes.items() if k != 'id']) + (self.id,)
-        db.execute(query, values, False)
-        return True
+        try:
+            db.execute(query, values, False)
+            return True
+        except Exception as e:
+            print(f"An error occurred when updating: {e}")
+            raise e
     
     @classmethod
     def update_mass(cls, changes:dict[str, Any], ids: [int]) -> bool:
@@ -104,25 +119,40 @@ class Model:
         set_clause = ', '.join([f"{key} = %s" for key in changes.keys() if key != 'id'])
         query = f"UPDATE {cls.table_name} SET {set_clause} WHERE id IN ({', '.join(str(id) for id in ids)});"
         values = tuple([v for k, v in changes.items() if k != 'id'])
-        print('values = ', values)
-        db.execute(query, values, False)
-        return True
+        try:
+            db.execute(query, values, False)
+            return True
+        except Exception as e:
+            print(f"An error occurred when updating in mass: {e}")
+            raise e
     
     @classmethod
     def mark_as_read(cls, ids: [int]):
         ids_str = ', '.join(map(str, ids))
         query = f"UPDATE {cls.table_name} SET read = TRUE WHERE id IN ({ids_str});"
-        db.execute(query, fetch=False)
+        try:
+            db.execute(query, fetch=False)
+        except Exception as e:
+            print(f"An error occurred when marking as read: {e}")
+            raise e
 
     # ------------------------------------ DELETE
     def delete(self):
         query = f"DELETE FROM {self.table_name} WHERE id = %s;"
-        db.execute(query, (self.id,), False)
-        return True
+        try:
+            db.execute(query, (self.id,), False)
+            return True
+        except Exception as e:
+            print(f"An error occurred when deleting: {e}")
+            raise e
     
     @classmethod
     def delete_mass(cls, ids: [int]):
         query = f"DELETE FROM {cls.table_name} WHERE id IN ({', '.join(str(id) for id in ids)});"
-        print(query)
-        db.execute(query, fetch=False)
-        return True
+        try:
+            db.execute(query, fetch=False)
+            return True
+        except Exception as e:
+            print(f"An error occurred when deleting in mass: {e}")
+            raise e
+

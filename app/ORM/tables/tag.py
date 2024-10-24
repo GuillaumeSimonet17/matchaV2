@@ -6,6 +6,7 @@ class Tag(Model):
     table_name = 'tag'
     column_names = ['id', 'name']
 
+
     def __init__(self, id, name):
         self.id = id
         self.name = name
@@ -15,19 +16,21 @@ class Tag(Model):
     def _all(cls):
         try:
             results = cls.get_all_dicts()
-            return [cls(**row) for row in results]
+            if results:
+                return [cls(**row) for row in results]
         except Exception as e:
-            print(f"Erreur dans la methode all de User: {e}")
-            return None
+            raise e
+        return None
         
     @classmethod
     def _find_by_id(cls, id):
         try:
             res = cls.get_dict_by_id(id)
-            return cls(**res)
+            if res:
+                return cls(**res)
         except Exception as e:
-            print(f"Erreur dans la methode find_by_id de Notif: {e}")
-            return None
+            raise e
+        return None
     
 
 class UserTag(Model):

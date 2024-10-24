@@ -15,8 +15,6 @@ class Friendship(Model):
         self.receiver_id = receiver_id
         self.created_at = created_at
 
-    
-    
 
     @classmethod
     def select_where_and(cls, state: str, user_id: int, columns: list[str] = None):
@@ -25,11 +23,14 @@ class Friendship(Model):
         columns = cls.get_all_column_names(columns)
         query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
                  f"WHERE state = {state} and receiver_id = {user_id} ;")
-        res = db.execute(query)
-        if not res:
-            return None
-        datas = cls.get_dicts_by_res(res, columns)
-        return [cls(**row) for row in datas]
+        try:
+            res = db.execute(query)
+            if res:
+                datas = cls.get_dicts_by_res(res, columns)
+                return [cls(**row) for row in datas]
+        except Exception as e:
+            raise e
+        return None
 
     # --- pending ---
     @classmethod
@@ -54,31 +55,44 @@ class Friendship(Model):
         query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
                  f"WHERE state = {state} "
                  f"and (receiver_id = {user_id} or sender_id = {user_id});")
-        res = db.execute(query)
-        if not res:
-            return None
-        datas = cls.get_dicts_by_res(res, columns)
-        return [cls(**row) for row in datas]
-
+        try:
+            res = db.execute(query)
+            if res:
+                datas = cls.get_dicts_by_res(res, columns)
+                return [cls(**row) for row in datas]
+        except Exception as e:
+            raise e
+        return None
+    
     @classmethod
     def get_friendship_by_user_ids(cls, user_ids: list[int], columns: list[str] = None):
         if len(user_ids) != 2:
             raise ValueError("It has to be 2 user_ids.")
+        columns = cls.get_all_column_names(columns)
         user1_id, user2_id = user_ids
         query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
                  "WHERE (sender_id = %s AND receiver_id = %s) "
                  "OR (sender_id = %s AND receiver_id = %s);")
-        res = db.execute(query, (user1_id, user2_id, user2_id, user1_id))
-        return cls(**res[0])
+        try:
+            res = db.execute(query, (user1_id, user2_id, user2_id, user1_id))
+            if res:
+                return cls(**res[0])
+        except Exception as e:
+            raise e
+        return None
 
     @classmethod
     def update_friendship_by_user_ids(cls, state: str, user_ids: list[int]):
         if len(user_ids) != 2:
             raise ValueError("It has to be 2 user_ids.")
         friendship = cls.get_friendship_by_user_ids(user_ids)
-        query = (f"UPDATE {cls.table_name} SET state = {state} "
-                 f"WHERE id IN {friendship.id}")
-        res = db.execute(query)
-        if not res:
-            return None
-        return True
+        if friendship:
+            query = (f"UPDATE {cls.table_name} SET state = {state} "
+                     f"WHERE id IN {friendship.id}")
+            try:
+                res = db.execute(query)
+                if res:
+                    return True
+            except Exception as e:
+                raise e
+        return None

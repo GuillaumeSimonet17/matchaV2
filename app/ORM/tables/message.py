@@ -26,11 +26,14 @@ class Message(Model):
         columns = cls.get_all_column_names(columns)
         query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
                  f"WHERE channel_id = {channel_id} and receiver_id = {receiver_id} ;")
-        messages = db.execute(query)
-        if not messages:
-            return None
-        datas = cls.get_dicts_by_res(messages, columns)
-        return [cls(**row) for row in datas]
+        try:
+            messages = db.execute(query)
+            if messages:
+                datas = cls.get_dicts_by_res(messages, columns)
+                return [cls(**row) for row in datas]
+        except Exception as e:
+            raise e
+        return None
 
     @classmethod
     def mark_messages_as_read(cls, channel_id: int, receiver_id: int):
@@ -48,10 +51,11 @@ class Message(Model):
         query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
                  f"WHERE channel_id = {channel_id} "
                  f"ORDER BY created_at DESC LIMIT 1;")
-        res = db.execute(query)
-        if not res:
-            return None
-        data = cls.get_dicts_by_res(res, columns)
-        return cls(**data[0])
-
-    
+        try:
+            res = db.execute(query)
+            if res:
+                data = cls.get_dicts_by_res(res, columns)
+                return cls(**data[0])
+        except Exception as e:
+            raise e
+        return None

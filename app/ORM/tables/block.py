@@ -1,5 +1,5 @@
-from app.app import Model
-from app.app import db
+from ORM.database import db
+from ORM.model import Model
 
 
 class Block(Model):
@@ -18,7 +18,11 @@ class Block(Model):
     def find_block(cls, sender_id: int, receiver_id: int):
         query = (f"SELECT id FROM {cls.table_name} "
                  f"WHERE sender_id = {sender_id} and receiver_id = {receiver_id};")
-        res = db.execute(query)
-        if not res:
-            return None
-        return True
+        try:
+            res = db.execute(query)
+            if res:
+                return True
+        except Exception as e:
+            raise e
+        return None
+        

@@ -1,4 +1,4 @@
-from app.app import Model
+from ORM.model import Model
 
 
 class User(Model):
@@ -23,21 +23,24 @@ class User(Model):
         self.fame_rate = fame_rate
         self.created_at = created_at
 
+
     # ------------------------------------ READ
     @classmethod
     def _all(cls):
         try:
             results = cls.get_all_dicts()
-            return [cls(**row) for row in results]
+            if results:
+                return [cls(**row) for row in results]
         except Exception as e:
-            print(f"Erreur dans la methode all de User: {e}")
-            return None
+            raise e
+        return None
 
     @classmethod
     def _find_by_id(cls, id):
         try:
             res = cls.get_dict_by_id(id)
-            return cls(**res)
+            if res:
+                return cls(**res)
         except Exception as e:
-            print(f"Erreur dans la methode find_by_id de User: {e}")
-            return None
+            raise e
+        return None

@@ -1,5 +1,5 @@
-from app.app import Model
-from app.app import db
+from ORM.database import db
+from ORM.model import Model
 
 
 class Channel(Model):
@@ -12,6 +12,7 @@ class Channel(Model):
         self.user_a = user_a
         self.user_b = user_b
         self.created_at = created_at
+
 
     # ------------------------------------ READ
     @classmethod
@@ -39,19 +40,25 @@ class Channel(Model):
         columns = cls.get_all_column_names(columns)
         query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
                  f"WHERE user_a = {user_id} or user_b = {user_id};")
-        res = db.execute(query)
-        if not res:
-            return None
-        datas = cls.get_dicts_by_res(res, columns)
-        return [cls(**row) for row in datas]
+        try:
+            res = db.execute(query)
+            if res:
+                datas = cls.get_dicts_by_res(res, columns)
+                return [cls(**row) for row in datas]
+        except Exception as e:
+            raise e
+        return None
 
     @classmethod
     def find_channel_by_user_ids(cls, user_1: int, user_2: int):
         query = (f"SELECT id FROM {cls.table_name} WHERE "
                  f"(user_a = {user_1} or user_a = {user_2}) "
                  f"and (user_b = {user_1} or user_b = {user_2});")
-        res = db.execute(query)
-        if not res:
-            return None
-        results = cls.get_dict_by_id(res[0])
-        return [cls(**results)]
+        try:
+            res = db.execute(query)
+            if res:
+                results = cls.get_dict_by_id(res[0])
+                return cls(**results)
+        except Exception as e:
+            raise e
+        return None
