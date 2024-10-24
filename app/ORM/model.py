@@ -1,6 +1,6 @@
 from typing import Any
 from werkzeug.exceptions import NotFound
-from app.app import db
+from ORM.database import db
 
 
 class Model:
@@ -73,6 +73,17 @@ class Model:
         for idx, col_name in enumerate(columns):
             data[col_name] = res[idx]
         return data
+    
+    @classmethod
+    def find_x_by_y_id(cls, y_name:str, y_id: int, columns: list[str] = None):
+        columns = cls.get_all_column_names(columns)
+        query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
+                 f"WHERE {y_name} = {y_id};")
+        res = db.execute(query)
+        if not res:
+            return None
+        datas = cls.get_dicts_by_res(res, columns)
+        return [cls(**row) for row in datas]
 
     # ------------------------------------ UPDATE
     def update(self, changes:dict[str, Any]) -> bool:

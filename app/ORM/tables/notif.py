@@ -1,5 +1,5 @@
-from app.app import Model
-from app.app import db
+from ORM.database import db
+from ORM.model import Model
 
 
 class Notif(Model):
@@ -41,11 +41,4 @@ class Notif(Model):
 
     @classmethod
     def find_notifs_by_user(cls, receiver_id: int, columns: list[str] = None):
-        columns = cls.get_all_column_names(columns)
-        query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
-                 f"WHERE receiver_id = {receiver_id};")
-        res = db.execute(query)
-        if not res:
-            return None
-        datas = cls.get_dicts_by_res(res, columns)
-        return [cls(**row) for row in datas]
+        return cls.find_x_by_y_id('receiver_id', receiver_id)

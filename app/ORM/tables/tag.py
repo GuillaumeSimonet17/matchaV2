@@ -43,13 +43,4 @@ class UserTag(Model):
 
     @classmethod
     def find_tags_by_user_id(cls, user_id: int, columns: list[str] = None):
-        if user_id is None:
-            raise ValueError('user_id cannot be None')
-        columns = cls.get_all_column_names(columns)
-        query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
-                 f"WHERE user_id = {user_id};")
-        res = db.execute(query)
-        if not res:
-            return None
-        datas = cls.get_dicts_by_res(res, columns)
-        return [cls(**row) for row in datas]
+        return cls.find_x_by_y_id('user_id', user_id)
