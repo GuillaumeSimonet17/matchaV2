@@ -1,168 +1,52 @@
 {% extends "index.html" %}
 {% block content %}
-    <section id="search" class="mb-5 {{ 'active' if request.path == '/' else '' }}">
-        <div class="m-0 p-0 container-fluid border border-dark rounded">
-            <form class="col-12 col-md-8 d-flex mb-4 mt-4 ">
-                <div class="pb-2 px-2 border-bottom border-secondary border-2 rounded col-12 col-md-8 d-flex justify-content-between">
-                    <div class="col-4 col-md-3 my-auto dropdown my-3">
-                        <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownFilters" data-bs-toggle="dropdown" aria-expanded="false">
-                            Filters
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownFilters">
-                            <li class="">
-                                <label for="customRange1" class="form-label">Example range</label>
-                                <input type="range" class="form-range" id="customRange1">
-                            </li>
-                            <li class="">
-                                <label for="customRange2" class="form-label">Example range</label>
-                                <input type="range" class="form-range" id="customRange2">
-                            </li>
-                        </ul>
-                    </div>
+<section id="search" class="mb-5 {{ 'active' if request.path == '/' else '' }}">
+    <div class="m-0 p-0 container-fluid border border-dark rounded">
+        <form class="col-12 col-md-8 d-flex mb-4 mt-4 ">
+            <div class="pb-2 px-2 border-bottom border-secondary border-2 rounded col-12 col-md-8 d-flex justify-content-between">
+                <div class="col-4 col-md-3 my-auto dropdown my-3">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownFilters"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        Filters
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownFilters">
+                        <li class="">
+                            <label for="customRange1" class="form-label">Example range</label>
+                            <input type="range" class="form-range" id="customRange1">
+                        </li>
+                        <li class="">
+                            <label for="customRange2" class="form-label">Example range</label>
+                            <input type="range" class="form-range" id="customRange2">
+                        </li>
+                    </ul>
+                </div>
 
-                    <div class="col-4 col-md-3 my-auto dropdown my-3">
-                      <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownOrder" data-bs-toggle="dropdown" aria-expanded="false">
+                <div class="col-4 col-md-3 my-auto dropdown my-3">
+                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownOrder"
+                            data-bs-toggle="dropdown" aria-expanded="false">
                         Ordered
-                      </button>
-                      <ul class="dropdown-menu" aria-labelledby="dropdownFilters">
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownFilters">
                         <li><a class="dropdown-item" href="#">Action</a></li>
                         <li><a class="dropdown-item" href="#">Another action</a></li>
                         <li><a class="dropdown-item" href="#">Something else here</a></li>
-                      </ul>
-                    </div>
-
-                    <button class="col-4 col-md-3 my-auto btn btn-primary">Save</button>
+                    </ul>
                 </div>
-            </form>
-            <div class="row p-0 m-0 flex-row">
-                <div class="p-0 m-0 row flex-row">
-                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
-                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>
-                        <p class="m-0 mt-2 fw-bold">name</p>
-                    </a>
-                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
-                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>
-                        <p class="m-0 mt-2 fw-bold">name</p>
-                    </a>
-                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
-                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>
-                        <p class="m-0 mt-2 fw-bold">name</p>
-                    </a>
-                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
-                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>
-                        <p class="m-0 mt-2 fw-bold">name</p>
-                    </a>
-                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
-                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>
-                        <p class="m-0 mt-2 fw-bold">name</p>
-                    </a>
-                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
-                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>
-                        <p class="m-0 mt-2 fw-bold">name</p>
-                    </a>
-                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
-                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>
-                        <p class="m-0 mt-2 fw-bold">name</p>
-                    </a>
-                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
-                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>
-                        <p class="m-0 mt-2 fw-bold">name</p>
-                    </a>
-                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
-                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>
-                        <p class="m-0 mt-2 fw-bold">name</p>
-                    </a>
-                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
-                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>
-                        <p class="m-0 mt-2 fw-bold">name</p>
-                    </a>
-                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
-                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>
-                        <p class="m-0 mt-2 fw-bold">name</p>
-                    </a>
-                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
-                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>
-                        <p class="m-0 mt-2 fw-bold">name</p>
-                    </a>
-                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
-                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>
-                        <p class="m-0 mt-2 fw-bold">name</p>
-                    </a>
-                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
-                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>
-                        <p class="m-0 mt-2 fw-bold">name</p>
-                    </a>
-                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
-                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>
-                        <p class="m-0 mt-2 fw-bold">name</p>
-                    </a>
-                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
-                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>
-                        <p class="m-0 mt-2 fw-bold">name</p>
-                    </a>
-                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
-                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>
-                        <p class="m-0 mt-2 fw-bold">name</p>
-                    </a>
-                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
-                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>
-                        <p class="m-0 mt-2 fw-bold">name</p>
-                    </a>
-                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
-                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>
-                        <p class="m-0 mt-2 fw-bold">name</p>
-                    </a>
-                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
-                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>
-                        <p class="m-0 mt-2 fw-bold">name</p>
-                    </a>
-<!--                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">-->
-<!--                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>-->
-<!--                        <p class="m-0 mt-2 fw-bold">name</p>-->
-<!--                    </a>-->
-<!--                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">-->
-<!--                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>-->
-<!--                        <p class="m-0 mt-2 fw-bold">name</p>-->
-<!--                    </a>-->
-<!--                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">-->
-<!--                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>-->
-<!--                        <p class="m-0 mt-2 fw-bold">name</p>-->
-<!--                    </a>-->
-<!--                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">-->
-<!--                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>-->
-<!--                        <p class="m-0 mt-2 fw-bold">name</p>-->
-<!--                    </a>-->
-<!--                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">-->
-<!--                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>-->
-<!--                        <p class="m-0 mt-2 fw-bold">name</p>-->
-<!--                    </a>-->
-<!--                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">-->
-<!--                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>-->
-<!--                        <p class="m-0 mt-2 fw-bold">name</p>-->
-<!--                    </a>-->
-<!--                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">-->
-<!--                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>-->
-<!--                        <p class="m-0 mt-2 fw-bold">name</p>-->
-<!--                    </a>-->
-<!--                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">-->
-<!--                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>-->
-<!--                        <p class="m-0 mt-2 fw-bold">name</p>-->
-<!--                    </a>-->
-<!--                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">-->
-<!--                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>-->
-<!--                        <p class="m-0 mt-2 fw-bold">name</p>-->
-<!--                    </a>-->
-<!--                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">-->
-<!--                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>-->
-<!--                        <p class="m-0 mt-2 fw-bold">name</p>-->
-<!--                    </a>-->
-<!--                    <a href="/profile" class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">-->
-<!--                        <img class="card-img-top" src="../static/img/boat.png" alt="Card image cap"/>-->
-<!--                        <p class="m-0 mt-2 fw-bold">name</p>-->
-<!--                    </a>-->
 
-                </div>
+                <button class="col-4 col-md-3 my-auto btn btn-primary">Save</button>
+            </div>
+        </form>
+        <div class="row p-0 m-0 flex-row">
+            <div class="p-0 m-0 row flex-row">
+                {% for profile in all_profile %}
+                <a href="/profile/{{ profile.id }}"
+                   class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
+                    <img class="card-img-top" src="{{ profile.image }}" alt="{{ profile.username }}'s profile image"/>
+                    <p class="m-0 mt-2 fw-bold">{{ profile.username }}</p>
+                </a>
+                {% endfor %}
             </div>
         </div>
-    </section>
+    </div>
+</section>
 {% endblock %}
