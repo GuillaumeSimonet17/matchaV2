@@ -138,23 +138,26 @@ def auth_register(request):
             'gender': gender,
             'gender_pref': gender_pref,
         }
-        # print('data = ', data)
+
         user_id = create_user(data)
-        print('user_id = ', user_id)
-        create_tags(user_id, tags)
-        session['username'] = username
-        session['user_id'] = user_id
-        return redirect(url_for('main.home'))
+        if user_id:
+            create_tags(user_id, tags)
+            session['username'] = username
+            session['user_id'] = user_id
+            return redirect(url_for('main.home'))
+        flash('Username ou email déjà utilisé', 'danger')
+
     return render_template('register.html')
 
 def create_user(data):
     user = User(None, data['username'], data['last_name'], data['first_name'], data['age'], data['password'],
-                data['email'],
-                data['profile_image'], data['bio'], data['gender'], data['gender_pref'])
-    print('user => ', user)
-    cre = user.create()
-    print('cre = ', cre)
-    return cre
+                data['email'], data['profile_image'], data['bio'], data['gender'], data['gender_pref'])
+    try:
+        user_created = user.create()
+        return user_created
+    except Exception as e:
+        print(e)
+        return None
 
 def create_tags(user_id, tags):
     for tag in tags:
@@ -167,10 +170,8 @@ def auth_login(request):
     password = request.form['password']
     
     user = User._find_by_username(username)
-    print('user ici => ', user)
     if user:
-        hashed_password = generate_password_hash(password)
-        if check_password_hash(user.password, hashed_password):
+        if check_password_hash(user.password, password):
             session['username'] = username
             session['user_id'] = user.id
             return True
