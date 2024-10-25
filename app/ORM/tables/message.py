@@ -19,7 +19,7 @@ class Message(Model):
 
     @classmethod
     def find_messages_by_channel_id(cls, channel_id: int):
-        return cls.find_x_by_y_id('channel_id', channel_id)
+        return cls.find_x_by_y('channel_id', channel_id)
 
     @classmethod
     def find_receiver_messages_by_channel_id(cls, channel_id: int, receiver_id: int, columns: list[str] = None):

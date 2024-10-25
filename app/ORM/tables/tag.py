@@ -1,4 +1,3 @@
-from ORM.database import db
 from ORM.model import Model
 
 
@@ -46,4 +45,4 @@ class UserTag(Model):
 
     @classmethod
     def find_tags_by_user_id(cls, user_id: int, columns: list[str] = None):
-        return cls.find_x_by_y_id('user_id', user_id)
+        return cls.find_x_by_y('user_id', user_id)

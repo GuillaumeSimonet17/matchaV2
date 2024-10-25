@@ -2,7 +2,6 @@ from typing import Any
 from werkzeug.exceptions import NotFound
 from ORM.database import db
 
-
 class Model:
     table_name = ''
     column_names = None
@@ -16,7 +15,7 @@ class Model:
         query = f"INSERT INTO {self.table_name} ({columns}) VALUES ({placeholders}) RETURNING id;"
         values = tuple(attrs.values())
         try:
-            print('cest une blague frr == ', db)
+            print('DB == ', db)
             res = db.execute(query, values)
             return res[0]
         except Exception as e:
@@ -82,14 +81,19 @@ class Model:
         return data
     
     @classmethod
-    def find_x_by_y_id(cls, y_name:str, y_id: int, columns: list[str] = None):
+    def find_x_by_y(cls, y_name:str, y: int | str, columns: list[str] = None):
         columns = cls.get_all_column_names(columns)
         query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
-                 f"WHERE {y_name} = {y_id};")
+                 f"WHERE {y_name} = '{y}';")
+        print('query = ', query)
         try:
+            print('coucou=>', db)
             res = db.execute(query)
+            print('res=>', res)
+
             if res:
                 datas = cls.get_dicts_by_res(res, columns)
+                print('data = ', datas)
                 return [cls(**row) for row in datas]
         except Exception as e:
             raise NotFound(f'id {id} not found in {cls.table_name}')

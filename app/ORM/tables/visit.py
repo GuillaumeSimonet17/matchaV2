@@ -40,4 +40,4 @@ class Visit(Model):
 
     @classmethod
     def find_visits_by_user(cls, sender_id: int, columns: list[str] = None):
-        return cls.find_x_by_y_id('sender_id', sender_id)
+        return cls.find_x_by_y('sender_id', sender_id)

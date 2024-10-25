@@ -5,7 +5,7 @@ from ORM.database import db
 class Friendship(Model):
     table_name = 'friendship'
     column_names = ['id', 'state', 'sender_id', 'receiver_id', 'created_at']
-    possible_states = ['invitation',  'uninvitation', 'connection']
+    possible_states = ['invitation',  'uninvitation', 'connected']
 
 
     def __init__(self, id, state, sender_id, receiver_id, created_at=None):

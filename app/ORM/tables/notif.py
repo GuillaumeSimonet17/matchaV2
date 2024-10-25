@@ -47,7 +47,7 @@ class Notif(Model):
 
     @classmethod
     def find_notifs_by_user(cls, receiver_id: int):
-        return cls.find_x_by_y_id('receiver_id', receiver_id)
+        return cls.find_x_by_y('receiver_id', receiver_id)
 
     @classmethod
     def mark_notifs_by_user_id_as_read(cls, user_id: int):

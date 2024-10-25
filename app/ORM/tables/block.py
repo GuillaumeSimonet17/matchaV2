@@ -1,6 +1,5 @@
-from ORM.database import db
 from ORM.model import Model
-
+from ORM.database import db
 
 class Block(Model):
     table_name = 'block'
