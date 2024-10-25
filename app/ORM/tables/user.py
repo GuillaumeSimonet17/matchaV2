@@ -44,3 +44,15 @@ class User(Model):
         except Exception as e:
             raise e
         return None
+    
+    @classmethod
+    def _find_by_username(cls, username):
+        try:
+            res = cls.find_x_by_y('username', username, cls.column_names)
+            print('res =>', res)
+            if res:
+                return cls(**res)
+        except Exception as e:
+            print(e)
+            return None
+        return None
