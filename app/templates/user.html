@@ -1,10 +1,9 @@
 {% extends "index.html" %}
 {% block content %}
-<section id="user" class="mb-5 d-flex flex-column justify-content-center align-items-center
-    {{ 'active' if request.path == '/' else '' }}" style="min-height: 90vh">
-    <div class="d-flex col-12">
-        <form method="POST" enctype="multipart/form-data"
-              class="row col-12 col-md-8 d-flex justify-content-center align-items-center">
+<section id="user" class="mb-5 d-flex flex-column justify-content-center align-items-center h-100
+    {{ 'active' if request.path == '/' else '' }}">
+    <div class="row d-flex col-12">
+        <form method="POST" enctype="multipart/form-data" class="row col-12 col-md-8 d-flex justify-content-center align-items-center">
 
             <div class="col-12 col-md-5">
 
@@ -30,7 +29,7 @@
                 <!-- Age -->
                 <div class="mb-3">
                     <label for="age" class="form-label">Age</label>
-                    <input type="number" class="form-control" id="age" name="age" min="18" value="{{user.age}}">
+                    <input type="number" class="form-control" id="age" name="age" value="{{user.age}}">
                 </div>
 
                 <!-- Email -->
@@ -181,9 +180,7 @@
         </form>
 
 <!--        TODO : mettre tout en required -->
-
-        <form method="POST" action="/change-password"
-              class="row col-12 col-md-4 d-flex justify-content-center align-items-center">
+        <form method="POST" action="/change-password" class="row col-12 col-md-4 d-flex justify-content-center align-items-center">
             <div class="mb-3">
                 <label for="current_password" class="form-label">Current Password</label>
                 <input type="password" class="form-control" id="current_password" name="current_password">

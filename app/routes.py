@@ -12,7 +12,7 @@ from ORM.tables.friendship import Friendship
 main = Blueprint('main', __name__)
 
 
-def update_user_infos(request):
+def update_user_infos(request, user):
     # normalement dans le form j'ai toute les infos du user déjà entré
     # si un champ est vide : error
     # récup le user et check les modif
@@ -31,11 +31,12 @@ def update_user_infos(request):
     gender_pref = request.form.get('gender_pref')
     tags = request.form.getlist('tags')
     
+    print('TAGS ====', tags)
     # --------------- VERIFICATION DES INFOS ----------------------
     if username == '' or last_name == '' or first_name == '' or age == '' or email == '' or image == '' or bio == '' \
             or gender == '' or gender_pref == '' or tags == []:
         flash('Nan gros, t\'as pas compris... T\'as pas le droit à des valeurs null', 'danger')
-        return render_template('user.html')
+        return render_template('user.html', user=user)
     
     # --------------- INTERCEPTER MODIFICATIONS ----------------------
     user = User._find_by_username(username)
@@ -65,7 +66,7 @@ def update_user_infos(request):
         user.update(data)
         flash('C\'est carré : update infos', 'success')
     
-    return render_template('user.html')
+    return render_template('user.html', user=user)
 
 
 def change_password(request):
@@ -253,11 +254,13 @@ def user():
     if 'username' not in session:
         return redirect(url_for('main.login'))
 
-    if request.method == 'POST':
-        return update_user_infos(request)
-
     user = User._find_by_username(session['username'])
     user_tags = UserTag.find_tags_by_user_id(user.id)
+
+    if request.method == 'POST':
+        return update_user_infos(request, user=user)
+
+    print('=================================================', user)
     return render_template('user.html', user=user, user_tags=user_tags)
 
 @main.route('/change-password', methods=['POST'])
