@@ -219,8 +219,10 @@ def register():
 @main.route('/')
 def home():
     if 'username' in session:
+        filtered_profiles = False
         all_profiles = Profile._all()
-        filtered_profiles = [profile for profile in all_profiles if profile.id != session['user_id'][0]]
+        if all_profiles:
+            filtered_profiles = [profile for profile in all_profiles if profile.id != session['user_id'][0]]
         # filtrer ceux que j'ai block et qui m'ont block
         return render_template('search.html', filtered_profiles=filtered_profiles)
     return redirect(url_for('main.login'))
@@ -246,8 +248,9 @@ def chat():
 @main.route('/profile/<int:profile_id>')
 def profile(profile_id):
     if 'username' in session:
+        user_id = session['user_id'][0]
         profile = Profile._find_by_id(profile_id)
-        friendship = Friendship.get_friendship_by_user_ids([session['user_id'], profile_id])
+        friendship = Friendship.get_friendship_by_user_ids([user_id, profile_id])
         state, connected, recevied_invitation, sent_invitation = False
         if friendship:
             state = friendship.state

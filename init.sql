@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS user_tag (
     tag_id INTEGER,
     CONSTRAINT fk_user FOREIGN KEY(user_id) REFERENCES app_user(id) ON DELETE CASCADE,
     CONSTRAINT fk_tag FOREIGN KEY(tag_id) REFERENCES tag(id) ON DELETE CASCADE,
-    CONSTRAINT unique_friendship UNIQUE(user_id, tag_id)
+    CONSTRAINT unique_user_tag UNIQUE(user_id, tag_id)
 );
 
 INSERT INTO tag (name)

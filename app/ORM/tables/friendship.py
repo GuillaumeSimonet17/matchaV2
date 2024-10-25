@@ -69,12 +69,11 @@ class Friendship(Model):
         if len(user_ids) != 2:
             raise ValueError("It has to be 2 user_ids.")
         columns = cls.get_all_column_names(columns)
-        user1_id, user2_id = user_ids
         query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
-                 "WHERE (sender_id = %s AND receiver_id = %s) "
-                 "OR (sender_id = %s AND receiver_id = %s);")
+                 f"WHERE (sender_id = {user_ids[0]} AND receiver_id = {user_ids[1]}) "
+                 f"OR (sender_id = {user_ids[1]} AND receiver_id = {user_ids[0]});")
         try:
-            res = db.execute(query, (user1_id, user2_id, user2_id, user1_id))
+            res = db.execute(query)
             if res:
                 return cls(**res[0])
         except Exception as e:
