@@ -38,7 +38,7 @@
         </form>
         <div class="row p-0 m-0 flex-row">
             <div class="p-0 m-0 row flex-row">
-                {% for profile in all_profile %}
+                {% for profile in filtered_profiles %}
                 <a href="/profile/{{ profile.id }}"
                    class="col-12 col-md-4 card border-0 border-bottom p-2 d-flex justify-content-between m-0">
                     <img class="card-img-top" src="{{ profile.image }}" alt="{{ profile.username }}'s profile image"/>

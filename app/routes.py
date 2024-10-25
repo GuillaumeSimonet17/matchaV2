@@ -49,8 +49,6 @@ def update_user_infos(request, user, user_tag_ids, tags):
         if first_name != user.first_name:
             data['first_name'] = first_name
         if int(age)  != user.age:
-            print(f'age ={type(age)}|')
-            print(f'user.age ={type(user.age)}|')
             data['age'] = age
         if email != user.email:
             data['email'] = email
@@ -64,12 +62,10 @@ def update_user_infos(request, user, user_tag_ids, tags):
             data['gender_pref'] = gender_pref
         
         new_tags = []
-        print('tag_ids_selected = ', tag_ids_selected)
         for tag_id_selected in tag_ids_selected:
             if tag_id_selected not in user_tag_ids:
                 new_tags.append(tag_id_selected)
 
-        print('new_tags = ', new_tags)
         # TODO :
         # if new_tags:
             #update les tags : add new ones and delete old ones that not in new_tags
@@ -125,8 +121,6 @@ def auth_register(request):
     gender_pref = request.form.get('gender_pref')
     tags = request.form.getlist('tags[]')
     
-    print('request.form = ', request.form)
-    print('\n tag => ', tags)
     # --------------- VERIFICATION DES INFOS ----------------------
     if len(username) < 3:
         valid = False
@@ -220,15 +214,15 @@ def register():
     if request.method == 'POST':
         return auth_register(request)
     tags = Tag._all()
-    print('tags =====================>', tags)
     return render_template('register.html', tags=tags)
 
 @main.route('/')
 def home():
     if 'username' in session:
         all_profiles = Profile._all()
+        filtered_profiles = [profile for profile in all_profiles if profile.id != session['user_id'][0]]
         # filtrer ceux que j'ai block et qui m'ont block
-        return render_template('search.html', all_profiles=all_profiles)
+        return render_template('search.html', filtered_profiles=filtered_profiles)
     return redirect(url_for('main.login'))
 
 @main.route('/historic')

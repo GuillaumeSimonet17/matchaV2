@@ -87,7 +87,6 @@ class Model:
                  f"WHERE {y_name} = '{y}';")
         print('query = ', query)
         try:
-            print('coucou=>', db)
             res = db.execute(query)
             print('res=>', res)
 
