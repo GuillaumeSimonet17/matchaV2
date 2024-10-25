@@ -7,17 +7,16 @@ class Model:
     table_name = ''
     column_names = None
 
+
     # ------------------------------------ CREATE
     def create(self):
-        if self.table_name == 'app_user':
-            if 'fame_rate' in self.__dict__:
-                del self.__dict__['fame_rate']
         attrs = {key: value for key, value in self.__dict__.items() if key not in ['id', 'created_at']}
         columns = ', '.join(attrs.keys())
         placeholders = ', '.join(['%s'] * len(attrs))
         query = f"INSERT INTO {self.table_name} ({columns}) VALUES ({placeholders}) RETURNING id;"
         values = tuple(attrs.values())
         try:
+            print('cest une blague frr == ', db)
             res = db.execute(query, values)
             return res[0]
         except Exception as e:

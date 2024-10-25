@@ -20,14 +20,19 @@ app.config['POSTGRES_PASSWORD'] = os.getenv('POSTGRES_PASSWORD')
 app.config['POSTGRES_HOST'] = os.getenv('POSTGRES_HOST')
 app.config['POSTGRES_PORT'] = os.getenv('POSTGRES_PORT')
 
+app.config['UPLOAD_FOLDER'] = 'uploads/'
+app.config['ALLOWED_EXTENSIONS'] = {'jpg', 'jpeg', 'png', 'webp'}
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+
 init_db(app.config)
 
 from ORM.tables.user import User
 
-# usr1 = User(None, 'username1', 'last1', 'first1', '20', 'password1', 'email1', 'img', 'bio', 'gender', 'genderpref')
+usr1 = User(None, 'username1', 'last1', 'first1', '20', 'password1', 'email1', 'img', 'bio', 'gender', 'genderpref')
 # usr2 = User(None, 'username2', 'last2', 'first2', '20', 'password2', 'email2', 'img', 'bio', 'gender', 'genderpref')
 # usr3 = User(None, 'username3', 'last3', 'first3', '30', 'password3', 'email3', 'img', 'bio', 'gender', 'genderpref')
-# user1 = usr1.create()
+
+user1 = usr1.create()
 # user2 = usr2.create()
 # user3 = usr3.create()
 # print('usr2 = ', usr2)

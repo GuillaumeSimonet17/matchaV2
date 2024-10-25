@@ -24,15 +24,17 @@ class Database:
         else:
             return self.connection.commit()
 
-    def close(self):
-        self.cursor.close()
-        self.connection.close()
+    # def close(self):
+    #     self.cursor.close()
+    #     self.connection.close()
 
 
 db = None
 
 def init_db(config):
     global db
+    print('Initializing database')
     db = Database(config['POSTGRES_DB'], config['POSTGRES_USER'],
                   config['POSTGRES_PASSWORD'], config['POSTGRES_HOST'],
                   config['POSTGRES_PORT'])
+    return db

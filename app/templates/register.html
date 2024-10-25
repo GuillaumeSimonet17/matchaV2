@@ -3,7 +3,7 @@
 <div class="col-12 m-0 overflow-auto d-flex flex-column justify-content-center align-items-center">
     <h1>Register</h1>
 <!--    TODO : Tout mettre en required -->
-    <form method="POST" action="/register" class="row col-12 d-flex justify-content-center align-items-center">
+    <form method="POST" action="/register" enctype="multipart/form-data" class="row col-12 d-flex justify-content-center align-items-center">
 
         <div class="col-12 col-md-5">
             <!-- Username -->
@@ -47,7 +47,7 @@
             <!-- Profile Image -->
             <div class="mb-3">
                 <label for="profile_image" class="form-label">Profile Image</label>
-                <input type="file" class="form-control" id="profile_image" name="profile_image" accept="image/*"
+                <input type="file" class="form-control" id="profile_image" name="profile_image"
                        onchange="previewImage(event)">
             </div>
 

@@ -1,5 +1,13 @@
+import os
 from flask import flash, Blueprint, render_template, session, redirect, url_for, request, abort
+from werkzeug.security import generate_password_hash, check_password_hash
+from ORM.tables.user import User
+from ORM.tables.tag import UserTag
+from werkzeug.utils import secure_filename
 
+
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ['jpg', 'jpeg', 'png', 'webp']
 
 def auth_register(request):
     valid = True
@@ -12,30 +20,59 @@ def auth_register(request):
     password = request.form.get('password')
     confirm_password = request.form.get('confirm_password')
     email = request.form.get('email')
-    profile_image = request.files.get('profile_image')  # Pour un fichier uploadé
+    image = request.files.get('profile_image')
     bio = request.form.get('bio')
     gender = request.form.get('gender')
     gender_pref = request.form.get('gender_pref')
     tags = request.form.getlist('tags')
     
     # --------------- VERIFICATION DES INFOS ----------------------
-    if password != confirm_password:
-        valid = False
-        flash('T\'as pas mis les même mots de passe.. T\'es con enfaite ?', 'danger')
     if len(username) < 3:
         valid = False
         flash('Tu sais pas lire enfaite ? C\'est  3 lettres minimum le username...', 'danger')
-
+    if password != confirm_password:
+        valid = False
+        flash('T\'as pas mis les même mots de passe.. T\'es con enfaite ?', 'danger')
+    if image and allowed_file(image.filename):
+        filename = secure_filename(image.filename)
+        # image_data = image.read()
+        file_path = os.path.join('uploads/', filename)
+        image.save(file_path)
+    
     # --------------- CREATE USER OR DISPLAY ERROR MESSAGE ----------------------
     if valid == True:
+        hashed_password = generate_password_hash(password)
+
         data = {
             'username': username,
+            'password': hashed_password,
+            'last_name': last_name,
+            'first_name': first_name,
+            'age': age,
+            'email': email,
+            'profile_image': image.filename,
+            'bio': bio,
+            'gender': gender,
+            'gender_pref': gender_pref,
         }
-        create_user(data)
+        # print('data = ', data)
+        user_id = create_user(data)
+        print('user_id = ', user_id)
+        create_tags(user_id, tags)
         session['username'] = username
         return redirect(url_for('main.home'))
     return render_template('register.html')
-
-
+    
 def create_user(data):
-    pass
+    user = User(None, data['username'], data['last_name'], data['first_name'], data['age'], data['password'], data['email'],
+                data['profile_image'], data['bio'], data['gender'], data['gender_pref'])
+    print('user => ', user)
+    cre = user.create()
+    print('cre = ', cre)
+    return cre
+
+def create_tags(user_id, tags):
+    for tag in tags:
+        print('tag = ', tag)
+        user_tag = UserTag.create(user_id, tag)
+        user_tag.create()
