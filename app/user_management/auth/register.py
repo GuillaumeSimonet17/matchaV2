@@ -1,9 +1,10 @@
 import os
-from flask import flash, Blueprint, render_template, session, redirect, url_for, request, abort
-from werkzeug.security import generate_password_hash, check_password_hash
+from flask import flash, render_template, session, redirect, url_for
+from werkzeug.security import generate_password_hash
+from werkzeug.utils import secure_filename
+
 from ORM.tables.user import User
 from ORM.tables.tag import UserTag
-from werkzeug.utils import secure_filename
 
 
 def allowed_file(filename):
@@ -36,7 +37,7 @@ def auth_register(request):
     if image and allowed_file(image.filename):
         filename = secure_filename(image.filename)
         # image_data = image.read()
-        file_path = os.path.join('uploads/', filename)
+        file_path = os.path.join('../../uploads/', filename)
         image.save(file_path)
     
     # --------------- CREATE USER OR DISPLAY ERROR MESSAGE ----------------------
@@ -60,6 +61,7 @@ def auth_register(request):
         print('user_id = ', user_id)
         create_tags(user_id, tags)
         session['username'] = username
+        session['user_id'] = user_id
         return redirect(url_for('main.home'))
     return render_template('register.html')
     
