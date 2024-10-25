@@ -4,7 +4,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from werkzeug.utils import secure_filename
 
 from ORM.tables.user import User
-from ORM.tables.tag import UserTag
+from ORM.tables.tag import UserTag, Tag
 from ORM.views.profile import Profile
 from ORM.tables.friendship import Friendship
 
@@ -12,7 +12,7 @@ from ORM.tables.friendship import Friendship
 main = Blueprint('main', __name__)
 
 
-def update_user_infos(request, user):
+def update_user_infos(request, user, user_tag_ids, tags):
     # normalement dans le form j'ai toute les infos du user déjà entré
     # si un champ est vide : error
     # récup le user et check les modif
@@ -25,48 +25,63 @@ def update_user_infos(request, user):
     first_name = request.form.get('first_name')
     age = request.form.get('age')
     email = request.form.get('email')
-    image = request.files.get('profile_image')
+    # image = request.files.get('profile_image')
     bio = request.form.get('bio')
     gender = request.form.get('gender')
     gender_pref = request.form.get('gender_pref')
-    tags = request.form.getlist('tags')
-    
-    print('TAGS ====', tags)
+    tag_ids_selected = request.form.getlist('tags[]')
+
     # --------------- VERIFICATION DES INFOS ----------------------
-    if username == '' or last_name == '' or first_name == '' or age == '' or email == '' or image == '' or bio == '' \
-            or gender == '' or gender_pref == '' or tags == []:
+    # TODO : or image == ''
+    if username == '' or last_name == '' or first_name == '' or age == '' or email == ''  or bio == '' \
+            or gender == '' or gender_pref == '' or tag_ids_selected == []:
         flash('Nan gros, t\'as pas compris... T\'as pas le droit à des valeurs null', 'danger')
-        return render_template('user.html', user=user)
-    
+        return render_template('user.html', user=user, user_tag_ids=user_tag_ids, tags=tags)
+
     # --------------- INTERCEPTER MODIFICATIONS ----------------------
     user = User._find_by_username(username)
     if user:
         data = {}
         if username != user.username:
-            data['username'] = user.username
+            data['username'] = username
         if last_name != user.last_name:
-            data['last_name'] = user.last_name
+            data['last_name'] = last_name
         if first_name != user.first_name:
-            data['first_name'] = user.first_name
-        if age != user.age:
-            data['age'] = user.age
+            data['first_name'] = first_name
+        if int(age)  != user.age:
+            print(f'age ={type(age)}|')
+            print(f'user.age ={type(user.age)}|')
+            data['age'] = age
         if email != user.email:
-            data['email'] = user.email
-        if image != user.image:
-            data['profile_image'] = user.image
+            data['email'] = email
+        # if image != user.profile_image:
+        #     data['profile_image'] = image
         if bio != user.bio:
-            data['bio'] = user.bio
+            data['bio'] = bio
         if gender != user.gender:
-            data['gender'] = user.gender
+            data['gender'] = gender
         if gender_pref != user.gender_pref:
-            data['gender_pref'] = user.gender_pref
-        if tags != user.tags:
-            data['tags'] = tags
+            data['gender_pref'] = gender_pref
         
-        user.update(data)
-        flash('C\'est carré : update infos', 'success')
+        new_tags = []
+        print('tag_ids_selected = ', tag_ids_selected)
+        for tag_id_selected in tag_ids_selected:
+            if tag_id_selected not in user_tag_ids:
+                new_tags.append(tag_id_selected)
+
+        print('new_tags = ', new_tags)
+        # TODO :
+        # if new_tags:
+            #update les tags : add new ones and delete old ones that not in new_tags
+
+        if data:
+            user.update(data)
+            user = User._find_by_id(user.id)
+            flash('C\'est carré : update infos', 'success')
+        else:
+            flash('T\'as rien changé, tu vas pas nous la faire', 'danger')
     
-    return render_template('user.html', user=user)
+    return render_template('user.html', user=user, tags=tags, user_tag_ids=user_tag_ids)
 
 
 def change_password(request):
@@ -108,8 +123,10 @@ def auth_register(request):
     bio = request.form.get('bio')
     gender = request.form.get('gender')
     gender_pref = request.form.get('gender_pref')
-    tags = request.form.getlist('tags')
+    tags = request.form.getlist('tags[]')
     
+    print('request.form = ', request.form)
+    print('\n tag => ', tags)
     # --------------- VERIFICATION DES INFOS ----------------------
     if len(username) < 3:
         valid = False
@@ -160,10 +177,9 @@ def create_user(data):
         print(e)
         return None
 
-def create_tags(user_id, tags):
-    for tag in tags:
-        print('tag = ', tag)
-        user_tag = UserTag.create(user_id, tag)
+def create_tags(user_id, tag_ids):
+    for tag_id in tag_ids:
+        user_tag = UserTag(None, user_id, tag_id)
         user_tag.create()
 
 def auth_login(request):
@@ -203,7 +219,9 @@ def logout():
 def register():
     if request.method == 'POST':
         return auth_register(request)
-    return render_template('register.html')
+    tags = Tag._all()
+    print('tags =====================>', tags)
+    return render_template('register.html', tags=tags)
 
 @main.route('/')
 def home():
@@ -256,12 +274,12 @@ def user():
 
     user = User._find_by_username(session['username'])
     user_tags = UserTag.find_tags_by_user_id(user.id)
-
+    tags = Tag._all()
+    user_tag_ids = [tag.tag_id for tag in user_tags]
     if request.method == 'POST':
-        return update_user_infos(request, user=user)
+        return update_user_infos(request, user=user, user_tag_ids=user_tag_ids, tags=tags)
 
-    print('=================================================', user)
-    return render_template('user.html', user=user, user_tags=user_tags)
+    return render_template('user.html', user=user, user_tag_ids=user_tag_ids, tags=tags)
 
 @main.route('/change-password', methods=['POST'])
 def update_password():

@@ -30,7 +30,7 @@ class Tag(Model):
         except Exception as e:
             raise e
         return None
-    
+
 
 class UserTag(Model):
     table_name = 'user_tag'
@@ -41,7 +41,6 @@ class UserTag(Model):
         self.id = id
         self.user_id = user_id
         self.tag_id = tag_id
-
 
     @classmethod
     def find_tags_by_user_id(cls, user_id: int, columns: list[str] = None):

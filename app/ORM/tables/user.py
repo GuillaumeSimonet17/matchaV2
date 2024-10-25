@@ -49,7 +49,6 @@ class User(Model):
     def _find_by_username(cls, username):
         try:
             res = cls.find_x_by_y('username', username, cls.column_names)
-            print('res =>', res)
             if res:
                 usr = res[0]
                 print(usr)
