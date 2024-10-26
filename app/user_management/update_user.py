@@ -81,6 +81,7 @@ def change_password(request):
     new_password = request.form.get('new_password')
     confirm_password = request.form.get('confirm_password')
     if current_password == '' or new_password == '' or confirm_password == '':
+        flash('T\'as pas tout rentré, tu vas pas nous la faire', 'danger')
         return False
     if confirm_password == new_password:
         user = User._find_by_username(session['username'])
