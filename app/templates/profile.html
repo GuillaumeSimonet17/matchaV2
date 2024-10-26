@@ -1,22 +1,29 @@
 {% extends "index.html" %}
 {% block content %}
-<section id="profile" class="mb-5 d-flex flex-column justify-content-center align-items-center{{ 'active' if request.path == '/' else '' }}">
-    <div class="mt-3 row d-flex col-12 border">
+<section id="profile"
+         class="mb-5 d-flex flex-column justify-content-center align-items-center{{ 'active' if request.path == '/' else '' }}">
+    <div class="mt-3 p-2 row d-flex col-12">
         <h2 class="pt-3">{{ profile.username }}</h2>
-        <div class="col-12 col-md-6 border">
+        <div class="col-12 col-md-6">
             <img class="img-fluid" src="data:image/png;base64, {{ profile_image_data }}" alt="Profile Image">
         </div>
-        <div class="col-12 col-md-6 border">
-            <div class="pt-2 ps-2">
-                <p><strong>First Name:</strong> {{ profile.first_name }}</p>
-                <p><strong>Last Name:</strong> {{ profile.last_name }}</p>
-                <p><strong>Age:</strong> {{ profile.age }}</p>
-                <p><strong>Gender:</strong> {{ profile.gender }}</p>
-                <p><strong>Preferred Gender:</strong> {{ profile.gender_pref }}</p>
+        <div class="col-12 col-md-6">
+            <div class="pt-2">
+                <p>{{ profile.first_name }} {{ profile.last_name }}</p>
+                <p>{{ profile.age }} ans</p>
+                <p>{{ profile.gender }}</p>
+                <p><strong>Search:</strong> {{ profile.gender_pref }}</p>
                 <p><strong>Bio:</strong> {{ profile.bio }}</p>
                 <p><strong>Fame Rate:</strong> {{ profile.fame_rate }}</p>
             </div>
+
             <div class="col-12">
+                {% for tag in user_tags %}
+                <p class="fw-bold bg-primary border border-primary rounded p-1 px-2 d-inline-block" >{{ tag.name }}</p>
+                {% endfor %}
+            </div>
+
+            <div class="col-12 mt-2">
                 {% if not friendship %}
                 <button class="btn btn-outline-primary col-2 col-md-1" type="button"><i class="bi bi-heart"></i>
                 </button>

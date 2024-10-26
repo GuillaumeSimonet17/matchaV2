@@ -75,5 +75,4 @@ class User(Model):
     def get_profile_image(cls, user_id):
         query = "SELECT profile_image FROM app_user WHERE id = %s;"
         image_data = db.execute(query, (user_id,))
-        print('image_data', image_data)
         return base64.b64encode(image_data[0][0]).decode('utf-8')
