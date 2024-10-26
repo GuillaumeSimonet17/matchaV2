@@ -8,6 +8,7 @@ from ORM.tables.user import User
 from ORM.tables.tag import UserTag, Tag
 from ORM.views.profile import Profile
 from ORM.tables.friendship import Friendship
+from ORM.tables.notif import Notif
 
 
 main = Blueprint('main', __name__)
@@ -53,10 +54,7 @@ def home():
                 if isinstance(user_id, tuple):
                     user_id = session['user_id'][0]
                 if profile.id != user_id:
-                    # Charge l'image du profil en base64
-                    image_data = Profile.get_profile_image(profile.id)  # Récupère l'image en bytes
-                    
-                    # Ajoute les données préparées pour le rendu
+                    image_data = Profile.get_profile_image(profile.id)
                     filtered_profiles.append({
                         'id': profile.id,
                         'username': profile.username,
@@ -74,7 +72,21 @@ def historic():
 @main.route('/notifs')
 def notifs():
     if 'username' in session:
-        return render_template('notifs.html')
+        
+        user_id = session['user_id']
+        if isinstance(user_id, tuple):
+            user_id = session['user_id'][0]
+        notifs = Notif.find_notifs_by_user(user_id)
+        notifs_list = []
+        if notifs:
+            for notif in notifs:
+                sender = Profile._find_by_id(notif.sender_id)
+                notifs_list.append({
+                    'sender': sender,
+                    'state': notif.state,
+                    'date': notif.date,
+                })
+        return render_template('notifs.html', notifs_list=notifs_list)
     return redirect(url_for('main.login'))
 
 @main.route('/chat')
@@ -91,7 +103,7 @@ def profile(profile_id):
         profile = Profile._find_by_id(profile_id)
         profile_image_data = User.get_profile_image(profile.id)
         user_tag_ids = UserTag.find_tags_by_user_id(profile.id)
-        print('userr_tags = ', user_tag_ids)
+
         user_tags = []
         for tag in user_tag_ids:
             user_tags.append(Tag._find_by_id(tag.id))
@@ -133,7 +145,6 @@ def update_password():
     if 'username' not in session:
         return redirect(url_for('main.login'))
     change_password(request)
-    print('ooooo\n')
     return redirect(url_for('main.user'))
 
 @main.app_errorhandler(404)
