@@ -84,7 +84,7 @@ def notifs():
                 notifs_list.append({
                     'sender': sender,
                     'state': notif.state,
-                    'date': notif.date,
+                    'date': notif.created_at.strftime('%Y-%m-%d %H:%M'),
                 })
         return render_template('notifs.html', notifs_list=notifs_list)
     return redirect(url_for('main.login'))
@@ -98,7 +98,9 @@ def chat():
 @main.route('/profile/<int:profile_id>')
 def profile(profile_id):
     if 'username' in session:
-        user_id = session['user_id'][0]
+        user_id = session['user_id']
+        if isinstance(user_id, tuple):
+            user_id = session['user_id'][0]
 
         profile = Profile._find_by_id(profile_id)
         profile_image_data = User.get_profile_image(profile.id)

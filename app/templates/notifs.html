@@ -11,43 +11,14 @@
                 <i class="bi bi-x-lg"></i>
             </button>
             <div class="ms-5  col-10 col-md-6">
-                <p class="mb-1"><a href="/profile">{{notif.sender.username}}</a>{{notif.state}}</p>
-                <p class="m-0 text-muted">{{notif.create_date}}</p>
+                <p class="mb-1"><a href="/profile/{{notif.sender.id}}">{{notif.sender.username}}</a> sent you a {{notif.state}}</p>
+                <p class="m-0 text-muted">{{notif.date}}</p>
             </div>
         </div>
         {% endfor %}
         {% else %}
         <p class="d-flex justify-content-center">Aucune notifications</p>
         {% endif %}
-
-
-        <div class="ms-3 mb-4 border-0 border-bottom col-10 justify-content-between d-flex align-items-center">
-            <button class="btn btn-outline-primary col-2 col-md-2" type="button">
-                <i class="bi bi-x-lg"></i>
-            </button>
-            <div class="ms-5 col-10 col-md-6">
-                <p class="mb-1"><a href="/profile">Pagbo</a> send you a message</p>
-                <p class="m-0 text-muted">Yesterday - 9pm</p>
-            </div>
-        </div>
-        <div class="ms-3 mb-4 border-0 border-bottom col-10 justify-content-between d-flex align-items-center">
-            <button class="btn btn-outline-primary col-2 col-md-2" type="button">
-                <i class="bi bi-x-lg"></i>
-            </button>
-            <div class="ms-5  col-10 col-md-6">
-                <p class="mb-1"><a href="/profile">Pagbo</a> views your profile</p>
-                <p class="m-0 text-muted">Yesterday - 9pm</p>
-            </div>
-        </div>
-        <div class="ms-3 mb-4 border-0 border-bottom col-10 justify-content-between d-flex align-items-center">
-            <button class="btn btn-outline-primary col-2 col-md-2" type="button">
-                <i class="bi bi-x-lg"></i>
-            </button>
-            <div class="ms-5  col-10 col-md-6">
-                <p class="mb-1"><a href="/profile">Pagbo</a> and you are now connected</p>
-                <p class="m-0 text-muted">Yesterday - 9pm</p>
-            </div>
-        </div>
     </div>
 </section>
 {% endblock %}
