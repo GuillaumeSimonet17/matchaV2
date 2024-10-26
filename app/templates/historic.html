@@ -1,28 +1,25 @@
 {% extends "index.html" %}
 {% block content %}
-    <section id="historic" class="mt-5 col-12 col-md-7 justify-content-center {{ 'active' if request.path == '/historic' else '' }}"
-        style="min-height: 90vh">
-        <div class="container-fluid d-flex justify-content-center border border-dark rounded pt-3">
-            <div class="row flex-column col-12">
-                <div class="mb-4 border-0 border-bottom col-12 justify-content-between d-flex align-items-center">
-                    <a href="/profile" class="mb-1">Pagbo</a>
-                    <p class="m-0 text-muted">Yesterday - 9pm</p>
-                </div>
-                <div class="mb-4 border-0 border-bottom col-12 justify-content-between d-flex align-items-center">
-                    <a href="/profile" class="mb-1">Voilier</a>
-                    <p class="m-0 text-muted">Yesterday - 9pm</p>
-                </div>
-                <div class="mb-4 border-0 border-bottom col-12 justify-content-between d-flex align-items-center">
-                    <a href="/profile" class="mb-1">Pagbo</a>
-                    <p class="m-0 text-muted">Yesterday - 9pm</p>
-                </div>
-                <div class="mb-4 border-0 border-bottom col-12 justify-content-between d-flex align-items-center">
-                    <a href="/profile" class="mb-1">Barque</a>
-                    <p class="m-0 text-muted">Yesterday - 9pm</p>
-                </div>
+<section id="historic"
+         class="mt-5 col-12 col-md-7 justify-content-center {{ 'active' if request.path == '/historic' else '' }}"
+         style="min-height: 90vh">
+    <div class="container-fluid d-flex justify-content-center border border-dark rounded pt-3">
+        <div class="row flex-column col-12">
+
+            {% if visits_list %}
+            {% for visit in visits_list %}
+            <div class="mb-4 border-0 border-bottom col-12 justify-content-between d-flex align-items-center">
+                <p class="mb-1"><a href="/profile/{{visit.receiver.id}}">{{visit.receiver.username}}</a></p>
+                    <p class="m-0 text-muted">{{visit.date}}</p>
             </div>
+
+            {% endfor %}
+            {% else %}
+            <p class="d-flex justify-content-center">Aucun historique</p>
+            {% endif %}
         </div>
-    </section>
+    </div>
+</section>
 {% endblock %}
 
 
