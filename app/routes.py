@@ -1,7 +1,9 @@
 import os
 from flask import Blueprint, flash, request, render_template, session, redirect, url_for
 from werkzeug.security import generate_password_hash, check_password_hash
-from werkzeug.utils import secure_filename
+
+from user_management.auth.login import auth_login
+from user_management.auth.register import auth_register, allowed_file
 
 from ORM.tables.user import User
 from ORM.tables.tag import UserTag, Tag
@@ -105,102 +107,6 @@ def change_password(request):
         flash('Tu sais pas écrire enfaite ? confirm_password ne correspond pas avec new_password', 'danger')
     return redirect(url_for('main.user'))
 
-def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ['jpg', 'jpeg', 'png', 'webp']
-
-def auth_register(request):
-    valid = True
-    
-    # --------------- RECUPERATION DES INFOS ----------------------
-    username = request.form.get('username')
-    last_name = request.form.get('last_name')
-    first_name = request.form.get('first_name')
-    age = request.form.get('age')
-    password = request.form.get('password')
-    confirm_password = request.form.get('confirm_password')
-    email = request.form.get('email')
-    image = request.files.get('profile_image')
-    bio = request.form.get('bio')
-    gender = request.form.get('gender')
-    gender_pref = request.form.get('gender_pref')
-    tags = request.form.getlist('tags[]')
-    
-    # --------------- VERIFICATION DES INFOS ----------------------
-    if len(username) < 3:
-        valid = False
-        flash('Tu sais pas lire enfaite ? C\'est  3 lettres minimum le username...', 'danger')
-    if password != confirm_password:
-        valid = False
-        flash('T\'as pas mis les même mots de passe.. T\'es con enfaite ?', 'danger')
-    if not image:
-        valid = False
-        flash('Met une image frère', 'danger')
-    if image and allowed_file(image.filename):
-        # filename = secure_filename(image.filename)
-        image_data = image.read()
-        # file_path = os.path.join('uploads/', filename)
-        # image.save(file_path)
-
-    # --------------- CREATE USER OR DISPLAY ERROR MESSAGE ----------------------
-    if valid == True:
-        hashed_password = generate_password_hash(password)
-        
-        data = {
-            'username': username,
-            'password': hashed_password,
-            'last_name': last_name,
-            'first_name': first_name,
-            'age': age,
-            'email': email,
-            'profile_image': None,
-            'bio': bio,
-            'gender': gender,
-            'gender_pref': gender_pref,
-        }
-
-        user_id = create_user(data)
-        if user_id:
-            User.save_profile_image(user_id, image_data)
-            create_tags(user_id, tags)
-            session['username'] = username
-            session['user_id'] = user_id
-            return redirect(url_for('main.home'))
-        flash('Username ou email déjà utilisé', 'danger')
-
-    return render_template('register.html')
-
-def create_user(data):
-    user = User(None, data['username'], data['last_name'], data['first_name'], data['age'], data['password'],
-                data['email'], None, data['bio'], data['gender'], data['gender_pref'])
-    try:
-        user_created = user.create()
-        return user_created
-    except Exception as e:
-        print(e)
-        return None
-
-def create_tags(user_id, tag_ids):
-    for tag_id in tag_ids:
-        user_tag = UserTag(None, user_id, tag_id)
-        user_tag.create()
-
-def auth_login(request):
-    username = request.form['username']
-    password = request.form['password']
-    
-    user = User._find_by_username(username)
-    if user:
-        if check_password_hash(user.password, password):
-            session['username'] = username
-            session['user_id'] = user.id
-            return True
-    
-    if username == 'admin' and password == 'psd':  # Remplacez par votre logique
-        session['username'] = username
-        return True
-    
-    return False
-
 @main.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
@@ -239,7 +145,10 @@ def home():
         if all_profiles:
             filtered_profiles = []
             for profile in all_profiles:
-                if profile.id != session['user_id'][0]:
+                user_id = session['user_id']
+                if isinstance(user_id, tuple):
+                    user_id = session['user_id'][0]
+                if profile.id != user_id:
                     # Charge l'image du profil en base64
                     image_data = Profile.get_profile_image(profile.id)  # Récupère l'image en bytes
                     
