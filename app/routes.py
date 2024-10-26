@@ -12,34 +12,36 @@ from ORM.tables.friendship import Friendship
 main = Blueprint('main', __name__)
 
 
-def update_user_infos(request, user, user_tag_ids, tags):
-    # normalement dans le form j'ai toute les infos du user déjà entré
-    # si un champ est vide : error
-    # récup le user et check les modif
-    # faire data {} avec modif
-    # call update
-    
+def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
+
     # --------------- RECUPERATION DES INFOS ----------------------
     username = request.form.get('username')
     last_name = request.form.get('last_name')
     first_name = request.form.get('first_name')
     age = request.form.get('age')
     email = request.form.get('email')
-    # image = request.files.get('profile_image')
     bio = request.form.get('bio')
     gender = request.form.get('gender')
     gender_pref = request.form.get('gender_pref')
     tag_ids_selected = request.form.getlist('tags[]')
+    new_image = request.files.get('new_profile_image')
 
     # --------------- VERIFICATION DES INFOS ----------------------
-    # TODO : or image == ''
     if username == '' or last_name == '' or first_name == '' or age == '' or email == ''  or bio == '' \
             or gender == '' or gender_pref == '' or tag_ids_selected == []:
         flash('Nan gros, t\'as pas compris... T\'as pas le droit à des valeurs null', 'danger')
-        return render_template('user.html', user=user, user_tag_ids=user_tag_ids, tags=tags)
+        return render_template('user.html', user=user, profile_image_data=profile_image_data,
+                               user_tag_ids=user_tag_ids, tags=tags)
 
     # --------------- INTERCEPTER MODIFICATIONS ----------------------
-    user = User._find_by_username(username)
+    # user = User._find_by_username(username)
+
+    print('new_image', new_image.filename)
+    if new_image.filename:
+        img_read = new_image.read()
+        User.save_profile_image(user.id, img_read)
+        profile_image_data = User.get_profile_image(user.id)
+
     if user:
         data = {}
         if username != user.username:
@@ -52,8 +54,6 @@ def update_user_infos(request, user, user_tag_ids, tags):
             data['age'] = age
         if email != user.email:
             data['email'] = email
-        # if image != user.profile_image:
-        #     data['profile_image'] = image
         if bio != user.bio:
             data['bio'] = bio
         if gender != user.gender:
@@ -73,11 +73,15 @@ def update_user_infos(request, user, user_tag_ids, tags):
         if data:
             user.update(data)
             user = User._find_by_id(user.id)
+            session['username'] = user.username
             flash('C\'est carré : update infos', 'success')
-        else:
+        if new_image.filename:
+            flash('C\'est carré : update image', 'success')
+        if not data and not new_image:
             flash('T\'as rien changé, tu vas pas nous la faire', 'danger')
-    
-    return render_template('user.html', user=user, tags=tags, user_tag_ids=user_tag_ids)
+
+    return render_template('user.html', user=user, profile_image_data=profile_image_data,
+                           tags=tags, user_tag_ids=user_tag_ids)
 
 
 def change_password(request):
@@ -128,12 +132,15 @@ def auth_register(request):
     if password != confirm_password:
         valid = False
         flash('T\'as pas mis les même mots de passe.. T\'es con enfaite ?', 'danger')
+    if not image:
+        valid = False
+        flash('Met une image frère', 'danger')
     if image and allowed_file(image.filename):
-        filename = secure_filename(image.filename)
-        # image_data = image.read()
-        file_path = os.path.join('uploads/', filename)
-        image.save(file_path)
-    
+        # filename = secure_filename(image.filename)
+        image_data = image.read()
+        # file_path = os.path.join('uploads/', filename)
+        # image.save(file_path)
+
     # --------------- CREATE USER OR DISPLAY ERROR MESSAGE ----------------------
     if valid == True:
         hashed_password = generate_password_hash(password)
@@ -145,7 +152,7 @@ def auth_register(request):
             'first_name': first_name,
             'age': age,
             'email': email,
-            'profile_image': image.filename,
+            'profile_image': None,
             'bio': bio,
             'gender': gender,
             'gender_pref': gender_pref,
@@ -153,6 +160,7 @@ def auth_register(request):
 
         user_id = create_user(data)
         if user_id:
+            User.save_profile_image(user_id, image_data)
             create_tags(user_id, tags)
             session['username'] = username
             session['user_id'] = user_id
@@ -163,7 +171,7 @@ def auth_register(request):
 
 def create_user(data):
     user = User(None, data['username'], data['last_name'], data['first_name'], data['age'], data['password'],
-                data['email'], data['profile_image'], data['bio'], data['gender'], data['gender_pref'])
+                data['email'], None, data['bio'], data['gender'], data['gender_pref'])
     try:
         user_created = user.create()
         return user_created
@@ -270,13 +278,16 @@ def user():
         return redirect(url_for('main.login'))
 
     user = User._find_by_username(session['username'])
+    print('iuserid = ', user)
+    profile_image_data = User.get_profile_image(user.id)
     user_tags = UserTag.find_tags_by_user_id(user.id)
     tags = Tag._all()
     user_tag_ids = [tag.tag_id for tag in user_tags]
     if request.method == 'POST':
-        return update_user_infos(request, user=user, user_tag_ids=user_tag_ids, tags=tags)
+        return update_user_infos(request, user=user, profile_image_data=profile_image_data, user_tag_ids=user_tag_ids, tags=tags)
 
-    return render_template('user.html', user=user, user_tag_ids=user_tag_ids, tags=tags)
+    return render_template('user.html', user=user, profile_image_data=profile_image_data,
+                           user_tag_ids=user_tag_ids, tags=tags)
 
 @main.route('/change-password', methods=['POST'])
 def update_password():

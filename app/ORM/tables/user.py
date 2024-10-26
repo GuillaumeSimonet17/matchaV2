@@ -1,5 +1,8 @@
-from ORM.model import Model
+import psycopg2
+import base64
 
+from ORM.model import Model
+from ORM.database import db
 
 class User(Model):
     table_name = 'app_user'
@@ -57,3 +60,20 @@ class User(Model):
             print(e)
             return None
         return None
+
+    @classmethod
+    def save_profile_image(cls, user_id, image_data):
+        query = "UPDATE app_user SET profile_image = %s WHERE id = %s;"
+        try:
+            db.execute(query, (psycopg2.Binary(image_data), user_id), fetch=False)
+        except Exception as e:
+            print(e)
+            return None
+        return True
+
+    @classmethod
+    def get_profile_image(cls, user_id):
+        query = "SELECT profile_image FROM app_user WHERE id = %s;"
+        image_data = db.execute(query, (user_id,))
+        print('image_data', image_data)
+        return base64.b64encode(image_data[0][0]).decode('utf-8')

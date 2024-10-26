@@ -1,8 +1,9 @@
 {% extends "index.html" %}
 {% block content %}
-<section id="user" class="mb-5 d-flex flex-column justify-content-center align-items-center h-100
+<section id="user" class="mb-5 d-flex flex-column justify-content-center align-items-center
     {{ 'active' if request.path == '/' else '' }}">
     <div class="row d-flex col-12">
+        <h2 class="mt-5 d-flex justify-content-center">Update Infos</h2>
         <form method="POST" enctype="multipart/form-data"
               class="row col-12 col-md-8 d-flex justify-content-center align-items-center">
 
@@ -39,46 +40,6 @@
                     <input type="email" class="form-control" id="email" name="email" value="{{user.email}}">
                 </div>
 
-                <!-- Profile Image -->
-                <div class="mb-3">
-                    <label for="profile_image" class="form-label">Profile Image</label>
-                    <input type="file" class="form-control" id="profile_image" name="profile_image" accept="image/*"
-                           onchange="previewImage(event)">
-                </div>
-
-                <!-- Image preview -->
-                <div class="mb-3">
-                    <img id="image_preview" src="{{ user.profile_image }}" alt="Image Preview">
-                </div>
-
-                <script>
-                    function previewImage(event) {
-                        const imagePreview = document.getElementById('image_preview');
-                        const file = event.target.files[0];
-
-                        if (file) {
-                            const reader = new FileReader();
-                            reader.onload = function (e) {
-                                imagePreview.src = e.target.result;
-                                imagePreview.style.display = 'block';
-                            }
-                            reader.readAsDataURL(file);
-                        } else {
-                            imagePreview.src = '';
-                            imagePreview.style.display = 'none';
-                        }
-                    }
-                </script>
-
-            </div>
-            <div class="col-12 col-md-5">
-
-                <!-- Bio -->
-                <div class="mb-3">
-                    <label for="bio" class="form-label">Bio</label>
-                    <textarea class="form-control" id="bio" name="bio" rows="3">{{user.bio}}</textarea>
-                </div>
-
                 <!-- Gender -->
                 <div class="mb-3">
                     <label for="gender" class="form-label">Gender</label>
@@ -92,20 +53,12 @@
                     </select>
                 </div>
 
-                <!-- Gender Preference -->
+                <!-- Bio -->
                 <div class="mb-3">
-                    <label for="gender_pref" class="form-label">Gender Preference</label>
-                    <select class="form-select" id="gender_pref" name="gender_pref">
-                        <option value="">Select Preference</option>
-                        <option value="male" {% if user.gender_pref=='male' %}selected="selected" {% endif %}>Male
-                        </option>
-                        <option value="female" {% if user.gender_pref=='female' %}selected="selected" {% endif %}>
-                            Female
-                        </option>
-                        <option value="both" {% if user.gender_pref=='both' %}selected="selected" {% endif %}>Other
-                        </option>
-                    </select>
+                    <label for="bio" class="form-label">Bio</label>
+                    <textarea class="form-control" id="bio" name="bio" rows="3">{{user.bio}}</textarea>
                 </div>
+
 
                 <!-- Tags Accordion -->
                 <div class="accordion" id="tagsAccordion">
@@ -133,10 +86,60 @@
                         </div>
                     </div>
                 </div>
+
+            </div>
+            <div class="col-12 col-md-5">
+
+                <!-- Profile Image -->
+                <div class="mb-3">
+                    <label for="profile_image" class="form-label">Profile Image</label>
+                    <input type="file" class="form-control" id="new_profile_image" name="new_profile_image" accept="image/*"
+                           onchange="previewImage(event)">
+                </div>
+
+                <!-- Image preview -->
+                <div class="mb-3">
+                    <img class="img-fluid" class="form-control" id="profile_image" src="data:image/png;base64, {{ profile_image_data }}" alt="Profile Image">
+                </div>
+
+                <script>
+                    function previewImage(event) {
+                        const imagePreview = document.getElementById('image_preview');
+                        const file = event.target.files[0];
+
+                        if (file) {
+                            const reader = new FileReader();
+                            reader.onload = function (e) {
+                                imagePreview.src = e.target.result;
+                                imagePreview.style.display = 'block';
+                            }
+                            reader.readAsDataURL(file);
+                        } else {
+                            imagePreview.src = '';
+                            imagePreview.style.display = 'none';
+                        }
+                    }
+                </script>
+
+                <!-- Gender Preference -->
+                <div class="mb-3">
+                    <label for="gender_pref" class="form-label">Gender Preference</label>
+                    <select class="form-select" id="gender_pref" name="gender_pref">
+                        <option value="">Select Preference</option>
+                        <option value="male" {% if user.gender_pref=='male' %}selected="selected" {% endif %}>Male
+                        </option>
+                        <option value="female" {% if user.gender_pref=='female' %}selected="selected" {% endif %}>
+                            Female
+                        </option>
+                        <option value="both" {% if user.gender_pref=='both' %}selected="selected" {% endif %}>Other
+                        </option>
+                    </select>
+                </div>
+
             </div>
 
             <!-- Submit Button -->
-            <div class="d-flex justify-content-center mb-4">
+            <div class="d-flex justify-content-center mt-2   mb-4">
                 <button type="submit" class="btn btn-primary col-12 col-md-3">Save</button>
             </div>
         </form>
@@ -144,23 +147,25 @@
         <!--        TODO : mettre tout en required -->
         <form method="POST" action="/change-password"
               class="row col-12 col-md-4 d-flex justify-content-center align-items-center">
-            <div class="mb-3">
-                <label for="current_password" class="form-label">Current Password</label>
-                <input type="password" class="form-control" id="current_password" name="current_password">
-            </div>
+            <div>
+                <div class="mb-3">
+                    <label for="current_password" class="form-label">Current Password</label>
+                    <input type="password" class="form-control" id="current_password" name="current_password">
+                </div>
 
-            <div class="mb-3">
-                <label for="new_password" class="form-label">New Password</label>
-                <input type="password" class="form-control" id="new_password" name="new_password">
-            </div>
+                <div class="mb-3">
+                    <label for="new_password" class="form-label">New Password</label>
+                    <input type="password" class="form-control" id="new_password" name="new_password">
+                </div>
 
-            <div class="mb-3">
-                <label for="confirm_password" class="form-label">Confirm New Password</label>
-                <input type="password" class="form-control" id="confirm_password" name="confirm_password">
-            </div>
+                <div class="mb-3">
+                    <label for="confirm_password" class="form-label">Confirm New Password</label>
+                    <input type="password" class="form-control" id="confirm_password" name="confirm_password">
+                </div>
 
-            <div class="d-flex justify-content-center mb-4">
-                <button type="submit" class="btn btn-primary col-12 col-md-5">Save new password</button>
+                <div class="d-flex justify-content-center mb-4">
+                    <button type="submit" class="btn btn-primary col-12 col-md-5">Save new password</button>
+                </div>
             </div>
         </form>
     </div>
