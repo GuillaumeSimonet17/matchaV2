@@ -42,9 +42,11 @@
                 {% for profile in filtered_profiles %}
                 <a href="/profile/{{ profile.id }}"
                    class="col-12 col-md-4 card border p-2 d-flex justify-content-between m-0">
-                    <img class="card-img-top" src="{{ profile.image }}" alt="{{ profile.username }}'s profile image"/>
+                    <div style="max-height: 200px; overflow: hidden;">
+                        <img class="img-fluid" class="form-control" id="profile_image" src="data:image/png;base64, {{ profile.profile_image }}" alt="Profile Image">
+                    </div>
                     <p class="m-0 mt-2 fw-bold">{{ profile.username }}</p>
-                    <p class="m-0 mt-2 fw-bold">{{ profile.id }}</p>
+<!--                    <p class="m-0 mt-2 fw-bold">{{ profile.id }}</p>-->
                 </a>
                 {% endfor %}
                 {% endif %}

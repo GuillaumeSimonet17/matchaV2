@@ -1,4 +1,7 @@
+import base64
+
 from ORM.model import Model
+from ORM.database import db
 
 
 class Profile(Model):
@@ -39,3 +42,10 @@ class Profile(Model):
         except Exception as e:
             raise e
         return None
+    
+    @classmethod
+    def get_profile_image(cls, user_id):
+        query = "SELECT profile_image FROM app_user WHERE id = %s;"
+        image_data = db.execute(query, (user_id,))
+        print('profile image_data', image_data)
+        return base64.b64encode(image_data[0][0]).decode('utf-8')

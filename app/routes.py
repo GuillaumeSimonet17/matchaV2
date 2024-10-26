@@ -224,14 +224,31 @@ def register():
     tags = Tag._all()
     return render_template('register.html', tags=tags)
 
+
+import base64
+
 @main.route('/')
 def home():
     if 'username' in session:
         filtered_profiles = False
         all_profiles = Profile._all()
-        if all_profiles:
-            filtered_profiles = [profile for profile in all_profiles if profile.id != session['user_id'][0]]
+        # if all_profiles:
+        #     filtered_profiles = [profile for profile in all_profiles if profile.id != session['user_id'][0]]
         # filtrer ceux que j'ai block et qui m'ont block
+        # all_profiles = Profile._all()
+        if all_profiles:
+            filtered_profiles = []
+            for profile in all_profiles:
+                if profile.id != session['user_id'][0]:
+                    # Charge l'image du profil en base64
+                    image_data = Profile.get_profile_image(profile.id)  # Récupère l'image en bytes
+                    
+                    # Ajoute les données préparées pour le rendu
+                    filtered_profiles.append({
+                        'id': profile.id,
+                        'username': profile.username,
+                        'profile_image': image_data
+                    })
         return render_template('search.html', filtered_profiles=filtered_profiles)
     return redirect(url_for('main.login'))
 
@@ -258,8 +275,9 @@ def profile(profile_id):
     if 'username' in session:
         user_id = session['user_id'][0]
         profile = Profile._find_by_id(profile_id)
+        profile_image_data = User.get_profile_image(user_id)
         friendship = Friendship.get_friendship_by_user_ids([user_id, profile_id])
-        state, connected, recevied_invitation, sent_invitation = False
+        state, connected, recevied_invitation, sent_invitation = False, False, False, False
         if friendship:
             state = friendship.state
             if state != 'connected':
@@ -269,7 +287,7 @@ def profile(profile_id):
                 connected = True
         # add historic tp user_id in db AND a notif to profile_id
         return render_template('profile.html', profile=profile, state=state, connected=connected,
-                               recevied_invitation=recevied_invitation, sent_invitation=sent_invitation)
+                               profile_image_data=profile_image_data, recevied_invitation=recevied_invitation, sent_invitation=sent_invitation)
     return redirect(url_for('main.login'))
 
 @main.route('/user', methods=['GET', 'POST'])

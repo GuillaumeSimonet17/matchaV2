@@ -93,33 +93,13 @@
                 <!-- Profile Image -->
                 <div class="mb-3">
                     <label for="profile_image" class="form-label">Profile Image</label>
-                    <input type="file" class="form-control" id="new_profile_image" name="new_profile_image" accept="image/*"
-                           onchange="previewImage(event)">
+                    <input type="file" class="form-control" id="new_profile_image" name="new_profile_image" accept="image/*">
                 </div>
 
                 <!-- Image preview -->
                 <div class="mb-3">
                     <img class="img-fluid" class="form-control" id="profile_image" src="data:image/png;base64, {{ profile_image_data }}" alt="Profile Image">
                 </div>
-
-                <script>
-                    function previewImage(event) {
-                        const imagePreview = document.getElementById('image_preview');
-                        const file = event.target.files[0];
-
-                        if (file) {
-                            const reader = new FileReader();
-                            reader.onload = function (e) {
-                                imagePreview.src = e.target.result;
-                                imagePreview.style.display = 'block';
-                            }
-                            reader.readAsDataURL(file);
-                        } else {
-                            imagePreview.src = '';
-                            imagePreview.style.display = 'none';
-                        }
-                    }
-                </script>
 
                 <!-- Gender Preference -->
                 <div class="mb-3">

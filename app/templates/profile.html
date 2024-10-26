@@ -1,33 +1,36 @@
 {% extends "index.html" %}
 {% block content %}
-<section id="profile" class="mb-5 {{ 'active' if request.path == '/' else '' }}" style="min-height: 90vh">
-    <div class="mt-3 container">
-<!--        <div class="">-->
-<!--            <img src="{{ profile.profile_image }}" class="d-block w-100" alt="{{ profile.username }}">-->
-<!--        </div>-->
+<section id="profile" class="mb-5 d-flex flex-column justify-content-center align-items-center{{ 'active' if request.path == '/' else '' }}">
+    <div class="mt-3 row d-flex col-12 border">
         <h2 class="pt-3">{{ profile.username }}</h2>
-        <div class="pt-2 ps-2">
-            <p><strong>First Name:</strong> {{ profile.first_name }}</p>
-            <p><strong>Last Name:</strong> {{ profile.last_name }}</p>
-            <p><strong>Age:</strong> {{ profile.age }}</p>
-            <p><strong>Gender:</strong> {{ profile.gender }}</p>
-            <p><strong>Preferred Gender:</strong> {{ profile.gender_pref }}</p>
-            <p><strong>Bio:</strong> {{ profile.bio }}</p>
-            <p><strong>Fame Rate:</strong> {{ profile.fame_rate }}</p>
+        <div class="col-12 col-md-6 border">
+            <img class="img-fluid" src="data:image/png;base64, {{ profile_image_data }}" alt="Profile Image">
         </div>
-        <div class="col-12">
-            {% if not friendship %}
+        <div class="col-12 col-md-6 border">
+            <div class="pt-2 ps-2">
+                <p><strong>First Name:</strong> {{ profile.first_name }}</p>
+                <p><strong>Last Name:</strong> {{ profile.last_name }}</p>
+                <p><strong>Age:</strong> {{ profile.age }}</p>
+                <p><strong>Gender:</strong> {{ profile.gender }}</p>
+                <p><strong>Preferred Gender:</strong> {{ profile.gender_pref }}</p>
+                <p><strong>Bio:</strong> {{ profile.bio }}</p>
+                <p><strong>Fame Rate:</strong> {{ profile.fame_rate }}</p>
+            </div>
+            <div class="col-12">
+                {% if not friendship %}
                 <button class="btn btn-outline-primary col-2 col-md-1" type="button"><i class="bi bi-heart"></i>
                 </button>
-            {% elif sent_invitation %}
+                {% elif sent_invitation %}
                 <p>Invitation envoyée</p>
-            {% elif received_invitation %}
+                {% elif received_invitation %}
                 <button class="btn btn-outline-primary col-2 col-md-1" type="button"><i class="bi bi-heart-half"></i>
                 </button>
-            {% elif connected %}
-                <button class="btn btn-outline-primary col-2 col-md-1" type="button"><i class="bi bi-heartbreak-fill"></i>
+                {% elif connected %}
+                <button class="btn btn-outline-primary col-2 col-md-1" type="button"><i
+                        class="bi bi-heartbreak-fill"></i>
                 </button>
-            {% endif %}
+                {% endif %}
+            </div>
         </div>
     </div>
 </section>
