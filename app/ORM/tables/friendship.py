@@ -50,10 +50,10 @@ class Friendship(Model):
         return cls.select_where_and('uninvitation', sender_id)
 
     @classmethod
-    def get_friendship_connections(cls, state: str, user_id: int, columns: list[str] = None):
+    def get_friendship_connections(cls, user_id: int, columns: list[str] = None):
         columns = cls.get_all_column_names(columns)
         query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
-                 f"WHERE state = {state} "
+                 f"WHERE state = 'connected' "
                  f"and (receiver_id = {user_id} or sender_id = {user_id});")
         try:
             res = db.execute(query)
