@@ -24,14 +24,21 @@
             </div>
 
             <div class="col-12 mt-2">
+
                 {% if not friendship %}
+                <!--       to send invitation         -->
                 <button class="btn btn-outline-primary col-2 col-md-1" type="button"><i class="bi bi-heart"></i>
                 </button>
+
                 {% elif sent_invitation %}
                 <p>Invitation envoyée</p>
+
                 {% elif received_invitation %}
+                <!--       to send connection         -->
                 <button class="btn btn-outline-primary col-2 col-md-1" type="button"><i class="bi bi-heart-half"></i>
                 </button>
+
+                <!--       to send uninvitation         -->
                 {% elif connected %}
                 <button class="btn btn-outline-primary col-2 col-md-1" type="button"><i
                         class="bi bi-heartbreak-fill"></i>
