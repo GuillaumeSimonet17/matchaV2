@@ -19,10 +19,6 @@ app.config['POSTGRES_PASSWORD'] = os.getenv('POSTGRES_PASSWORD')
 app.config['POSTGRES_HOST'] = os.getenv('POSTGRES_HOST')
 app.config['POSTGRES_PORT'] = os.getenv('POSTGRES_PORT')
 
-app.config['UPLOAD_FOLDER'] = 'uploads/'
-app.config['ALLOWED_EXTENSIONS'] = {'jpg', 'jpeg', 'png', 'webp'}
-os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-
 db = init_db(app.config)
 print('fdp => ', db)
 from routes import main as main_routes
