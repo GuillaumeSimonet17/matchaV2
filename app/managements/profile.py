@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, request, render_template, session, redirect, url_for
+from flask import render_template, session
 
 from ORM.views.profile import Profile
 from ORM.tables.friendship import Friendship
