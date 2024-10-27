@@ -51,10 +51,7 @@ def auth_register(request):
         valid = False
         flash('Met une image frère', 'danger')
     if image and allowed_file(image.filename):
-        # filename = secure_filename(image.filename)
         image_data = image.read()
-        # file_path = os.path.join('uploads/', filename)
-        # image.save(file_path)
     
     # --------------- CREATE USER OR DISPLAY ERROR MESSAGE ----------------------
     if valid == True:
