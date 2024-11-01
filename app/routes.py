@@ -13,6 +13,9 @@ from managements.historic import go_historic
 from managements.user_management.user import go_user
 
 from ORM.tables.tag import Tag
+from ORM.tables.friendship import Friendship
+from ORM.views.profile import Profile
+
 
 from app import socketio
 
@@ -31,8 +34,58 @@ def on_join(data):
 def send_invitation_route(data):
     sender_id = data.get('sender_id')
     receiver_id = data.get('receiver_id')
-    print('ca envoi sa mér', sender_id, receiver_id)
+
+    # check if friendship exist
+    friendship = Friendship.get_friendship_by_user_ids([sender_id, receiver_id])
+    if friendship:
+        if friendship.state == 'invitation':
+            send_connection_route(data)
+        return
+
+    # create friendship
+    friendship = Friendship(None, 'invitation', sender_id, receiver_id)
+    friendship.create()
+
+    # add notif
+
     emit('receive_invitation', {'message': f'Invitation sent from {sender_id}'}, room=receiver_id)
+
+@socketio.on('send_connection')
+def send_connection_route(data):
+    sender_id = data.get('sender_id')
+    receiver_id = data.get('receiver_id')
+
+    # get friendship and check if state is invitation and receiver_id = sender_id
+    friendship = Friendship.get_friendship_by_user_ids([sender_id, receiver_id])
+    
+    if friendship.state != 'invitation' and friendship.sender_id != int(receiver_id):
+        return
+
+    # update state
+    friendship.update({'state': 'connected'})
+
+
+    # add notif
+
+    emit('receive_connection', {'message': f'Connection sent from {sender_id}'}, room=receiver_id)
+
+@socketio.on('send_uninvitation')
+def send_uninvitation_route(data):
+    sender_id = data.get('sender_id')
+    receiver_id = data.get('receiver_id')
+
+    # get friendship and check if state is connected
+    friendship = Friendship.get_friendship_by_user_ids([sender_id, receiver_id])
+
+    if friendship.state != 'connected':
+        return
+
+    # update state
+    friendship.update({'state': 'uninvitation', 'sender_id': sender_id, 'receiver_id': receiver_id})
+    
+    # add notif
+
+    emit('receive_uninvitation', {'message': f'Uninvitation sent from {sender_id}'}, room=receiver_id)
 
 
 # --------------------------- HTTP ---------------------------
@@ -82,7 +135,22 @@ def notifs():
 def chat():
     if 'username' not in session:
         return redirect(url_for('main.login'))
-    return render_template('chat.html')
+    
+    user_id = session['user_id']
+    connections = Friendship.get_friendship_connections(user_id)
+    other_user_ids = [
+        conn.sender_id if conn.receiver_id == user_id else conn.receiver_id
+        for conn in connections
+    ]
+
+    profiles = []
+    for id in other_user_ids:
+        profile = Profile._find_by_id(id)
+        if profile:
+            image_data = Profile.get_profile_image(profile.id)
+            profiles.append({'id': profile.id, 'username': profile.username, 'image_data': image_data})
+
+    return render_template('chat.html', profiles=profiles)
 
 @main.route('/profile/<int:profile_id>')
 def profile(profile_id):

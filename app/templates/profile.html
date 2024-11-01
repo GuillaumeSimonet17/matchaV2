@@ -10,6 +10,7 @@
         </div>
         <div class="col-12 col-md-6">
             <div class="pt-2">
+                <h1>{{ profile.id }}</h1>
                 <p>{{ profile.first_name }} {{ profile.last_name }}</p>
                 <p>{{ profile.age }} ans</p>
                 <p>{{ profile.gender }}</p>
@@ -24,31 +25,44 @@
                 {% endfor %}
             </div>
 
+            {% if state != 'uninvitation' %}
             <div class="col-12 mt-2">
 
-                {% if not friendship or sent_invitation %}
                 <p id="alert-invitation-sent" class="d-none alert alert-success">Invitation envoyée</p>
+                <p id="alert-connection-sent" class="d-none alert alert-success">You are connected and can now chat</p>
+
+                {% if sent_invitation %}
+                <p class="alert alert-success">Invitation envoyée</p>
                 {% endif %}
 
-                {% if not friendship %}
+                {% if not state %}
                 <!--       to send invitation         -->
                 <button id="btn-send-invit" class="btn btn-outline-primary col-2 col-md-1" type="button"
-                    data-profile-id="{{ profile.id }}" data-user-id="{{ user_id }}">
+                    data-profile-id="{{ profile.id }}">
                     <i class="bi bi-heart"></i>
                 </button>
+                {% endif %}
 
-                {% elif received_invitation %}
+                {% if recevied_invitation %}
                 <!--       to send connection         -->
-                <button class="btn btn-outline-primary col-2 col-md-1" type="button"><i class="bi bi-heart-half"></i>
-                </button>
-
-                <!--       to send uninvitation         -->
-                {% elif connected %}
-                <button class="btn btn-outline-primary col-2 col-md-1" type="button"><i
-                        class="bi bi-heartbreak-fill"></i>
+                <button id="btn-send-connect" class="btn btn-outline-primary col-2 col-md-1" type="button"
+                    data-profile-id="{{ profile.id }}">
+                    <i class="bi bi-heart-half"></i>
                 </button>
                 {% endif %}
+
+                <!--       to send uninvitation         -->
+                {% if connected %}
+                <button id="btn-send-uninvit" class="btn btn-outline-primary col-2 col-md-1" type="button"
+                    data-profile-id="{{ profile.id }}">
+                    <i class="bi bi-heartbreak-fill"></i>
+                </button>
+                <p class="alert alert-success">You are connected and can now chat</p>
+                {% endif %}
+
             </div>
+            {% endif %}
+
         </div>
     </div>
 </section>

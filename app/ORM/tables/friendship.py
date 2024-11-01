@@ -1,3 +1,5 @@
+from os import getcwd
+
 from ORM.model import Model
 from ORM.database import db
 
@@ -75,7 +77,8 @@ class Friendship(Model):
         try:
             res = db.execute(query)
             if res:
-                return cls(**res[0])
+                dict = cls.get_dict_by_id(res[0][0])
+                return cls(**dict)
         except Exception as e:
             raise e
         return None
@@ -86,12 +89,10 @@ class Friendship(Model):
             raise ValueError("It has to be 2 user_ids.")
         friendship = cls.get_friendship_by_user_ids(user_ids)
         if friendship:
-            query = (f"UPDATE {cls.table_name} SET state = {state} "
-                     f"WHERE id IN {friendship.id}")
+            query = (f"UPDATE {cls.table_name} SET state = '{state}' "
+                     f"WHERE id = {friendship.id}")
             try:
-                res = db.execute(query)
-                if res:
-                    return True
+                db.execute(query, fetch=False)
             except Exception as e:
                 raise e
         return None

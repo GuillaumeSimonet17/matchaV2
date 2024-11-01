@@ -20,17 +20,17 @@ def go_profile(profile_id: int):
             user_tags.append(tag)
 
     friendship = Friendship.get_friendship_by_user_ids([user_id, profile_id])
-
     state, connected, recevied_invitation, sent_invitation = False, False, False, False
-
+    
     if friendship:
         state = friendship.state
+
         if state != 'connected':
             recevied_invitation = friendship.receiver_id == session['user_id']
             sent_invitation = friendship.sender_id == session['user_id']
         else:
             connected = True
-    
+
     if not (Visit.find_visit(user_id, profile_id)):
         visit = Visit(None, user_id, profile_id)
         visit.create()

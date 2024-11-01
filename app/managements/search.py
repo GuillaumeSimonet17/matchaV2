@@ -20,4 +20,5 @@ def go_search():
                     'username': profile.username,
                     'profile_image': image_data
                 })
+
     return render_template('search.html', filtered_profiles=filtered_profiles, user_id=user_id)
