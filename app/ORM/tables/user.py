@@ -54,7 +54,7 @@ class User(Model):
             res = cls.find_x_by_y('username', username, cls.column_names)
             if res:
                 usr = res[0]
-                print(usr)
+                # print(usr)
                 return usr
         except Exception as e:
             print(e)

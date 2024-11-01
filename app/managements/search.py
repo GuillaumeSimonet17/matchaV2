@@ -1,5 +1,6 @@
 from flask import render_template, session
 from ORM.views.profile import Profile
+from ORM.tables.user import User
 
 
 def go_search():
@@ -12,8 +13,6 @@ def go_search():
         filtered_profiles = []
         for profile in all_profiles:
             user_id = session['user_id']
-            if isinstance(user_id, tuple):
-                user_id = session['user_id'][0]
             if profile.id != user_id:
                 image_data = Profile.get_profile_image(profile.id)
                 filtered_profiles.append({
@@ -21,4 +20,4 @@ def go_search():
                     'username': profile.username,
                     'profile_image': image_data
                 })
-    return render_template('search.html', filtered_profiles=filtered_profiles)
+    return render_template('search.html', filtered_profiles=filtered_profiles, user_id=user_id)

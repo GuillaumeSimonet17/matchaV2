@@ -15,7 +15,7 @@ class Model:
         query = f"INSERT INTO {self.table_name} ({columns}) VALUES ({placeholders}) RETURNING id;"
         values = tuple(attrs.values())
         try:
-            print('DB == ', db)
+            # print('DB == ', db)
             res = db.execute(query, values)
             return res[0]
         except Exception as e:
@@ -85,14 +85,14 @@ class Model:
         columns = cls.get_all_column_names(columns)
         query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
                  f"WHERE {y_name} = '{y}';")
-        print('query = ', query)
+        # print('query = ', query)
         try:
             res = db.execute(query)
-            print('res=>', res)
+            # print('res=>', res)
 
             if res:
                 datas = cls.get_dicts_by_res(res, columns)
-                print('data = ', datas)
+                # print('data = ', datas)
                 return [cls(**row) for row in datas]
         except Exception as e:
             raise NotFound(f'id {id} not found in {cls.table_name}')

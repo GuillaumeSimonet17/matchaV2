@@ -20,7 +20,7 @@ app.config['POSTGRES_HOST'] = os.getenv('POSTGRES_HOST')
 app.config['POSTGRES_PORT'] = os.getenv('POSTGRES_PORT')
 
 db = init_db(app.config)
-print('fdp => ', db)
+
 from routes import main as main_routes
 
 from ORM.tables.user import User

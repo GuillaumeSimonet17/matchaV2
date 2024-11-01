@@ -28,7 +28,7 @@ def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
     # --------------- INTERCEPTER MODIFICATIONS ----------------------
     # user = User._find_by_username(username)
     
-    print('new_image', new_image.filename)
+    # print('new_image', new_image.filename)
     if new_image.filename:
         img_read = new_image.read()
         User.save_profile_image(user.id, img_read)

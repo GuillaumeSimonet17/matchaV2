@@ -28,7 +28,7 @@ class Tag(Model):
             if res:
                 return cls(**res)
         except Exception as e:
-            raise e
+            return None
         return None
 
 

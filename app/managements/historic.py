@@ -5,8 +5,6 @@ from ORM.tables.visit import Visit
 
 def go_historic():
     user_id = session['user_id']
-    if isinstance(user_id, tuple):
-        user_id = session['user_id'][0]
     visits = Visit.find_visits_by_user(user_id)
     visits_list = []
     if visits:

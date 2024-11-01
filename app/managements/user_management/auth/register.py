@@ -75,7 +75,7 @@ def auth_register(request):
             User.save_profile_image(user_id, image_data)
             create_tags(user_id, tags)
             session['username'] = username
-            session['user_id'] = user_id
+            session['user_id'] = user_id[0]
             return redirect(url_for('main.home'))
         flash('Username ou email déjà utilisé', 'danger')
     

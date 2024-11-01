@@ -11,8 +11,6 @@ def go_notif():
     # reinitaliser le badge
     
     user_id = session['user_id']
-    if isinstance(user_id, tuple):
-        user_id = session['user_id'][0]
     notifs = Notif.find_notifs_by_user(user_id)
     notifs_list = []
     if notifs:

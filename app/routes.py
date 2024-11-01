@@ -1,4 +1,6 @@
 from flask import Blueprint, flash, request, render_template, session, redirect, url_for
+from flask_socketio import emit, join_room
+
 
 from managements.user_management.auth.login import auth_login
 from managements.user_management.auth.register import auth_register
@@ -12,8 +14,28 @@ from managements.user_management.user import go_user
 
 from ORM.tables.tag import Tag
 
+from app import socketio
 
 main = Blueprint('main', __name__)
+
+# --------------------------- SOCKET ---------------------------
+
+@socketio.on('join')
+def on_join(data):
+    user_id = data.get('user_id')
+    if user_id:
+        join_room(user_id)
+        print(f"User {user_id} joined their room.")
+
+@socketio.on('send_invitation')
+def send_invitation_route(data):
+    sender_id = data.get('sender_id')
+    receiver_id = data.get('receiver_id')
+    print('ca envoi sa mér', sender_id, receiver_id)
+    emit('receive_invitation', {'message': f'Invitation sent from {sender_id}'}, room=receiver_id)
+
+
+# --------------------------- HTTP ---------------------------
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
