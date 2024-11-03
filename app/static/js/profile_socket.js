@@ -1,4 +1,7 @@
-import {socket, currentUserId} from './socket_management.js';
+import socket from './socket_management.js';
+
+const currentUserIdElement = document.getElementById('current-user');
+const currentUserId = currentUserIdElement ? currentUserIdElement.getAttribute('data-current-user-id') : null;  // Utiliser l'attribut 'data-id'
 
 // ----------------------------------- EMIT -----------------------------------
 

@@ -15,7 +15,8 @@ from managements.user_management.user import go_user
 from ORM.tables.tag import Tag
 from ORM.tables.friendship import Friendship
 from ORM.views.profile import Profile
-
+from ORM.tables.channel import Channel
+from ORM.tables.message import Message
 
 from app import socketio
 
@@ -30,6 +31,7 @@ def on_join(data):
         join_room(user_id)
         print(f"User {user_id} joined their room.")
 
+# FRIENDSHIP ---------------
 @socketio.on('send_invitation')
 def send_invitation_route(data):
     sender_id = data.get('sender_id')
@@ -64,6 +66,9 @@ def send_connection_route(data):
     # update state
     friendship.update({'state': 'connected'})
 
+    # create channel between users
+    channel = Channel(None, sender_id, receiver_id)
+    channel.create()
 
     # add notif
 
@@ -87,7 +92,41 @@ def send_uninvitation_route(data):
 
     emit('receive_uninvitation', {'message': f'Uninvitation sent from {sender_id}'}, room=receiver_id)
 
+# CHAT ---------------
+@socketio.on('get_messages')
+def get_messages(data):
+    user_id = session.get('user_id')
+    profile_id = data.get('profile_id')
+    
+    profile_selected = Profile._find_by_id(profile_id)
 
+    # Récupérer le channel
+    channel = Channel.find_channel_by_user_ids(user_id, profile_id)
+
+    # Récupérer les messages entre user_id et profile_id
+    messages_data = []
+    messages = Message.find_messages_by_channel_id(channel.id)
+
+    if messages:
+        messages_data = [{"receiver_id": msg.receiver_id, "sender_id": msg.sender_id, "content": msg.content, "created_at": msg.created_at.strftime('%Y-%m-%d %H:%M') } for msg in messages]
+
+    # Envoyer les messages au client qui a demandé
+    emit('display_messages', {'messages': messages_data, 'profile_username': profile_selected.username}, room=request.sid)
+
+@socketio.on('send_message')
+def send_message(data):
+    print(data)
+    sender_id = int(data['sender_id'])
+    receiver_id = int(data['receiver_id'])
+    content = data['content']
+    print(content)
+    print(type(sender_id))
+    print(receiver_id)
+    if receiver_id != 0:
+        channel = Channel.find_channel_by_user_ids(sender_id, receiver_id)
+        msg = Message(None, channel.id, sender_id, receiver_id, content, False)
+        msg.create()
+    
 # --------------------------- HTTP ---------------------------
 
 @main.route('/login', methods=['GET', 'POST'])
@@ -135,22 +174,47 @@ def notifs():
 def chat():
     if 'username' not in session:
         return redirect(url_for('main.login'))
-    
+        
     user_id = session['user_id']
-    connections = Friendship.get_friendship_connections(user_id)
-    other_user_ids = [
-        conn.sender_id if conn.receiver_id == user_id else conn.receiver_id
-        for conn in connections
-    ]
-
     profiles = []
-    for id in other_user_ids:
-        profile = Profile._find_by_id(id)
-        if profile:
-            image_data = Profile.get_profile_image(profile.id)
-            profiles.append({'id': profile.id, 'username': profile.username, 'image_data': image_data})
 
-    return render_template('chat.html', profiles=profiles)
+    connections = Friendship.get_friendship_connections(user_id)
+    if connections:
+        other_user_ids = [
+            conn.sender_id if conn.receiver_id == user_id else conn.receiver_id
+            for conn in connections
+        ]
+
+        profiles = []
+        for id in other_user_ids:
+            profile = Profile._find_by_id(id)
+            if profile:
+                image_data = Profile.get_profile_image(profile.id)
+                profiles.append({'id': profile.id, 'username': profile.username, 'image_data': image_data})
+
+        messages_data = []
+        last_message = Message.find_last_channel_id(user_id)
+        if last_message:
+            channel_id = last_message['channel_id']
+            profile_id = last_message['profile_id']
+            
+            profile_selected = Profile._find_by_id(profile_id)
+    
+            # Récupérer les messages entre user_id et profile_id
+            messages = Message.find_messages_by_channel_id(channel_id)
+            if messages:
+                messages_data = [{"receiver_id": msg.receiver_id, "sender_id": msg.sender_id, "content": msg.content,
+                                  "created_at": msg.created_at.strftime('%Y-%m-%d %H:%M')} for msg in messages]
+        else:
+            channel = Channel.find_last_channel_by_user_id(user_id)
+            if channel.user_a == user_id:
+                profile_id = channel.user_b
+            else:
+                profile_id = channel.user_a
+            profile_selected = Profile._find_by_id(profile_id)
+
+    return render_template('chat.html', profiles=profiles, user_id=user_id, profile_selected=profile_selected,
+                           profile_id=profile_id, messages_data=messages_data)
 
 @main.route('/profile/<int:profile_id>')
 def profile(profile_id):

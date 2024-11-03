@@ -50,6 +50,25 @@ class Channel(Model):
         return None
 
     @classmethod
+    def find_last_channel_by_user_id(cls, user_id: int, columns: list[str] = None):
+        if user_id is None:
+            raise ValueError('user_id cannot be None')
+        columns = cls.get_all_column_names(columns)
+        query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
+             f"WHERE user_a = %s OR user_b = %s "
+             f"ORDER BY created_at DESC LIMIT 1;")
+        params = (user_id, user_id)
+        try:
+            res = db.execute(query, params)
+            if res:
+                results = cls.get_dict_by_id(res[0][0])
+                return cls(**results)
+        except Exception as e:
+            raise e
+        return None
+
+
+    @classmethod
     def find_channel_by_user_ids(cls, user_1: int, user_2: int):
         query = (f"SELECT id FROM {cls.table_name} WHERE "
                  f"(user_a = {user_1} or user_a = {user_2}) "

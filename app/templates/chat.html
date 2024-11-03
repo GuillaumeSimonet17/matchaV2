@@ -1,34 +1,49 @@
 {% extends "index.html" %}
 {% block content %}
-<section id="chat" class="border  col-12 col-md-10 {{ 'active' if request.path == '/chat' else '' }}">
+<section id="chat" class="border col-12 col-md-10 {{ 'active' if request.path == '/chat' else '' }}">
+    <p id="current-user" data-current-user-id="{{ user_id }}"/>
+    <p id="current-profile" data-profile-id="{{ profile_id }}"/>
     <div class="container border p-0 rounded d-flex" style="min-height: 90vh">
         <div class="col-3 col-md-3">
             <nav class="nav flex-column bg-light h-100 rounded-3 shadow sticky-top">
                 {% for profile in profiles %}
-                <a href="#" class="nav-link d-flex justify-content-between align-items-center border-bottom
-                {{ 'active-chat' if True else '' }}">
+                <a href="#" class="nav-link d-flex justify-content-between align-items-center border-bottom user-profile
+                    {% if profile_id == profile.id %}bg-primary{% endif %}"
+                   data-username="{{ profile.username }}" data-profile-id="{{ profile.id }}">
                     <img style="width: 30px;" src="data:image/png;base64, {{ profile.image_data }}"
                          alt="Profile image"/>
-                    <p class="m-0 fw-bold">{{profile.username}}</p>
+                    <p class="m-0 fw-bold">{{ profile.username }}</p>
                 </a>
                 {% endfor %}
             </nav>
         </div>
 
-        <div class="col-9 col-md-9 d-flex flex-column">
-            <div class="p-4 bg-light h-100 d-flex flex-column align-items-center">
-                <div class="d-inline-flex align-items-center rounded mt-1 me-auto my-msg" style="width: auto;">
-                    <p class="p-2 px-3 m-0 my-msg">yoooooooooo</p>
+        <div id="channel-container" class="col-9 col-md-9 d-flex flex-column" style="max-height: 88vh;">
+            <div id="chat-container" class="overflow-auto p-4 bg-light h-100 d-flex flex-column align-items-center">
+                {% for msg in messages_data %}
+                <div class="d-flex flex-column align-items-center rounded mt-1 px-2
+                    {% if msg.sender_id == user_id %}me-auto my-msg{% else %}ms-auto border{% endif %}">
+                    <p class="text-dark p-2 px-3 m-0 text-end text-break">
+                        <strong class="text-dark">
+                            {% if msg.sender_id == user_id %}You{% else %}{{ profile_selected.username }}{% endif %}:
+                        </strong>
+                        {{ msg.content }}
+                    </p>
+                    <small class="text-dark">{{ msg.created_at }}</small>
                 </div>
-                <div class="d-inline-flex align-items-center rounded mt-1 ms-auto border" style="width: auto;">
-                    <p class="p-2 px-3 m-0 text-end text-break">yoooooooooo ca dji koa</p>
-                </div>
+                {% endfor %}
+                {% if not messages_data or messages_data == [] %}
+                <p>No messages</p>
+                {% endif %}
             </div>
             <div class="border-top d-flex justify-content-between bg-light">
-                <input type="text" class="px-4 col-9 col-md-10 border-0">
-                <button class="btn col-3 col-md-2">send</button>
+                <input id="input-msg" type="text" class="px-4 col-9 col-md-10 border-0"/>
+                <button data-profile-id="{{ profile_id }}" id="btn-send" class="btn col-3 col-md-2">Send</button>
             </div>
         </div>
     </div>
 </section>
+
+<script src="/static/js/chat.js" type="module"></script>
+
 {% endblock %}

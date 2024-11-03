@@ -59,3 +59,19 @@ class Message(Model):
         except Exception as e:
             raise e
         return None
+    
+    @classmethod
+    def find_last_channel_id(cls, user_id: int):
+        query = (f"SELECT sender_id, receiver_id, channel_id FROM {cls.table_name} "
+                 f"WHERE sender_id = {user_id} or receiver_id = {user_id} "
+                 f"ORDER BY created_at DESC LIMIT 1;")
+        try:
+            res = db.execute(query)
+            if res:
+                if user_id == res[0][0]:
+                    return {'profile_id': res[0][1], 'channel_id': res[0][2]}
+                else:
+                    return {'profile_id': res[0][0], 'channel_id': res[0][2]}
+        except Exception as e:
+            raise e
+        return None
