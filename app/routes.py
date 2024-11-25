@@ -81,7 +81,7 @@ def send_connection_route(data):
 
     sender = Profile._find_by_id(sender_id)
     
-    emit('receive_connection', {'sender_username': sender.username, 'sender_id': sender.id, 'date': 'Now', 'state': 'invitation' }, room=f'user_{receiver_id}')
+    emit('receive_connection', {'sender_username': sender.username, 'sender_id': sender.id, 'date': 'Now', 'state': 'connected' }, room=f'user_{receiver_id}')
 
 @socketio.on('send_uninvitation')
 def send_uninvitation_route(data):
@@ -102,7 +102,7 @@ def send_uninvitation_route(data):
 
     sender = Profile._find_by_id(sender_id)
 
-    emit('receive_uninvitation', {'sender_username': sender.username, 'sender_id': sender.id, 'date': 'Now', 'state': 'invitation' }, room=f'user_{receiver_id}')
+    emit('receive_uninvitation', {'sender_username': sender.username, 'sender_id': sender.id, 'date': 'Now', 'state': 'uninvitation' }, room=f'user_{receiver_id}')
 
 # CHAT ---------------
 @socketio.on('get_messages')
@@ -149,8 +149,8 @@ def received_message(data):
 @main.route('/get_current_page')
 def get_current_page():
     current_page = session.get('current_page', 'default')
-    print('current_page ==> ', current_page)
-    return jsonify({'current_page': current_page})
+    current_profile_id = session.get('profile_id', 'default')
+    return jsonify({'current_page': current_page, 'current_profile_id': current_profile_id})
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():

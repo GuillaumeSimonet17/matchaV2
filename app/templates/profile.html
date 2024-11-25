@@ -26,18 +26,18 @@
             </div>
 
             {% if state != 'uninvitation' %}
-            <div class="col-12 mt-2">
+            <div id="friendship-btn-container" class="col-12 mt-2">
 
                 <p id="alert-invitation-sent" class="d-none alert alert-success">Invitation envoyée</p>
                 <p id="alert-connection-sent" class="d-none alert alert-success">You are connected and can now chat</p>
 
                 {% if sent_invitation %}
-                <p class="alert alert-success">Invitation envoyée</p>
+                <p id="alert-invitation-received" class="alert alert-success">Invitation envoyée</p>
                 {% endif %}
 
                 {% if not state %}
                 <!--       to send invitation         -->
-                <button id="btn-send-invit" class="btn btn-outline-primary col-2 col-md-1" type="button"
+                <button id="btn-send-invit" class="btn btn-outline-primary col-2 col-md-3" type="button"
                     data-profile-id="{{ profile.id }}">
                     <i class="bi bi-heart"></i>
                 </button>
@@ -45,21 +45,18 @@
 
                 {% if recevied_invitation %}
                 <!--       to send connection         -->
-                <button id="btn-send-connect" class="btn btn-outline-primary col-2 col-md-1" type="button"
+                <button id="btn-send-connect" class="btn btn-outline-primary col-2 col-md-3" type="button"
                     data-profile-id="{{ profile.id }}">
                     <i class="bi bi-heart-half"></i>
                 </button>
                 {% endif %}
-
                 <!--       to send uninvitation         -->
                 {% if connected %}
-                <button id="btn-send-uninvit" class="btn btn-outline-primary col-2 col-md-1" type="button"
+                <button id="btn-send-uninvit" class="btn btn-outline-primary col-2 col-md-3" type="button"
                     data-profile-id="{{ profile.id }}">
                     <i class="bi bi-heartbreak-fill"></i>
                 </button>
-                <p class="alert alert-success">You are connected and can now chat</p>
                 {% endif %}
-
             </div>
             {% endif %}
 

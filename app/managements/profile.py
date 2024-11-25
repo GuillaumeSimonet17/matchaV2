@@ -10,6 +10,7 @@ from managements.notif import get_numbers_of_notifs
 
 def go_profile(profile_id: int):
     user_id = session['user_id']
+    session['profile_id'] = profile_id
     profile = Profile._find_by_id(profile_id)
     profile_image_data = User.get_profile_image(profile.id)
     user_tag_ids = UserTag.find_tags_by_user_id(profile.id)
