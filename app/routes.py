@@ -177,8 +177,12 @@ def chat():
         
     user_id = session['user_id']
     profiles = []
+    profile_id = None
+    profile_selected = None
+    messages_data = []
 
     connections = Friendship.get_friendship_connections(user_id)
+
     if connections:
         other_user_ids = [
             conn.sender_id if conn.receiver_id == user_id else conn.receiver_id
@@ -192,14 +196,14 @@ def chat():
                 image_data = Profile.get_profile_image(profile.id)
                 profiles.append({'id': profile.id, 'username': profile.username, 'image_data': image_data})
 
-        messages_data = []
         last_message = Message.find_last_channel_id(user_id)
+        
         if last_message:
             channel_id = last_message['channel_id']
             profile_id = last_message['profile_id']
-            
+
             profile_selected = Profile._find_by_id(profile_id)
-    
+
             # Récupérer les messages entre user_id et profile_id
             messages = Message.find_messages_by_channel_id(channel_id)
             if messages:

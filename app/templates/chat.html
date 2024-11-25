@@ -20,6 +20,7 @@
 
         <div id="channel-container" class="col-9 col-md-9 d-flex flex-column" style="max-height: 88vh;">
             <div id="chat-container" class="overflow-auto p-4 bg-light h-100 d-flex flex-column align-items-center">
+                {% if profile_selected %}
                 {% for msg in messages_data %}
                 <div class="d-flex flex-column align-items-center rounded mt-1 px-2
                     {% if msg.sender_id == user_id %}me-auto my-msg{% else %}ms-auto border{% endif %}">
@@ -32,6 +33,8 @@
                     <small class="text-dark">{{ msg.created_at }}</small>
                 </div>
                 {% endfor %}
+                {% endif %}
+
                 {% if not messages_data or messages_data == [] %}
                 <p>No messages</p>
                 {% endif %}
