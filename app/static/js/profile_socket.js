@@ -1,7 +1,7 @@
-import socket from './socket_management.js';
+import { incrementBadgeNotif } from './notif.js';
 
 const currentUserIdElement = document.getElementById('current-user');
-const currentUserId = currentUserIdElement ? currentUserIdElement.getAttribute('data-current-user-id') : null;  // Utiliser l'attribut 'data-id'
+const currentUserId = currentUserIdElement ? currentUserIdElement.getAttribute('data-current-user-id') : null;
 
 // ----------------------------------- EMIT -----------------------------------
 
@@ -59,15 +59,24 @@ if (btnSendUninvit) {
 
 socket.on('receive_invitation', function(data) {
     // add notif
+    incrementBadgeNotif()
+
+    // add 'Invitation reçue'
     console.log('Invitation reçue:', data.message);
 });
 
 socket.on('receive_connection', function(data) {
     // add notif
+    incrementBadgeNotif()
+
+    // change 'Invitation envoyée' by You are connected and can now chat
     console.log('Connection reçue:', data.message);
 });
 
 socket.on('receive_uninvitation', function(data) {
     // add notif
+    incrementBadgeNotif()
+
+    //  remove 'You are connected and can now chat'
     console.log('Uninvitation reçue:', data.message);
 });

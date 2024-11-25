@@ -1,14 +1,14 @@
 from flask import render_template, session
 from ORM.views.profile import Profile
-from ORM.tables.user import User
+from managements.notif import get_numbers_of_notifs
 
 
 def go_search():
     filtered_profiles = False
     all_profiles = Profile._all()
-    
+
     # filtrer ceux que j'ai block et qui m'ont block
-    
+
     if all_profiles:
         filtered_profiles = []
         for profile in all_profiles:
@@ -20,5 +20,7 @@ def go_search():
                     'username': profile.username,
                     'profile_image': image_data
                 })
-
-    return render_template('search.html', filtered_profiles=filtered_profiles, user_id=user_id)
+                
+    nb_notifs = get_numbers_of_notifs()
+    return render_template('search.html', filtered_profiles=filtered_profiles, user_id=user_id,
+                           nb_notifs=nb_notifs)

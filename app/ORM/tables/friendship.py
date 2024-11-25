@@ -65,7 +65,7 @@ class Friendship(Model):
         except Exception as e:
             raise e
         return None
-    
+
     @classmethod
     def get_friendship_by_user_ids(cls, user_ids: list[int], columns: list[str] = None):
         if len(user_ids) != 2:

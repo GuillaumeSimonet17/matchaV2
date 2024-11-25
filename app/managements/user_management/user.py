@@ -2,6 +2,7 @@ from flask import render_template, session, request
 from ORM.tables.user import User
 from ORM.tables.tag import UserTag, Tag
 from managements.user_management.update_user import update_user_infos
+from managements.notif import get_numbers_of_notifs
 
 
 def go_user():
@@ -11,8 +12,9 @@ def go_user():
     tags = Tag._all()
     user_tag_ids = [tag.tag_id for tag in user_tags]
     if request.method == 'POST':
-        return update_user_infos(request, user=user, profile_image_data=profile_image_data, user_tag_ids=user_tag_ids,
+        return update_user_infos(request, user=user, user_id=user.id, profile_image_data=profile_image_data, user_tag_ids=user_tag_ids,
                                  tags=tags)
-    
-    return render_template('user.html', user=user, profile_image_data=profile_image_data,
-                           user_tag_ids=user_tag_ids, tags=tags)
+
+    nb_notifs = get_numbers_of_notifs()
+    return render_template('user.html', user=user, user_id=user.id, profile_image_data=profile_image_data,
+                           user_tag_ids=user_tag_ids, tags=tags, nb_notifs=nb_notifs)

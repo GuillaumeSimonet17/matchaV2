@@ -18,10 +18,20 @@
 
     </div>
 
-    <script type="module" src="/static/js/socket_management.js"></script>
-
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+
+    <script type="module" src="/static/js/profile_socket.js"></script>
+
+    <script>
+        const socket = io();
+        const user_id = "{{ user_id }}";
+
+        socket.on('connect', function () {
+            console.log('connected')
+            socket.emit('join', {user_id: user_id});
+        });
+    </script>
 </body>
 
 </html>

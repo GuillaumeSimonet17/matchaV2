@@ -1,4 +1,4 @@
-import socket from './socket_management.js';
+// import socket from './socket_management.js';
 
 const currentUserIdElement = document.getElementById('current-user');
 const currentUserId = currentUserIdElement ? currentUserIdElement.getAttribute('data-current-user-id') : null;
@@ -34,8 +34,8 @@ if (profiles) {
 
 const btnSend = document.querySelector('#btn-send')
 if (btnSend) {
-    //
-        // const profileId = btnSend.getAttribute('data-profile-id');
+
+    // const profileId = btnSend.getAttribute('data-profile-id');
 
     btnSend.addEventListener('click', function (event) {
 
@@ -60,6 +60,10 @@ if (btnSend) {
         }
     })
 }
+
+socket.on('receive_message', function (data) {
+    socket.emit('received_message', data);
+})
 
 socket.on('display_messages', function (data) {
     const chatContainer = document.querySelector('#chat-container');

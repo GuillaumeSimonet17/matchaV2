@@ -76,6 +76,7 @@ def auth_register(request):
             create_tags(user_id, tags)
             session['username'] = username
             session['user_id'] = user_id[0]
+            session['current_page'] = 'home'
             return redirect(url_for('main.home'))
         flash('Username ou email déjà utilisé', 'danger')
     

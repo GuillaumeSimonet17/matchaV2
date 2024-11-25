@@ -7,7 +7,13 @@ from dotenv import load_dotenv
 from ORM.database import init_db
 
 app = Flask(__name__)
-socketio = SocketIO(app)
+
+app.config.update(
+    SESSION_COOKIE_SAMESITE="None",  # Autoriser les cookies dans des contextes tiers
+    SESSION_COOKIE_SECURE=True      # Obligatoire pour SameSite=None (HTTPS nécessaire)
+)
+
+socketio = SocketIO(app, cors_allowed_origins="*")
 
 load_dotenv()
 
@@ -160,5 +166,5 @@ from ORM.tables.message import Message
 app.register_blueprint(main_routes)
 
 if __name__ == '__main__':
-    app.run(debug=True)
-    socketio.run(app)
+    app.run(debug=True, ssl_context="adhoc")
+    socketio.run(app, host='0.0.0.0', port=5000)

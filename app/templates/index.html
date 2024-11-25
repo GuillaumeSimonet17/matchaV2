@@ -32,14 +32,16 @@
         <img class="{{ 'active' if request.path == '/' else '' }} mt-2" style="width: 35px; transform: rotate(180deg);"
              src="../static/img/airbnb.png" alt="Card image cap"/>
     </a>
-    <a class=" nav-link d-flex justify-content-center position-relative" href="/notifs">
-        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            99+
+    <a class="nav-link d-flex justify-content-center position-relative" href="/notifs">
+        {% if nb_notifs %}
+        <span id="badge-notifs" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            {{nb_notifs}}
         </span>
-        <i class="bi bi-bell {{ 'active' if request.path == '/notifs' else '' }}" style="font-size: 2rem"></i>
+        {% endif %}
+        <i id="notif-icon" class="bi bi-bell {{ 'active' if request.path == '/notifs' else '' }}" style="font-size: 2rem"></i>
     </a>
     <a class="nav-link d-flex justify-content-center position-relative" href="/chat">
-        <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+        <span id="badge-msg-notifs" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
             2
         </span>
         <i class="{{ 'active' if request.path == '/chat' else '' }} bi bi-chat-left" style="font-size: 2rem;"></i>

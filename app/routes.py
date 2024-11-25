@@ -1,6 +1,6 @@
 from flask import Blueprint, flash, request, render_template, session, redirect, url_for
 from flask_socketio import emit, join_room
-
+from app import socketio
 
 from managements.user_management.auth.login import auth_login
 from managements.user_management.auth.register import auth_register
@@ -11,12 +11,14 @@ from managements.notif import go_notif
 from managements.search import go_search
 from managements.historic import go_historic
 from managements.user_management.user import go_user
+from managements.notif import get_numbers_of_notifs
 
 from ORM.tables.tag import Tag
 from ORM.tables.friendship import Friendship
 from ORM.views.profile import Profile
 from ORM.tables.channel import Channel
 from ORM.tables.message import Message
+from ORM.tables.notif import Notif
 
 from app import socketio
 
@@ -27,8 +29,10 @@ main = Blueprint('main', __name__)
 @socketio.on('join')
 def on_join(data):
     user_id = data.get('user_id')
+    print(user_id)
     if user_id:
-        join_room(user_id)
+        print('join => ', int(user_id))
+        join_room(f"user_{user_id}")
         print(f"User {user_id} joined their room.")
 
 # FRIENDSHIP ---------------
@@ -44,22 +48,24 @@ def send_invitation_route(data):
             send_connection_route(data)
         return
 
-    # create friendship
     friendship = Friendship(None, 'invitation', sender_id, receiver_id)
     friendship.create()
 
-    # add notif
-
-    emit('receive_invitation', {'message': f'Invitation sent from {sender_id}'}, room=receiver_id)
+    notif = Notif(None, 'invitation', sender_id, receiver_id, False)
+    notif.create()
+    print(receiver_id)
+    print(type(receiver_id))
+    print(int(receiver_id))
+    emit('receive_invitation', {'message': f'Invitation sent from {sender_id}'}, room=f'user_{receiver_id}')
 
 @socketio.on('send_connection')
 def send_connection_route(data):
     sender_id = data.get('sender_id')
     receiver_id = data.get('receiver_id')
 
-    # get friendship and check if state is invitation and receiver_id = sender_id
     friendship = Friendship.get_friendship_by_user_ids([sender_id, receiver_id])
-    
+
+    # get friendship and check if state is invitation and receiver_id = sender_id
     if friendship.state != 'invitation' and friendship.sender_id != int(receiver_id):
         return
 
@@ -70,9 +76,10 @@ def send_connection_route(data):
     channel = Channel(None, sender_id, receiver_id)
     channel.create()
 
-    # add notif
-
-    emit('receive_connection', {'message': f'Connection sent from {sender_id}'}, room=receiver_id)
+    notif = Notif(None, 'connection', sender_id, receiver_id, False)
+    notif.create()
+    
+    emit('receive_connection', {'message': f'Connection sent from {sender_id}'}, room=f'user_{receiver_id}')
 
 @socketio.on('send_uninvitation')
 def send_uninvitation_route(data):
@@ -87,10 +94,11 @@ def send_uninvitation_route(data):
 
     # update state
     friendship.update({'state': 'uninvitation', 'sender_id': sender_id, 'receiver_id': receiver_id})
-    
-    # add notif
 
-    emit('receive_uninvitation', {'message': f'Uninvitation sent from {sender_id}'}, room=receiver_id)
+    notif = Notif(None, 'uninvitation', sender_id, receiver_id, False)
+    notif.create()
+
+    emit('receive_uninvitation', {'message': f'Uninvitation sent from {sender_id}'}, room=f'user_{receiver_id}')
 
 # CHAT ---------------
 @socketio.on('get_messages')
@@ -100,33 +108,38 @@ def get_messages(data):
     
     profile_selected = Profile._find_by_id(profile_id)
 
-    # Récupérer le channel
     channel = Channel.find_channel_by_user_ids(user_id, profile_id)
 
-    # Récupérer les messages entre user_id et profile_id
     messages_data = []
     messages = Message.find_messages_by_channel_id(channel.id)
 
     if messages:
-        messages_data = [{"receiver_id": msg.receiver_id, "sender_id": msg.sender_id, "content": msg.content, "created_at": msg.created_at.strftime('%Y-%m-%d %H:%M') } for msg in messages]
+        messages_data = [{"receiver_id": msg.receiver_id, "sender_id": msg.sender_id, "content": msg.content,
+                          "created_at": msg.created_at.strftime('%Y-%m-%d %H:%M') } for msg in messages]
 
-    # Envoyer les messages au client qui a demandé
-    emit('display_messages', {'messages': messages_data, 'profile_username': profile_selected.username}, room=request.sid)
+    session['current_channel'] = profile_selected.id
+    emit('display_messages', {'messages': messages_data, 'profile_username': profile_selected.username},
+         room=request.sid)
 
 @socketio.on('send_message')
 def send_message(data):
-    print(data)
     sender_id = int(data['sender_id'])
     receiver_id = int(data['receiver_id'])
     content = data['content']
-    print(content)
-    print(type(sender_id))
-    print(receiver_id)
+
     if receiver_id != 0:
         channel = Channel.find_channel_by_user_ids(sender_id, receiver_id)
         msg = Message(None, channel.id, sender_id, receiver_id, content, False)
-        msg.create()
-    
+        new_msg = msg.create()
+
+    emit('receive_message', {'messages': new_msg, 'profile_id': sender_id}, room=f'user_{receiver_id}')
+
+@socketio.on('received_message')
+def received_message(data):
+    if data['profile_id'] == session['current_channel']:
+        get_messages(data)
+    # else: add a notif
+
 # --------------------------- HTTP ---------------------------
 
 @main.route('/login', methods=['GET', 'POST'])
@@ -137,12 +150,15 @@ def login():
         flash('Ecris mieux stp', 'danger')
     
     if 'username' in session:
+        session['current_page'] = 'home'
         return redirect(url_for('main.home'))
     return render_template('login.html')
 
 @main.route('/logout')
 def logout():
     session.pop('username', None)
+    session.pop('current_page', None)
+    session.pop('current_channel', None)
     return redirect(url_for('main.login'))
 
 @main.route('/register', methods=['GET', 'POST'])
@@ -154,20 +170,24 @@ def register():
 
 @main.route('/')
 def home():
+    print(session)
     if 'username' not in session:
         return redirect(url_for('main.login'))
+    session['current_page'] = 'home'
     return go_search()
 
 @main.route('/historic')
 def historic():
     if 'username' not in session:
         return redirect(url_for('main.login'))
+    session['current_page'] = 'historic'
     return go_historic()
 
 @main.route('/notifs', methods=['GET'])
 def notifs():
     if 'username' not in session:
         return redirect(url_for('main.login'))
+    session['current_page'] = 'notifs'
     return go_notif()
 
 @main.route('/chat')
@@ -217,19 +237,26 @@ def chat():
                 profile_id = channel.user_a
             profile_selected = Profile._find_by_id(profile_id)
 
+        session['current_channel'] = profile_selected.id
+
+    session['current_page'] = 'chat'
+    
+    nb_notifs = get_numbers_of_notifs()
     return render_template('chat.html', profiles=profiles, user_id=user_id, profile_selected=profile_selected,
-                           profile_id=profile_id, messages_data=messages_data)
+                           profile_id=profile_id, messages_data=messages_data, nb_notifs=nb_notifs)
 
 @main.route('/profile/<int:profile_id>')
 def profile(profile_id):
     if 'username' not in session:
         return redirect(url_for('main.login'))
+    session['current_page'] = 'profile'
     return go_profile(profile_id)
 
 @main.route('/user', methods=['GET', 'POST'])
 def user():
     if 'username' not in session:
         return redirect(url_for('main.login'))
+    session['current_page'] = 'user'
     return go_user()
 
 @main.route('/change-password', methods=['POST'])
