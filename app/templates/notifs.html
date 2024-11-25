@@ -3,7 +3,7 @@
 <section id="notifs"
          class="mt-5 col-12 col-md-7 d-flex justify-content-center {{ 'active' if request.path == '/' else '' }}"
          style="min-height: 90vh">
-    <div class="row flex-column col-12">
+    <div id="notifs-container" class="row flex-column col-12">
         {% if notifs_list %}
         {% for notif in notifs_list %}
         <div class="ms-3 mb-4 border-0 border-bottom col-10 justify-content-between d-flex align-items-center">

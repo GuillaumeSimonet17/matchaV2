@@ -1,4 +1,4 @@
-from flask import Blueprint, flash, request, render_template, session, redirect, url_for
+from flask import Blueprint, flash, request, render_template, session, redirect, url_for, jsonify
 from flask_socketio import emit, join_room
 from app import socketio
 
@@ -53,10 +53,10 @@ def send_invitation_route(data):
 
     notif = Notif(None, 'invitation', sender_id, receiver_id, False)
     notif.create()
-    print(receiver_id)
-    print(type(receiver_id))
-    print(int(receiver_id))
-    emit('receive_invitation', {'message': f'Invitation sent from {sender_id}'}, room=f'user_{receiver_id}')
+    
+    sender = Profile._find_by_id(sender_id)
+    
+    emit('receive_invitation', {'sender_username': sender.username, 'sender_id': sender.id, 'date': 'Now', 'state': 'invitation' }, room=f'user_{receiver_id}')
 
 @socketio.on('send_connection')
 def send_connection_route(data):
@@ -78,8 +78,10 @@ def send_connection_route(data):
 
     notif = Notif(None, 'connection', sender_id, receiver_id, False)
     notif.create()
+
+    sender = Profile._find_by_id(sender_id)
     
-    emit('receive_connection', {'message': f'Connection sent from {sender_id}'}, room=f'user_{receiver_id}')
+    emit('receive_connection', {'sender_username': sender.username, 'sender_id': sender.id, 'date': 'Now', 'state': 'invitation' }, room=f'user_{receiver_id}')
 
 @socketio.on('send_uninvitation')
 def send_uninvitation_route(data):
@@ -98,7 +100,9 @@ def send_uninvitation_route(data):
     notif = Notif(None, 'uninvitation', sender_id, receiver_id, False)
     notif.create()
 
-    emit('receive_uninvitation', {'message': f'Uninvitation sent from {sender_id}'}, room=f'user_{receiver_id}')
+    sender = Profile._find_by_id(sender_id)
+
+    emit('receive_uninvitation', {'sender_username': sender.username, 'sender_id': sender.id, 'date': 'Now', 'state': 'invitation' }, room=f'user_{receiver_id}')
 
 # CHAT ---------------
 @socketio.on('get_messages')
@@ -141,6 +145,12 @@ def received_message(data):
     # else: add a notif
 
 # --------------------------- HTTP ---------------------------
+
+@main.route('/get_current_page')
+def get_current_page():
+    current_page = session.get('current_page', 'default')
+    print('current_page ==> ', current_page)
+    return jsonify({'current_page': current_page})
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():

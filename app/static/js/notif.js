@@ -1,5 +1,4 @@
 export function incrementBadgeNotif() {
-    console.log('coucouuuu')
     let badge = document.getElementById('badge-notifs');
     if (!badge) {
         badge = document.createElement('span');
