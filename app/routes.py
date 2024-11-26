@@ -1,6 +1,5 @@
 from flask import Blueprint, flash, request, render_template, session, redirect, url_for, jsonify
 from flask_socketio import emit, join_room
-from app import socketio
 
 from managements.user_management.auth.login import auth_login
 from managements.user_management.auth.register import auth_register
@@ -11,7 +10,7 @@ from managements.notif import go_notif
 from managements.search import go_search
 from managements.historic import go_historic
 from managements.user_management.user import go_user
-from managements.notif import get_numbers_of_notifs
+from managements.chat import go_chat
 
 from ORM.tables.tag import Tag
 from ORM.tables.friendship import Friendship
@@ -136,6 +135,19 @@ def send_message(data):
         msg = Message(None, channel.id, sender_id, receiver_id, content, False)
         new_msg = msg.create()
 
+    have_to_notif = False
+    notifs_exist = Notif.find_notif('message', sender_id, receiver_id)
+    if not notifs_exist:
+        have_to_notif = True
+    else:
+        for notif_exist in notifs_exist:
+            if notif_exist.read:
+                have_to_notif = True
+
+    if have_to_notif:
+        notif = Notif(None, 'message', sender_id, receiver_id, False)
+        notif.create()
+        
     emit('receive_message', {'messages': new_msg, 'profile_id': sender_id}, room=f'user_{receiver_id}')
 
 @socketio.on('received_message')
@@ -204,56 +216,9 @@ def notifs():
 def chat():
     if 'username' not in session:
         return redirect(url_for('main.login'))
-        
-    user_id = session['user_id']
-    profiles = []
-    profile_id = None
-    profile_selected = None
-    messages_data = []
+    return go_chat()
 
-    connections = Friendship.get_friendship_connections(user_id)
 
-    if connections:
-        other_user_ids = [
-            conn.sender_id if conn.receiver_id == user_id else conn.receiver_id
-            for conn in connections
-        ]
-
-        profiles = []
-        for id in other_user_ids:
-            profile = Profile._find_by_id(id)
-            if profile:
-                image_data = Profile.get_profile_image(profile.id)
-                profiles.append({'id': profile.id, 'username': profile.username, 'image_data': image_data})
-
-        last_message = Message.find_last_channel_id(user_id)
-        
-        if last_message:
-            channel_id = last_message['channel_id']
-            profile_id = last_message['profile_id']
-
-            profile_selected = Profile._find_by_id(profile_id)
-
-            # Récupérer les messages entre user_id et profile_id
-            messages = Message.find_messages_by_channel_id(channel_id)
-            if messages:
-                messages_data = [{"receiver_id": msg.receiver_id, "sender_id": msg.sender_id, "content": msg.content,
-                                  "created_at": msg.created_at.strftime('%Y-%m-%d %H:%M')} for msg in messages]
-        else:
-            channel = Channel.find_last_channel_by_user_id(user_id)
-            if channel.user_a == user_id:
-                profile_id = channel.user_b
-            else:
-                profile_id = channel.user_a
-            profile_selected = Profile._find_by_id(profile_id)
-
-        session['current_channel'] = profile_selected.id
-
-    session['current_page'] = 'chat'
-    
-    nb_notifs = get_numbers_of_notifs()
-    return render_template('chat.html', profiles=profiles, user_id=user_id, profile_selected=profile_selected,
-                           profile_id=profile_id, messages_data=messages_data, nb_notifs=nb_notifs)
 
 @main.route('/profile/<int:profile_id>')
 def profile(profile_id):

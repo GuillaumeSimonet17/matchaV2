@@ -94,7 +94,6 @@ function display_friendship_changes(data) {
         document.getElementById('friendship-btn-container').insertAdjacentHTML('afterbegin', newAlert);
     }
     if (data.state === 'connected') {
-        console.log('aloooooooooo')
         const p_balise2 = `
             <p id="alert-connection-received" class="alert alert-success">You are connected and can now chat</p>
             `
@@ -116,9 +115,8 @@ socket.on('receive_invitation', function (data) {
             if (currentPage === 'notifs') {
                 add_notif(data)
             } else {
-                incrementBadgeNotif();
-                console.log('data.sender_id =  ', data.sender_id)
-                console.log('current_profile_id  ', res.current_profile_id)
+                incrementBadgeNotif(data)
+
                 if (currentPage === 'profile' && data.sender_id === res.current_profile_id) {
                     display_friendship_changes(data)
                 }

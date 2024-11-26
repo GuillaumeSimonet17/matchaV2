@@ -1,6 +1,6 @@
 from flask import render_template, session
 from ORM.views.profile import Profile
-from managements.notif import get_numbers_of_notifs
+from managements.notif import get_numbers_of_notifs, get_numbers_of_notifs_msg
 
 
 def go_search():
@@ -22,5 +22,6 @@ def go_search():
                 })
                 
     nb_notifs = get_numbers_of_notifs()
+    nb_notifs_msg = get_numbers_of_notifs_msg()
     return render_template('search.html', filtered_profiles=filtered_profiles, user_id=user_id,
-                           nb_notifs=nb_notifs)
+                           nb_notifs=nb_notifs, nb_notifs_msg=nb_notifs_msg)

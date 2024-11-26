@@ -1,7 +1,7 @@
 from flask import render_template, session
 from ORM.views.profile import Profile
 from ORM.tables.visit import Visit
-from managements.notif import get_numbers_of_notifs
+from managements.notif import get_numbers_of_notifs, get_numbers_of_notifs_msg
 
 
 def go_historic():
@@ -17,4 +17,6 @@ def go_historic():
             })
 
     nb_notifs = get_numbers_of_notifs()
-    return render_template('historic.html', user_id=user_id, visits_list=visits_list, nb_notifs=nb_notifs)
+    nb_notifs_msg = get_numbers_of_notifs_msg()
+    return render_template('historic.html', user_id=user_id, visits_list=visits_list,
+                        nb_notifs=nb_notifs, nb_notifs_msg=nb_notifs_msg)

@@ -35,7 +35,7 @@ class Notif(Model):
         if state not in cls.possible_states:
             raise ValueError(f"State {state} is not valid")
         query = (f"SELECT id FROM {cls.table_name} "
-                 f"WHERE state = {state} and sender_id = {sender_id} and receiver_id = {receiver_id};")
+                 f"WHERE state = '{state}' and sender_id = {sender_id} and receiver_id = {receiver_id};")
         try:
             res = db.execute(query)
             if res:
@@ -52,6 +52,13 @@ class Notif(Model):
     @classmethod
     def mark_notifs_by_user_id_as_read(cls, user_id: int):
         notifs = cls.find_notifs_by_user(user_id)
-        unread_notifs_ids = [notif.id for notif in notifs if not notif.read]
+        unread_notifs_ids = [notif.id for notif in notifs if not notif.read and notif.state != 'message']
         if unread_notifs_ids:
             cls.mark_as_read(unread_notifs_ids)
+
+    @classmethod
+    def delete_notifs_msg_by_user_id(cls, user_id: int):
+        notifs = cls.find_notifs_by_user(user_id)
+        msg_notifs_ids = [notif.id for notif in notifs if notif.state == 'message']
+        if msg_notifs_ids:
+            cls.delete_mass(msg_notifs_ids)

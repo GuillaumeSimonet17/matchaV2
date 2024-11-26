@@ -6,7 +6,7 @@ from ORM.tables.user import User
 from ORM.tables.tag import UserTag, Tag
 from ORM.tables.visit import Visit
 
-from managements.notif import get_numbers_of_notifs
+from managements.notif import get_numbers_of_notifs, get_numbers_of_notifs_msg
 
 def go_profile(profile_id: int):
     user_id = session['user_id']
@@ -41,6 +41,8 @@ def go_profile(profile_id: int):
     # send a notif to profile_id
 
     nb_notifs = get_numbers_of_notifs()
+    nb_notifs_msg = get_numbers_of_notifs_msg()
     return render_template('profile.html', profile=profile, state=state, connected=connected,
                            profile_image_data=profile_image_data, recevied_invitation=recevied_invitation,
-                           sent_invitation=sent_invitation, user_tags=user_tags, user_id=user_id, nb_notifs=nb_notifs)
+                           sent_invitation=sent_invitation, user_tags=user_tags, user_id=user_id,
+                           nb_notifs=nb_notifs, nb_notifs_msg=nb_notifs_msg)

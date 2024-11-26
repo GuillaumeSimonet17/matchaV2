@@ -41,9 +41,11 @@
         <i id="notif-icon" class="bi bi-bell {{ 'active' if request.path == '/notifs' else '' }}" style="font-size: 2rem"></i>
     </a>
     <a class="nav-link d-flex justify-content-center position-relative" href="/chat">
+        {% if nb_notifs_msg %}
         <span id="badge-msg-notifs" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            2
+            {{nb_notifs_msg}}
         </span>
+        {% endif %}
         <i class="{{ 'active' if request.path == '/chat' else '' }} bi bi-chat-left" style="font-size: 2rem;"></i>
     </a>
     <a class="nav-link d-flex justify-content-center" href="/user">

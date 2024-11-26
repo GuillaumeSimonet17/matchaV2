@@ -1,4 +1,4 @@
-// import socket from './socket_management.js';
+import {incrementBadgeMsg} from './notif.js';
 
 const currentUserIdElement = document.getElementById('current-user');
 const currentUserId = currentUserIdElement ? currentUserIdElement.getAttribute('data-current-user-id') : null;
@@ -62,6 +62,9 @@ if (btnSend) {
 }
 
 socket.on('receive_message', function (data) {
+    console.log('ah d\'accord')
+    incrementBadgeMsg();
+
     socket.emit('received_message', data);
 })
 
