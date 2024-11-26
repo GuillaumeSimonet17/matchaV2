@@ -22,6 +22,30 @@ if (btnSendInvit) {
     };
 }
 
+const btnSendBlock = document.getElementById('btn-send-block')
+if (btnSendBlock) {
+    btnSendBlock.onclick = function () {
+
+        const receiver_id = this.getAttribute('data-profile-id');
+
+        socket.emit('send_block', {
+            sender_id: currentUserId,
+            receiver_id: receiver_id
+        });
+
+        this.remove();
+         const p_balise_block = `
+            <p id="alert-block-sent" class="row alert alert-success">Vous venez de bloquer ce bateau</p>
+            `
+        document.getElementById('friendship-btn-container').insertAdjacentHTML('afterbegin', p_balise_block);
+
+        const btnInvit = document.getElementById('btn-send-invit')
+        if (btnInvit) {
+            btnInvit.remove()
+        }
+    };
+}
+
 const btnSendConnect = document.getElementById('btn-send-connect')
 if (btnSendConnect) {
     btnSendConnect.onclick = function () {

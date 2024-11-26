@@ -62,7 +62,6 @@ if (btnSend) {
 }
 
 socket.on('receive_message', function (data) {
-    console.log('ah d\'accord')
     incrementBadgeMsg();
 
     socket.emit('received_message', data);

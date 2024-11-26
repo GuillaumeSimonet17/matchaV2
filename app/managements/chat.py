@@ -6,6 +6,7 @@ from ORM.tables.channel import Channel
 from ORM.tables.message import Message
 from ORM.tables.notif import Notif
 
+from managements.profile import is_blocked
 from managements.notif import get_numbers_of_notifs, get_numbers_of_notifs_msg
 
 
@@ -27,12 +28,14 @@ def go_chat():
         profiles = []
         for id in other_user_ids:
             profile = Profile._find_by_id(id)
+            if (is_blocked(user_id, id)):
+                continue
             if profile:
                 image_data = Profile.get_profile_image(profile.id)
                 profiles.append({'id': profile.id, 'username': profile.username, 'image_data': image_data})
         
         last_message = Message.find_last_channel_id(user_id)
-        
+
         if last_message:
             channel_id = last_message['channel_id']
             profile_id = last_message['profile_id']

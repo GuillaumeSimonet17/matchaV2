@@ -5,7 +5,7 @@ from managements.user_management.auth.login import auth_login
 from managements.user_management.auth.register import auth_register
 from managements.user_management.update_user import change_password
 
-from managements.profile import go_profile
+from managements.profile import go_profile, is_blocked
 from managements.notif import go_notif
 from managements.search import go_search
 from managements.historic import go_historic
@@ -18,6 +18,7 @@ from ORM.views.profile import Profile
 from ORM.tables.channel import Channel
 from ORM.tables.message import Message
 from ORM.tables.notif import Notif
+from ORM.tables.block import Block
 
 from app import socketio
 
@@ -40,6 +41,9 @@ def send_invitation_route(data):
     sender_id = data.get('sender_id')
     receiver_id = data.get('receiver_id')
 
+    if (is_blocked(sender_id, receiver_id)):
+        return
+
     # check if friendship exist
     friendship = Friendship.get_friendship_by_user_ids([sender_id, receiver_id])
     if friendship:
@@ -57,11 +61,25 @@ def send_invitation_route(data):
     
     emit('receive_invitation', {'sender_username': sender.username, 'sender_id': sender.id, 'date': 'Now', 'state': 'invitation' }, room=f'user_{receiver_id}')
 
+@socketio.on('send_block')
+def send_block_route(data):
+    if (is_blocked(data['sender_id'], data['receiver_id'])):
+        return
+    block = Block(None, data['sender_id'], data['receiver_id'])
+    block.create()
+    
+    channel = Channel.find_channel_by_user_ids(data['sender_id'], data['receiver_id'])
+    if channel:
+        channel.delete()
+
 @socketio.on('send_connection')
 def send_connection_route(data):
     sender_id = data.get('sender_id')
     receiver_id = data.get('receiver_id')
-
+    
+    if (is_blocked(sender_id, receiver_id)):
+        return
+    
     friendship = Friendship.get_friendship_by_user_ids([sender_id, receiver_id])
 
     # get friendship and check if state is invitation and receiver_id = sender_id
@@ -86,6 +104,13 @@ def send_connection_route(data):
 def send_uninvitation_route(data):
     sender_id = data.get('sender_id')
     receiver_id = data.get('receiver_id')
+
+    if (is_blocked(sender_id, receiver_id)):
+        return
+    
+    channel = Channel.find_channel_by_user_ids(data['sender_id'], data['receiver_id'])
+    if channel:
+        channel.delete()
 
     # get friendship and check if state is connected
     friendship = Friendship.get_friendship_by_user_ids([sender_id, receiver_id])
@@ -129,6 +154,9 @@ def send_message(data):
     sender_id = int(data['sender_id'])
     receiver_id = int(data['receiver_id'])
     content = data['content']
+    
+    if (is_blocked(sender_id, receiver_id)):
+        return
 
     if receiver_id != 0:
         channel = Channel.find_channel_by_user_ids(sender_id, receiver_id)

@@ -5,6 +5,7 @@ from ORM.tables.friendship import Friendship
 from ORM.tables.user import User
 from ORM.tables.tag import UserTag, Tag
 from ORM.tables.visit import Visit
+from ORM.tables.block import Block
 
 from managements.notif import get_numbers_of_notifs, get_numbers_of_notifs_msg
 
@@ -38,11 +39,24 @@ def go_profile(profile_id: int):
         visit = Visit(None, user_id, profile_id)
         visit.create()
 
-    # send a notif to profile_id
+    # send a notif view to profile_id
+    block = is_blocked(user_id, profile_id)
 
     nb_notifs = get_numbers_of_notifs()
     nb_notifs_msg = get_numbers_of_notifs_msg()
     return render_template('profile.html', profile=profile, state=state, connected=connected,
                            profile_image_data=profile_image_data, recevied_invitation=recevied_invitation,
                            sent_invitation=sent_invitation, user_tags=user_tags, user_id=user_id,
-                           nb_notifs=nb_notifs, nb_notifs_msg=nb_notifs_msg)
+                           nb_notifs=nb_notifs, nb_notifs_msg=nb_notifs_msg, block=block)
+
+def is_blocked(user_id, profile_id):
+    block = False
+    are_blocked = Block.find_block(user_id, profile_id)
+    if are_blocked:
+        block = True
+    else:
+        are_blocked = Block.find_block(profile_id, user_id)
+        print('are_blocked = ', are_blocked)
+        if are_blocked:
+            block = True
+    return block
