@@ -43,10 +43,10 @@
     <a class="nav-link d-flex justify-content-center position-relative" href="/chat">
         {% if nb_notifs_msg %}
         <span id="badge-msg-notifs" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            {{nb_notifs_msg}}
+            <i class="bi bi-bell-fill text-light"></i>
         </span>
         {% endif %}
-        <i class="{{ 'active' if request.path == '/chat' else '' }} bi bi-chat-left" style="font-size: 2rem;"></i>
+        <i  id="chat-icon" class="{{ 'active' if request.path == '/chat' else '' }} bi bi-chat-left" style="font-size: 2rem;"></i>
     </a>
     <a class="nav-link d-flex justify-content-center" href="/user">
         <i class="bi bi-person {{ 'active' if request.path == '/user' else '' }}" style="font-size: 2rem"></i>

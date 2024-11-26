@@ -164,7 +164,7 @@ def send_message(data):
     receiver_id = int(data['receiver_id'])
     content = data['content']
     
-    if (is_blocked(sender_id, receiver_id)):
+    if is_blocked(sender_id, receiver_id):
         return
 
     if receiver_id != 0:
@@ -195,21 +195,27 @@ def received_message(data):
 
 # --------------------------- HTTP ---------------------------
 
-@main.route('/get_current_page')
+@main.route('/get_current_page', methods=['GET'])
 def get_current_page():
     current_page = session.get('current_page', 'default')
     current_profile_id = session.get('profile_id', 'default')
-    return jsonify({'current_page': current_page, 'current_profile_id': current_profile_id})
+    current_channel = session.get('current_channel', 'default')
+
+    return jsonify({'current_page': current_page, 'current_profile_id': current_profile_id, 'current_channel': current_channel})
 
 @main.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
         if auth_login(request):
+            user = User._find_by_username(session['username'])
+            user.update({'connected': True})
+
             return redirect(url_for('main.home'))
         flash('Ecris mieux stp', 'danger')
     
     if 'username' in session:
         session['current_page'] = 'home'
+        session['current_channel'] = None
         return redirect(url_for('main.home'))
     return render_template('login.html')
 
@@ -218,6 +224,10 @@ def logout():
     session.pop('username', None)
     session.pop('current_page', None)
     session.pop('current_channel', None)
+    
+    user = User._find_by_id(session['user_id'])
+    user.update({'connected': False})
+    
     return redirect(url_for('main.login'))
 
 @main.route('/register', methods=['GET', 'POST'])
@@ -229,10 +239,11 @@ def register():
 
 @main.route('/')
 def home():
-    print(session)
-    if 'username' not in session:
+    if 'username' not in session or not User._find_by_username(session['username']):
+        session.clear()
         return redirect(url_for('main.login'))
     session['current_page'] = 'home'
+    session['current_channel'] = None
     return go_search()
 
 @main.route('/historic')
@@ -240,6 +251,7 @@ def historic():
     if 'username' not in session:
         return redirect(url_for('main.login'))
     session['current_page'] = 'historic'
+    session['current_channel'] = None
     return go_historic()
 
 @main.route('/notifs', methods=['GET'])
@@ -247,6 +259,7 @@ def notifs():
     if 'username' not in session:
         return redirect(url_for('main.login'))
     session['current_page'] = 'notifs'
+    session['current_channel'] = None
     return go_notif()
 
 @main.route('/chat')

@@ -25,9 +25,9 @@ class Channel(Model):
             return None
 
     @classmethod
-    def _find_by_id(cls, id):
+    def _find_by_id(cls, id: int):
         try:
-            res = cls.get_dict_by_id(id)
+            res = cls.get_dict_by_id(int(id))
             return cls(**res)
         except Exception as e:
             print(f"Erreur dans la methode find_by_id de User: {e}")

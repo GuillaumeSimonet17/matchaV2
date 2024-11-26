@@ -7,11 +7,11 @@ from ORM.database import db
 class User(Model):
     table_name = 'app_user'
     column_names = ['id', 'username', 'last_name', 'first_name', 'age', 'password', 'email',
-                    'profile_image', 'bio', 'gender', 'gender_pref', 'fame_rate', 'created_at']
+                    'profile_image', 'bio', 'gender', 'gender_pref', 'fame_rate', 'connected', 'created_at']
 
 
     def __init__(self, id, username, last_name, first_name, age, password,
-                 email, profile_image, bio, gender, gender_pref, fame_rate=None, created_at=None):
+                 email, profile_image, bio, gender, gender_pref, fame_rate, connected, created_at=None):
         self.id = id
         self.username = username
         self.last_name = last_name
@@ -24,6 +24,7 @@ class User(Model):
         self.gender = gender
         self.gender_pref = gender_pref
         self.fame_rate = fame_rate
+        self.connected = connected
         self.created_at = created_at
 
 
@@ -39,9 +40,9 @@ class User(Model):
         return None
 
     @classmethod
-    def _find_by_id(cls, id):
+    def _find_by_id(cls, id: int):
         try:
-            res = cls.get_dict_by_id(id)
+            res = cls.get_dict_by_id(int(id))
             if res:
                 return cls(**res)
         except Exception as e:

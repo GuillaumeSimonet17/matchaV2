@@ -41,7 +41,7 @@ def go_chat():
             profile_id = last_message['profile_id']
             
             profile_selected = Profile._find_by_id(profile_id)
-            
+
             # Récupérer les messages entre user_id et profile_id
             messages = Message.find_messages_by_channel_id(channel_id)
             if messages:
@@ -58,7 +58,7 @@ def go_chat():
         session['current_channel'] = profile_selected.id
     
     session['current_page'] = 'chat'
-    
+
     Notif.delete_notifs_msg_by_user_id(user_id)
     
     nb_notifs = get_numbers_of_notifs()

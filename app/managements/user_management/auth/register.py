@@ -10,7 +10,7 @@ def allowed_file(filename):
 
 def create_user(data):
     user = User(None, data['username'], data['last_name'], data['first_name'], data['age'], data['password'],
-                data['email'], None, data['bio'], data['gender'], data['gender_pref'])
+                data['email'], None, data['bio'], data['gender'], data['gender_pref'], data['fame_rate'], data['connected'])
     try:
         user_created = user.create()
         return user_created
@@ -41,6 +41,8 @@ def auth_register(request):
     tags = request.form.getlist('tags[]')
     
     # --------------- VERIFICATION DES INFOS ----------------------
+    if not tags:
+        valid = False
     if len(username) < 3:
         valid = False
         flash('Tu sais pas lire enfaite ? C\'est  3 lettres minimum le username...', 'danger')
@@ -68,6 +70,8 @@ def auth_register(request):
             'bio': bio,
             'gender': gender,
             'gender_pref': gender_pref,
+            'fame_rate': 0,
+            'connected': True,
         }
         
         user_id = create_user(data)

@@ -22,9 +22,9 @@ class Tag(Model):
         return None
         
     @classmethod
-    def _find_by_id(cls, id):
+    def _find_by_id(cls, id: int):
         try:
-            res = cls.get_dict_by_id(id)
+            res = cls.get_dict_by_id(int(id))
             if res:
                 return cls(**res)
         except Exception as e:

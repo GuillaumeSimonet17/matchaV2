@@ -12,11 +12,12 @@ CREATE TABLE IF NOT EXISTS app_user (
     gender VARCHAR(10) NOT NULL,
     gender_pref VARCHAR(10) NOT NULL,
     fame_rate DOUBLE PRECISION,
+    connected BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE VIEW app_profile AS
-SELECT id, username, last_name, first_name, age, profile_image, bio, gender, gender_pref, fame_rate
+SELECT id, username, last_name, first_name, age, profile_image, bio, gender, gender_pref, fame_rate, connected
 FROM app_user;
 
 -- TAGS Many2many -----------------------------------------------------------------------------------

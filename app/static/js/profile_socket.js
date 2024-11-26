@@ -139,7 +139,7 @@ socket.on('receive_invitation', function (data) {
             if (currentPage === 'notifs') {
                 add_notif(data)
             } else {
-                incrementBadgeNotif(data)
+                incrementBadgeNotif()
 
                 if (currentPage === 'profile' && data.sender_id === res.current_profile_id) {
                     display_friendship_changes(data)
@@ -161,8 +161,6 @@ socket.on('receive_connection', function (data) {
                 add_notif(data)
             } else {
                 incrementBadgeNotif();
-                console.log('data.profile_id=  ', data.sender_id)
-                console.log('res.current_profile_id =  ', res.current_profile_id)
                 if (currentPage === 'profile' && data.sender_id === res.current_profile_id) {
                     display_friendship_changes(data)
                 }
@@ -170,8 +168,6 @@ socket.on('receive_connection', function (data) {
         })
         .catch(error => console.error('Error fetching session data:', error));
 
-    console.log('Invitation reçue:');
-    // change 'Invitation envoyée' by You are connected and can now chat
     console.log('Connection reçue:');
 });
 
@@ -185,8 +181,6 @@ socket.on('receive_uninvitation', function (data) {
                 add_notif(data)
             } else {
                 incrementBadgeNotif();
-                console.log('data.profile_id=  ', data.sender_id)
-                console.log('res.current_profile_id  ', res.current_profile_id)
                 if (currentPage === 'profile' && data.sender_id === res.current_profile_id) {
                     display_friendship_changes(data)
                 }
@@ -196,7 +190,6 @@ socket.on('receive_uninvitation', function (data) {
 
     console.log('Uninvitation reçue:');
 });
-
 
 socket.on('receive_view_profile', function (data) {
     fetch('/get_current_page')

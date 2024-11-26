@@ -20,7 +20,7 @@ class Notif(Model):
 
 
     @classmethod
-    def _find_by_id(cls, id):
+    def _find_by_id(cls, id: int):
         try:
             res = cls.get_dict_by_id(id)
             if res:
@@ -59,6 +59,7 @@ class Notif(Model):
     @classmethod
     def delete_notifs_msg_by_user_id(cls, user_id: int):
         notifs = cls.find_notifs_by_user(user_id)
-        msg_notifs_ids = [notif.id for notif in notifs if notif.state == 'message']
-        if msg_notifs_ids:
-            cls.delete_mass(msg_notifs_ids)
+        if notifs:
+            msg_notifs_ids = [notif.id for notif in notifs if notif.state == 'message']
+            if msg_notifs_ids:
+                cls.delete_mass(msg_notifs_ids)
