@@ -35,8 +35,6 @@ if (profiles) {
 const btnSend = document.querySelector('#btn-send')
 if (btnSend) {
 
-    // const profileId = btnSend.getAttribute('data-profile-id');
-
     btnSend.addEventListener('click', function (event) {
 
         let message = document.querySelector('#input-msg')

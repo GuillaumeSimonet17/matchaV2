@@ -40,18 +40,30 @@
             <div class="p-0 m-0 row flex-row">
                 {% if filtered_profiles %}
                 {% for profile in filtered_profiles %}
-                <a href="/profile/{{ profile.id }}"
-                   class="col-12 col-md-4 card border p-2 d-flex justify-content-between m-0">
+                <a id="view-profile" href="/profile/{{ profile.id }}"
+                   class="col-12 col-md-4 card border p-2 d-flex justify-content-between m-0"
+                   data-profile-id="{{ profile.id }}">
                     <div style="max-height: 200px; overflow: hidden;">
-                        <img class="img-fluid" class="form-control" id="profile_image" src="data:image/png;base64, {{ profile.profile_image }}" alt="Profile Image">
+                        <img class="img-fluid" class="form-control" id="profile_image"
+                             src="data:image/png;base64, {{ profile.profile_image }}" alt="Profile Image">
                     </div>
                     <p class="m-0 mt-2 fw-bold">{{ profile.username }}</p>
-<!--                    <p class="m-0 mt-2 fw-bold">{{ profile.id }}</p>-->
                 </a>
                 {% endfor %}
                 {% endif %}
             </div>
         </div>
     </div>
+    <script>
+        document.querySelector('.row').addEventListener('click', function (event) {
+            const target = event.target.closest('a[id="view-profile"]');
+
+            if (target) {
+                const profileId = target.getAttribute('data-profile-id');
+                socket.emit('view_profile', {'receiver_id': profileId});
+            }
+        });
+
+    </script>
 </section>
 {% endblock %}

@@ -6,6 +6,7 @@ from ORM.tables.user import User
 from ORM.tables.tag import UserTag, Tag
 from ORM.tables.visit import Visit
 from ORM.tables.block import Block
+from ORM.tables.notif import Notif
 
 from managements.notif import get_numbers_of_notifs, get_numbers_of_notifs_msg
 
@@ -41,6 +42,10 @@ def go_profile(profile_id: int):
 
     # send a notif view to profile_id
     block = is_blocked(user_id, profile_id)
+    
+    if not Notif.find_notif('view', user_id, profile_id):
+        notif = Notif(None, 'view', user_id, profile_id, False)
+        notif.create()
 
     nb_notifs = get_numbers_of_notifs()
     nb_notifs_msg = get_numbers_of_notifs_msg()

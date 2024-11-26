@@ -148,6 +148,15 @@ def get_messages(data):
     session['current_channel'] = profile_selected.id
     emit('display_messages', {'messages': messages_data, 'profile_username': profile_selected.username},
          room=request.sid)
+    
+@socketio.on('view_profile')
+def view_profile(data):
+    user_id = session.get('user_id')
+    username = session.get('username')
+    receiver_id = data['receiver_id']
+    
+    emit('receive_view_profile', {'receiver_id': receiver_id, 'sender_id': user_id, 'sender_username': username},
+         room=f'user_{int(data['receiver_id'])}')
 
 @socketio.on('send_message')
 def send_message(data):
@@ -182,7 +191,7 @@ def send_message(data):
 def received_message(data):
     if data['profile_id'] == session['current_channel']:
         get_messages(data)
-    # else: add a notif
+    # else: add a notif TODO
 
 # --------------------------- HTTP ---------------------------
 

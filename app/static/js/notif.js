@@ -22,7 +22,7 @@ export function incrementBadgeNotif() {
 
 export function incrementBadgeMsg() {
     let badgemsg = document.getElementById('badge-msg-notifs');
-    console.log('ah suuuuuuuuuuuuuuu', badgemsg);
+
     if (!badgemsg) {
         badgemsg = document.createElement('span');
         badgemsg.id = 'badge-msg-notifs';
@@ -40,6 +40,4 @@ export function incrementBadgeMsg() {
         currentValue = 0;
     }
     badgemsg.textContent = currentValue + 1;
-    console.log('ah badgemsg.textContent', badgemsg.textContent);
-
 }

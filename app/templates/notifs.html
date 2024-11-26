@@ -10,8 +10,10 @@
             <button id="delete-notif" class="btn btn-outline-primary col-2 col-md-2" type="button">
                 <i class="bi bi-x-lg"></i>
             </button>
-            <div class="ms-5  col-10 col-md-6">
-                <p class="mb-1"><a href="/profile/{{notif.sender.id}}">{{notif.sender.username}}</a> sent you a {{notif.state}}</p>
+            <div class="ms-5 col-10 col-md-6">
+                <p class="mb-1"><a id="notif-profile" href="/profile/{{notif.sender.id}}" data-profile-id="{{ notif.sender.id }}"
+                >{{notif.sender.username}}</a> sent you a
+                    {{notif.state}}</p>
                 <p class="m-0 text-muted">{{notif.date}}</p>
             </div>
         </div>
@@ -20,5 +22,17 @@
         <p class="d-flex justify-content-center">Aucune notifications</p>
         {% endif %}
     </div>
+
+    <script>
+        document.querySelector('#notifs-container').addEventListener('click', function (event) {
+            const target = event.target.closest('a[id="notif-profile"]');
+
+            if (target) {
+                const profileId = target.getAttribute('data-profile-id');
+                socket.emit('view_profile', {'receiver_id': profileId});
+            }
+        });
+
+    </script>
 </section>
 {% endblock %}

@@ -1,4 +1,4 @@
-import {incrementBadgeNotif} from './notif.js';
+import {incrementBadgeMsg, incrementBadgeNotif} from './notif.js';
 
 const currentUserIdElement = document.getElementById('current-user');
 const currentUserId = currentUserIdElement ? currentUserIdElement.getAttribute('data-current-user-id') : null;
@@ -34,7 +34,7 @@ if (btnSendBlock) {
         });
 
         this.remove();
-         const p_balise_block = `
+        const p_balise_block = `
             <p id="alert-block-sent" class="row alert alert-success">Vous venez de bloquer ce bateau</p>
             `
         document.getElementById('friendship-btn-container').insertAdjacentHTML('afterbegin', p_balise_block);
@@ -188,13 +188,29 @@ socket.on('receive_uninvitation', function (data) {
                 console.log('data.profile_id=  ', data.sender_id)
                 console.log('res.current_profile_id  ', res.current_profile_id)
                 if (currentPage === 'profile' && data.sender_id === res.current_profile_id) {
-                    console.log('coucou toi')
                     display_friendship_changes(data)
                 }
             }
         })
         .catch(error => console.error('Error fetching session data:', error));
 
-    //  remove 'You are connected and can now chat'
     console.log('Uninvitation reçue:');
 });
+
+
+socket.on('receive_view_profile', function (data) {
+    fetch('/get_current_page')
+        .then(response => response.json())
+        .then(res => {
+            const currentPage = res.current_page;
+
+            if (currentPage === 'notifs') {
+                data['state'] = 'view'
+                data['date'] = 'Now'
+                add_notif(data)
+            } else {
+                incrementBadgeNotif();
+            }
+        })
+        .catch(error => console.error('Error fetching session data:', error));
+})

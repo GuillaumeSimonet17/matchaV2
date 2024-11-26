@@ -5,15 +5,15 @@
     <p id="current-profile" data-profile-id="{{ profile_id }}"/>
     <div class="container border p-0 rounded d-flex" style="min-height: 90vh">
         <div class="col-3 col-md-3">
-            <nav class="nav flex-column bg-light h-100 rounded-3 shadow sticky-top">
+            <nav id="profile-chat-container" class="nav flex-column bg-light h-100 rounded-3 shadow sticky-top">
                 {% for profile in profiles %}
-                <a href="#" class="nav-link d-flex justify-content-between align-items-center border-bottom user-profile
+                <div class=" nav-link d-flex justify-content-between align-items-center border-bottom user-profile
                     {% if profile_id == profile.id %}bg-primary{% endif %}"
                    data-username="{{ profile.username }}" data-profile-id="{{ profile.id }}">
                     <img style="width: 30px;" src="data:image/png;base64, {{ profile.image_data }}"
                          alt="Profile image"/>
                     <p class="m-0 fw-bold">{{ profile.username }}</p>
-                </a>
+                </div>
                 {% endfor %}
             </nav>
         </div>
@@ -45,6 +45,19 @@
             </div>
         </div>
     </div>
+
+    <script>
+        document.querySelector('#profile-chat-container').addEventListener('click', function (event) {
+            const target = event.target.closest('a[id="chat-profile"]');
+
+            if (target) {
+                const profileId = target.getAttribute('data-profile-id');
+                socket.emit('view_profile', {'receiver_id': profileId});
+            }
+        });
+
+    </script>
+
 </section>
 
 <script src="/static/js/chat.js" type="module"></script>
