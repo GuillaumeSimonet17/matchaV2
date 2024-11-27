@@ -1,4 +1,8 @@
 import psycopg2
+import logging
+import threading
+
+db_lock = threading.Lock()
 
 
 class Database:
@@ -14,16 +18,25 @@ class Database:
         )
         print('Database connection established')
         self.cursor = self.connection.cursor()
-
-
+    
     def execute(self, query, params=None, fetch=True):
-        self.cursor.execute(query, params)
-        if fetch:
-            self.connection.commit()
-            return self.cursor.fetchall()
-        else:
-            return self.connection.commit()
-
+        with db_lock:
+        
+            try:
+                logging.debug(f"Executing query: {query} with params: {params}")
+                self.cursor.execute(query, params)
+                if fetch:
+                    result = self.cursor.fetchall()
+                    logging.debug(f"Query result: {result}")
+                    return result
+                else:
+                    self.connection.commit()
+                    logging.debug("Query committed successfully.")
+            except Exception as e:
+                logging.error(f"Query failed: {e}")
+                self.connection.rollback()
+                raise e
+        
     # def close(self):
     #     self.cursor.close()
     #     self.connection.close()
