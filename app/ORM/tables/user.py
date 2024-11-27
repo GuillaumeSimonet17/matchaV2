@@ -7,11 +7,12 @@ from ORM.database import db
 class User(Model):
     table_name = 'app_user'
     column_names = ['id', 'username', 'last_name', 'first_name', 'age', 'password', 'email',
-                    'profile_image', 'bio', 'gender', 'gender_pref', 'fame_rate', 'connected', 'created_at']
+                    'profile_image', 'bio', 'gender', 'gender_pref', 'fame_rate', 'connected',
+                    'location', 'lng', 'lat', 'created_at']
 
 
     def __init__(self, id, username, last_name, first_name, age, password,
-                 email, profile_image, bio, gender, gender_pref, fame_rate, connected, created_at=None):
+                 email, profile_image, bio, gender, gender_pref, fame_rate, connected, location, lng, lat, created_at=None):
         self.id = id
         self.username = username
         self.last_name = last_name
@@ -25,6 +26,9 @@ class User(Model):
         self.gender_pref = gender_pref
         self.fame_rate = fame_rate
         self.connected = connected
+        self.location = location
+        self.lng = lng
+        self.lat = lat
         self.created_at = created_at
 
 

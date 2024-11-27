@@ -13,11 +13,14 @@ CREATE TABLE IF NOT EXISTS app_user (
     gender_pref VARCHAR(10) NOT NULL,
     fame_rate DOUBLE PRECISION,
     connected BOOLEAN DEFAULT FALSE,
+    lng DOUBLE PRECISION,
+    lat DOUBLE PRECISION,
+    location VARCHAR(255),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE VIEW app_profile AS
-SELECT id, username, last_name, first_name, age, profile_image, bio, gender, gender_pref, fame_rate, connected
+SELECT id, username, last_name, first_name, age, profile_image, bio, gender, gender_pref, fame_rate, connected, location
 FROM app_user;
 
 -- TAGS Many2many -----------------------------------------------------------------------------------

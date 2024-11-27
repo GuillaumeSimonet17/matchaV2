@@ -2,7 +2,7 @@
 {% block index %}
 <div class="col-12 col-md-5 m-0 d-flex flex-column justify-content-center align-items-center">
     <h1>Login</h1>
-    <form method="POST" action="/login" class="col-10 col-md-8 mt-5">
+    <form id="form-login" method="POST" action="/login" class="col-10 col-md-8 mt-5">
         <div class="mb-3">
             <label for="username" class="form-label">Nom d'utilisateur</label>
             <input type="text" class="form-control" id="username" name="username" required>
@@ -13,6 +13,7 @@
                    autocomplete="password" required>
         </div>
         <button type="submit" class="btn btn-primary w-100">Se connecter</button>
+
     </form>
 
     <!-- Section pour les messages flash -->
@@ -33,4 +34,32 @@
     </div>
 
 </div>
+
+<script>
+    fetch('https://api.opencagedata.com/geocode/v1/json?q=auto&key=ad10d1fa56804356afea60668546b54f')
+        .then(response => response.json())
+        .then(data => {
+            if (data.results.length > 0) {
+                const country = data.results[0].components.country;
+                let city = data.results[0].components.city;
+
+                if (city === undefined) {
+                    location_name = country;
+                } else {
+                    location_name = city + ', ' + country;
+                }
+
+                const location_balise = `
+                    <input required type="text" class="form-control " id="location" name="location"
+                       name="location" value="${location_name}">
+                    `
+                document.getElementById('form-login').insertAdjacentHTML('afterbegin', location_balise);
+
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching location data:', error);
+        });
+</script>
+
 {% endblock %}

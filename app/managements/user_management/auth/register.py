@@ -1,4 +1,6 @@
-from flask import session, flash, render_template, session, redirect, url_for
+import requests
+
+from flask import flash, render_template, session, redirect, url_for
 from werkzeug.security import generate_password_hash
 
 from ORM.tables.user import User
@@ -10,7 +12,8 @@ def allowed_file(filename):
 
 def create_user(data):
     user = User(None, data['username'], data['last_name'], data['first_name'], data['age'], data['password'],
-                data['email'], None, data['bio'], data['gender'], data['gender_pref'], data['fame_rate'], data['connected'])
+                data['email'], None, data['bio'], data['gender'], data['gender_pref'], data['fame_rate'],
+                data['connected'], data['location'], data['lng'], data['lat'])
     try:
         user.create()
         user_created = User._find_by_username(data['username'])
@@ -61,6 +64,16 @@ def auth_register(request):
     if valid == True:
         hashed_password = generate_password_hash(password)
         
+        location = request.form.get('location')
+        API_KEY = 'ad10d1fa56804356afea60668546b54f'
+        url = f"https://api.opencagedata.com/geocode/v1/json?q={location}&key={API_KEY}"
+        response = requests.get(url)
+
+        geo = response.json()
+        geo = geo['results'][0]
+        lng = geo['geometry']['lng']
+        lat = geo['geometry']['lat']
+        
         data = {
             'username': username,
             'password': hashed_password,
@@ -74,9 +87,13 @@ def auth_register(request):
             'gender_pref': gender_pref,
             'fame_rate': 0,
             'connected': True,
+            'location': location,
+            'lng': lng,
+            'lat': lat,
         }
-        
+
         user_id = create_user(data)
+
         if user_id:
             User.save_profile_image(user_id, image_data)
             create_tags(user_id, tags)

@@ -1,8 +1,10 @@
-import os
+import requests
+
 from flask import flash, render_template, session
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from ORM.tables.user import User
+
 
 
 def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
@@ -17,23 +19,25 @@ def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
     gender_pref = request.form.get('gender_pref')
     tag_ids_selected = request.form.getlist('tags[]')
     new_image = request.files.get('new_profile_image')
+    location = request.form.get('location')
+
     
     # --------------- VERIFICATION DES INFOS ----------------------
     if username == '' or last_name == '' or first_name == '' or age == '' or email == '' or bio == '' \
-            or gender == '' or gender_pref == '' or tag_ids_selected == []:
+            or gender == '' or gender_pref == '' or location == '' or tag_ids_selected == []:
         flash('Nan gros, t\'as pas compris... T\'as pas le droit à des valeurs null', 'danger')
         return render_template('user.html', user=user, profile_image_data=profile_image_data,
                                user_tag_ids=user_tag_ids, tags=tags)
     
     # --------------- INTERCEPTER MODIFICATIONS ----------------------
-    # user = User._find_by_username(username)
+    user = User._find_by_username(username)
     
     # print('new_image', new_image.filename)
     if new_image.filename:
         img_read = new_image.read()
         User.save_profile_image(user.id, img_read)
         profile_image_data = User.get_profile_image(user.id)
-    
+
     if user:
         data = {}
         if username != user.username:
@@ -52,7 +56,28 @@ def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
             data['gender'] = gender
         if gender_pref != user.gender_pref:
             data['gender_pref'] = gender_pref
-        
+
+        if location != user.location:
+            API_KEY = 'ad10d1fa56804356afea60668546b54f'
+            url = f"https://api.opencagedata.com/geocode/v1/json?q={location}&key={API_KEY}"
+            response = requests.get(url)
+            geo = response.json()
+            geo = geo['results'][0]
+            print(geo)
+            if geo['components'].get('city'):
+                city = geo['components']['city'] + ', '
+            elif geo['components'].get('county'):
+                city = geo['components']['county'] + ', '
+            else:
+                city = ''
+            country = geo['components']['country']
+            location = city + country
+            lng = geo['geometry']['lng']
+            lat = geo['geometry']['lat']
+            data['location'] = location
+            data['lng'] = lng
+            data['lat'] = lat
+
         new_tags = []
         for tag_id_selected in tag_ids_selected:
             if tag_id_selected not in user_tag_ids:

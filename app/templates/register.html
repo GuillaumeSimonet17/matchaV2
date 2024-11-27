@@ -3,12 +3,14 @@
 <div class="col-12 m-0 overflow-auto d-flex flex-column justify-content-center align-items-center">
     <h1>Register</h1>
 
-    <form method="POST" action="/register" enctype="multipart/form-data" class="row col-12 d-flex justify-content-center align-items-center">
+    <form id="form-register" method="POST" action="/register" enctype="multipart/form-data"
+          class="row col-12 d-flex justify-content-center align-items-center">
 
         <div class="col-12 col-md-5">
             <!-- Username -->
             <div class="mb-3">
-                <label for="username" class="form-label d-flex">Username<p class="alert alert-info py-0 ms-1">3 lettres minimum</p></label>
+                <label for="username" class="form-label d-flex">Username<p class="alert alert-info py-0 ms-1">3 lettres
+                    minimum</p></label>
                 <input required type="text" class="form-control" id="username" name="username">
             </div>
             <!-- Last Name -->
@@ -29,12 +31,14 @@
             <!-- Password -->
             <div class="mb-3">
                 <label for="password" class="form-label">Password</label>
-                <input required type="password" autocomplete="password" class="form-control" id="password" name="password">
+                <input required type="password" autocomplete="password" class="form-control" id="password"
+                       name="password">
             </div>
             <!-- Confirm Password -->
             <div class="mb-3">
                 <label for="confirm_password" class="form-label">Confirm Password</label>
-                <input required type="password" autocomplete="password" class="form-control" id="confirm_password" name="confirm_password">
+                <input required type="password" autocomplete="password" class="form-control" id="confirm_password"
+                       name="confirm_password">
             </div>
             <!-- Email -->
             <div class="mb-3">
@@ -101,7 +105,7 @@
                     <option value="both">Both</option>
                 </select>
             </div>
-<!--    TODO : TAGS à mettre en required -->
+            <!--    TODO : TAGS à mettre en required -->
 
             <div class="accordion" id="tagsAccordion">
                 <div class="accordion-item">
@@ -154,4 +158,34 @@
     <a href="/login">Already have an account ?</a>
 
 </div>
+
+<script>
+    fetch('https://api.opencagedata.com/geocode/v1/json?q=auto&key=ad10d1fa56804356afea60668546b54f')
+        .then(response => response.json())
+        .then(data => {
+            if (data.results.length > 0) {
+                const country = data.results[0].components.country;
+                let city = data.results[0].components.city;
+
+                if (city === undefined) {
+                    location_name = country;
+                } else {
+                    location_name = city + ', ' + country;
+                }
+
+                const location_balise = `
+                    <input required type="text" class="form-control d-none" id="location" name="location"
+                       name="location" value="${location_name}">
+                    `
+                document.getElementById('form-register').insertAdjacentHTML('afterbegin', location_balise);
+
+                data['location'] = location
+                data['lng'] = data.results[0].geometry.lng
+                data['lat'] = data.results[0].geometry.lat
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching location data:', error);
+        });
+</script>
 {% endblock %}
