@@ -6,8 +6,7 @@ class Notif(Model):
     table_name = 'notif'
     column_names = ['id', 'state', 'sender_id', 'receiver_id', 'read', 'created_at']
     possible_states = ['message', 'invitation', 'uninvitation', 'connection', 'view']
-
-
+    
     def __init__(self, id, state, sender_id, receiver_id, read, created_at=None):
         self.id = id
         if state not in self.possible_states:
@@ -17,8 +16,7 @@ class Notif(Model):
         self.receiver_id = receiver_id
         self.read = read
         self.created_at = created_at
-
-
+    
     @classmethod
     def _find_by_id(cls, id: int):
         try:
@@ -28,7 +26,7 @@ class Notif(Model):
         except Exception as e:
             raise e
         return None
-
+    
     # si une notif existe deja même state et les memes ids dans l'ordre
     @classmethod
     def find_notif(cls, state: str, sender_id: int, receiver_id: int):
@@ -38,9 +36,26 @@ class Notif(Model):
                  f"WHERE state = '{state}' and sender_id = {sender_id} and receiver_id = {receiver_id};")
         try:
             res = db.execute(query)
-            if res:
+            if res or len(res) > 0:
                 results = cls.get_dict_by_id(res[0])
+                
                 return [cls(**results)]
+        except Exception as e:
+            raise e
+        return None
+   
+    @classmethod
+    def find_notifs(cls, state: str, sender_id: int, receiver_id: int, columns: list[str] = None):
+        if state not in cls.possible_states:
+            raise ValueError(f"State {state} is not valid")
+        columns = cls.get_all_column_names(columns)
+        query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
+                 f"WHERE state = '{state}' and sender_id = {sender_id} and receiver_id = {receiver_id};")
+        try:
+            res = db.execute(query)
+            if res:
+                datas = cls.get_dicts_by_res(res, columns)
+                return [cls(**row) for row in datas]
         except Exception as e:
             raise e
         return None
@@ -48,14 +63,14 @@ class Notif(Model):
     @classmethod
     def find_notifs_by_user(cls, receiver_id: int):
         return cls.find_x_by_y('receiver_id', receiver_id)
-
+    
     @classmethod
     def mark_notifs_by_user_id_as_read(cls, user_id: int):
         notifs = cls.find_notifs_by_user(user_id)
         unread_notifs_ids = [notif.id for notif in notifs if not notif.read and notif.state != 'message']
         if unread_notifs_ids:
             cls.mark_as_read(unread_notifs_ids)
-
+    
     @classmethod
     def delete_notifs_msg_by_user_id(cls, user_id: int):
         notifs = cls.find_notifs_by_user(user_id)
