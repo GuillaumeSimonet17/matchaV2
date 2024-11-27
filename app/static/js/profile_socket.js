@@ -1,4 +1,4 @@
-import {incrementBadgeMsg, incrementBadgeNotif} from './notif.js';
+import {incrementBadgeNotif} from './notif.js';
 
 const currentUserIdElement = document.getElementById('current-user');
 const currentUserId = currentUserIdElement ? currentUserIdElement.getAttribute('data-current-user-id') : null;
@@ -138,6 +138,9 @@ socket.on('receive_invitation', function (data) {
 
             if (currentPage === 'notifs') {
                 add_notif(data)
+
+                socket.emit('mark_notifs_as_read', data);
+
             } else {
                 incrementBadgeNotif()
 
@@ -159,6 +162,9 @@ socket.on('receive_connection', function (data) {
 
             if (currentPage === 'notifs') {
                 add_notif(data)
+
+                socket.emit('mark_notifs_as_read', data);
+
             } else {
                 incrementBadgeNotif();
                 if (currentPage === 'profile' && data.sender_id === res.current_profile_id) {
@@ -179,6 +185,9 @@ socket.on('receive_uninvitation', function (data) {
 
             if (currentPage === 'notifs') {
                 add_notif(data)
+
+                socket.emit('mark_notifs_as_read', data);
+
             } else {
                 incrementBadgeNotif();
                 if (currentPage === 'profile' && data.sender_id === res.current_profile_id) {
@@ -200,7 +209,10 @@ socket.on('receive_view_profile', function (data) {
             if (currentPage === 'notifs') {
                 data['state'] = 'view'
                 data['date'] = 'Now'
+
                 add_notif(data)
+
+                socket.emit('mark_notifs_as_read', data);
             } else {
                 incrementBadgeNotif();
             }

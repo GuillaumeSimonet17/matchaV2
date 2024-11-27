@@ -19,6 +19,7 @@ from ORM.tables.channel import Channel
 from ORM.tables.message import Message
 from ORM.tables.notif import Notif
 from ORM.tables.block import Block
+from ORM.tables.user import User
 
 from app import socketio
 
@@ -29,11 +30,8 @@ main = Blueprint('main', __name__)
 @socketio.on('join')
 def on_join(data):
     user_id = data.get('user_id')
-    print(user_id)
     if user_id:
-        print('join => ', int(user_id))
         join_room(f"user_{user_id}")
-        print(f"User {user_id} joined their room.")
 
 # FRIENDSHIP ---------------
 @socketio.on('send_invitation')
@@ -134,9 +132,9 @@ def get_messages(data):
     user_id = session.get('user_id')
     profile_id = data.get('profile_id')
     
-    profile_selected = Profile._find_by_id(profile_id)
+    profile_selected = Profile._find_by_id(int(profile_id))
 
-    channel = Channel.find_channel_by_user_ids(user_id, profile_id)
+    channel = Channel.find_channel_by_user_ids(int(user_id), int(profile_id))
 
     messages_data = []
     messages = Message.find_messages_by_channel_id(channel.id)
@@ -170,8 +168,8 @@ def send_message(data):
     if receiver_id != 0:
         channel = Channel.find_channel_by_user_ids(sender_id, receiver_id)
         msg = Message(None, channel.id, sender_id, receiver_id, content, False)
-        new_msg = msg.create()
-
+        msg.create()
+    
     have_to_notif = False
     notifs_exist = Notif.find_notif('message', sender_id, receiver_id)
     if not notifs_exist:
@@ -184,14 +182,29 @@ def send_message(data):
     if have_to_notif:
         notif = Notif(None, 'message', sender_id, receiver_id, False)
         notif.create()
-        
-    emit('receive_message', {'messages': new_msg, 'profile_id': sender_id}, room=f'user_{receiver_id}')
+
+    print('ici ', f'user_{receiver_id}')
+    emit('receive_message', {'sender_id': sender_id}, room=f'user_{receiver_id}')
 
 @socketio.on('received_message')
 def received_message(data):
-    if data['profile_id'] == session['current_channel']:
+    if data['sender_id'] == session['current_channel']:
+        data['profile_id'] = data['sender_id']
         get_messages(data)
-    # else: add a notif TODO
+
+        notifs_exist = Notif.find_notifs('message', int(data['profile_id']), int(session['user_id']))
+        if isinstance(notifs_exist, Notif):
+            notifs_exist = list(notifs_exist)
+
+        unviewed_notif_ids = [notif.id for notif in notifs_exist if not notif.read]
+        Notif.mark_as_read(unviewed_notif_ids)
+        
+@socketio.on('mark_notifs_as_read')
+def mark_notifs_as_read(data):
+    user_id = session['user_id']
+    receiver_id = data['receiver_id']
+    Notif.mark_notifs_by_user_id_as_read(user_id)
+
 
 # --------------------------- HTTP ---------------------------
 
@@ -200,7 +213,6 @@ def get_current_page():
     current_page = session.get('current_page', 'default')
     current_profile_id = session.get('profile_id', 'default')
     current_channel = session.get('current_channel', 'default')
-
     return jsonify({'current_page': current_page, 'current_profile_id': current_profile_id, 'current_channel': current_channel})
 
 @main.route('/login', methods=['GET', 'POST'])
@@ -221,6 +233,8 @@ def login():
 
 @main.route('/logout')
 def logout():
+    if session.get('current_page') == 'notifs' and session['user_id']:
+        Notif.mark_notifs_by_user_id_as_read(session['user_id'])
     session.pop('username', None)
     session.pop('current_page', None)
     session.pop('current_channel', None)
@@ -242,52 +256,84 @@ def home():
     if 'username' not in session or not User._find_by_username(session['username']):
         session.clear()
         return redirect(url_for('main.login'))
+
+    if session.get('current_page') == 'notifs' and session['user_id']:
+        Notif.mark_notifs_by_user_id_as_read(session['user_id'])
+
     session['current_page'] = 'home'
     session['current_channel'] = None
     return go_search()
 
 @main.route('/historic')
 def historic():
-    if 'username' not in session:
+    if 'username' not in session or not User._find_by_username(session['username']):
+        session.clear()
         return redirect(url_for('main.login'))
+
+    if session.get('current_page') == 'notifs' and session['user_id']:
+        Notif.mark_notifs_by_user_id_as_read(session['user_id'])
+
     session['current_page'] = 'historic'
     session['current_channel'] = None
     return go_historic()
 
 @main.route('/notifs', methods=['GET'])
 def notifs():
-    if 'username' not in session:
+    if 'username' not in session or not User._find_by_username(session['username']):
+        session.clear()
         return redirect(url_for('main.login'))
+
+    if session.get('current_page') == 'notifs' and session['user_id']:
+        Notif.mark_notifs_by_user_id_as_read(session['user_id'])
+
     session['current_page'] = 'notifs'
     session['current_channel'] = None
     return go_notif()
 
 @main.route('/chat')
 def chat():
-    if 'username' not in session:
+    if 'username' not in session or not User._find_by_username(session['username']):
+        session.clear()
         return redirect(url_for('main.login'))
+
+    if session.get('current_page') == 'notifs' and session['user_id']:
+        Notif.mark_notifs_by_user_id_as_read(session['user_id'])
+
     return go_chat()
-
-
 
 @main.route('/profile/<int:profile_id>')
 def profile(profile_id):
-    if 'username' not in session:
+    if 'username' not in session or not User._find_by_username(session['username']):
+        session.clear()
         return redirect(url_for('main.login'))
+
+    if session.get('current_page') == 'notifs' and session['user_id']:
+        Notif.mark_notifs_by_user_id_as_read(session['user_id'])
+
     session['current_page'] = 'profile'
     return go_profile(profile_id)
 
 @main.route('/user', methods=['GET', 'POST'])
 def user():
-    if 'username' not in session:
+    if 'username' not in session or not User._find_by_username(session['username']):
+        session.clear()
         return redirect(url_for('main.login'))
+
+    if session.get('current_page') == 'notifs' and session['user_id']:
+        Notif.mark_notifs_by_user_id_as_read(session['user_id'])
+
     session['current_page'] = 'user'
     return go_user()
 
 @main.route('/change-password', methods=['POST'])
 def update_password():
-    if 'username' not in session:
+    if 'username' not in session or not User._find_by_username(session['username']):
+        session.clear()
         return redirect(url_for('main.login'))
+
+    if session.get('current_page') == 'notifs' and session['user_id']:
+        Notif.mark_notifs_by_user_id_as_read(session['user_id'])
+
     change_password(request)
     return redirect(url_for('main.user'))
 

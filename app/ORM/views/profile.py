@@ -7,11 +7,11 @@ from ORM.database import db
 class Profile(Model):
     table_name = 'app_profile'
     column_names = ['id', 'username', 'last_name', 'first_name', 'age', 'profile_image',
-                    'bio', 'gender', 'gender_pref', 'fame_rate']
+                    'bio', 'gender', 'gender_pref', 'fame_rate', 'connected']
 
 
     def __init__(self, id, username, last_name, first_name, age,
-                 profile_image, bio, gender, gender_pref, fame_rate):
+                 profile_image, bio, gender, gender_pref, fame_rate, connected):
         self.id = id
         self.username = username
         self.last_name = last_name
@@ -22,6 +22,7 @@ class Profile(Model):
         self.gender = gender
         self.gender_pref = gender_pref
         self.fame_rate = fame_rate
+        self.connected = connected
 
     # ------------------------------------ READ
     @classmethod
@@ -34,9 +35,9 @@ class Profile(Model):
             return None
 
     @classmethod
-    def _find_by_id(cls, id):
+    def _find_by_id(cls, id: int):
         try:
-            res = cls.get_dict_by_id(id)
+            res = cls.get_dict_by_id(int(id))
             if res:
                 return cls(**res)
         except Exception as e:
@@ -45,6 +46,7 @@ class Profile(Model):
     
     @classmethod
     def get_profile_image(cls, user_id):
-        query = "SELECT profile_image FROM app_user WHERE id = %s;"
+        query = "SELECT profile_image FROM app_profile WHERE id = %s;"
         image_data = db.execute(query, (user_id,))
-        return base64.b64encode(image_data[0][0]).decode('utf-8')
+        if image_data[0][0]:
+            return base64.b64encode(image_data[0][0]).decode('utf-8')

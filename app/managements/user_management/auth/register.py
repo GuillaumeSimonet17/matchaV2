@@ -12,8 +12,10 @@ def create_user(data):
     user = User(None, data['username'], data['last_name'], data['first_name'], data['age'], data['password'],
                 data['email'], None, data['bio'], data['gender'], data['gender_pref'], data['fame_rate'], data['connected'])
     try:
-        user_created = user.create()
-        return user_created
+        user.create()
+        user_created = User._find_by_username(data['username'])
+        if user_created:
+            return user_created.id
     except Exception as e:
         print(e)
         return None
@@ -79,7 +81,8 @@ def auth_register(request):
             User.save_profile_image(user_id, image_data)
             create_tags(user_id, tags)
             session['username'] = username
-            session['user_id'] = user_id[0]
+            session['user_id'] = user_id
+            print('IN CREATE USER == USER_ID ==> ', user_id)
             session['current_page'] = 'home'
             return redirect(url_for('main.home'))
         flash('Username ou email déjà utilisé', 'danger')

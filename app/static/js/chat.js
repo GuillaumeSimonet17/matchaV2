@@ -8,7 +8,9 @@ let currentProfileId = currentProfileIdElement ? currentProfileIdElement.getAttr
 
 document.addEventListener("DOMContentLoaded", function () {
     const chatContainer = document.getElementById("chat-container");
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+    if (chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
 });
 
 const profiles = document.querySelectorAll('.user-profile')
@@ -39,7 +41,11 @@ if (btnSend) {
 
         let message = document.querySelector('#input-msg')
         if (message.value !== '') {
-            socket.emit('send_message', {content: message.value, sender_id: currentUserId, receiver_id: currentProfileId});
+            socket.emit('send_message', {
+                content: message.value,
+                sender_id: currentUserId,
+                receiver_id: currentProfileId
+            });
 
             const chatContainer = document.querySelector('#chat-container');
 
@@ -60,14 +66,29 @@ if (btnSend) {
 }
 
 socket.on('receive_message', function (data) {
-    incrementBadgeMsg();
 
-    socket.emit('received_message', data);
+    fetch(`/get_current_page`, {method: 'GET'})
+        .then(response => response.json())
+        .then(res => {
+            const currentPage = res.current_page;
+
+            if (currentPage === 'chat' && data['sender_id'] === res.current_channel) {
+
+                socket.emit('received_message', data);
+
+            } else {
+                incrementBadgeMsg();
+            }
+        })
+        .catch(error => console.error('Error fetching session data:', error));
+
 })
 
 socket.on('display_messages', function (data) {
     const chatContainer = document.querySelector('#chat-container');
-    chatContainer.innerHTML = '';
+    if (chatContainer) {
+        chatContainer.innerHTML = '';
+    }
 
     if (data.messages.length === 0) {
         const msgElement = document.createElement('div');
@@ -84,13 +105,15 @@ socket.on('display_messages', function (data) {
             msgElement.classList.add('d-flex', 'flex-column', 'align-items-center', 'rounded', 'mt-1', 'px-2', 'ms-auto', 'border');
         msgElement.innerHTML = `
                 <p class="text-dark p-2 px-3 m-0 text-end text-break"><strong class="text-dark">${msg.sender_id == currentUserId ?
-                    'You' : data.profile_username}:</strong> ${msg.content}</p>
+            'You' : data.profile_username}:</strong> ${msg.content}</p>
                 <small class="text-dark">${msg.created_at}</small>
             `;
 
         chatContainer.appendChild(msgElement);
 
     });
-    chatContainer.scrollTop = chatContainer.scrollHeight;
+    if (chatContainer) {
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
 
 });
