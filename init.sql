@@ -91,8 +91,7 @@ CREATE TABLE IF NOT EXISTS notif (
     read BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT fk_sender FOREIGN KEY(sender_id) REFERENCES app_user(id) ON DELETE CASCADE,
-    CONSTRAINT fk_receiver FOREIGN KEY(receiver_id) REFERENCES app_user(id) ON DELETE CASCADE,
-    CONSTRAINT unique_notif UNIQUE(state, sender_id, receiver_id)
+    CONSTRAINT fk_receiver FOREIGN KEY(receiver_id) REFERENCES app_user(id) ON DELETE CASCADE
 );
 
 -- CHANNEL One2many -----------------------------------------------------------------------------------
