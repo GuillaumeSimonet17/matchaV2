@@ -1,4 +1,4 @@
-from flask import render_template, session
+from flask import render_template, session, redirect, url_for
 
 from ORM.views.profile import Profile
 from ORM.tables.friendship import Friendship
@@ -13,6 +13,10 @@ def go_profile(profile_id: int):
     user_id = session['user_id']
     session['profile_id'] = profile_id
     profile = Profile._find_by_id(profile_id)
+
+    if is_blocked(user_id, profile_id):
+        return redirect(url_for('main.home'))
+
     online = profile.connected
     profile_image_data = Profile.get_profile_image(profile.id)
     user_tag_ids = UserTag.find_tags_by_user_id(profile.id)
@@ -39,8 +43,6 @@ def go_profile(profile_id: int):
         visit = Visit(None, user_id, profile_id)
         visit.create()
 
-    block = is_blocked(user_id, profile_id)
-
     notif = Notif(None, 'view', user_id, profile_id, False)
     notif.create()
 
@@ -52,7 +54,7 @@ def go_profile(profile_id: int):
     return render_template('profile.html', profile=profile, state=state, connected=connected,
                            profile_image_data=profile_image_data, received_invitation=received_invitation,
                            sent_invitation=sent_invitation, user_tags=user_tags, user_id=user_id,
-                           nb_notifs=nb_notifs, nb_notifs_msg=nb_notifs_msg, block=block, online=online)
+                           nb_notifs=nb_notifs, nb_notifs_msg=nb_notifs_msg, online=online)
 
 def is_blocked(user_id, profile_id):
     block = False
