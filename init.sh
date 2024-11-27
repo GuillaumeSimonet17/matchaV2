@@ -32,13 +32,13 @@ while ! pg_isready -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" > /dev/null 2>&1; do
 done
 echo "PostgreSQL is ready!"
 
-#echo "Creating database if it doesn't exist..."
-#if ! psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U guillaume -d postgres -tc "SELECT 1 FROM pg_database WHERE datname = 'matcha'" | grep -q 1; then
-#  psql -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" -U guillaume -d postgres -c "CREATE DATABASE matcha;"
-#  echo "Database 'matcha' created."
-#else
-#  echo "Database 'matcha' already exists."
-#fi
+echo "Creating database if it doesn't exist..."
+if ! psql -h localhost -p 5432 -U guillaume matcha; then
+  psql -h localhost -p 5432 -U guillaume -d postgres -c "CREATE DATABASE matcha;"
+  echo "Database 'matcha' created."
+else
+  echo "Database 'matcha' already exists."
+fi
 
 echo "Init.sql run"
 cat init.sql | psql -h localhost -p 5432 -U guillaume matcha
