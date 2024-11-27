@@ -2,7 +2,6 @@ from flask import render_template, session
 
 from ORM.views.profile import Profile
 from ORM.tables.friendship import Friendship
-from ORM.tables.user import User
 from ORM.tables.tag import UserTag, Tag
 from ORM.tables.visit import Visit
 from ORM.tables.block import Block
@@ -14,6 +13,7 @@ def go_profile(profile_id: int):
     user_id = session['user_id']
     session['profile_id'] = profile_id
     profile = Profile._find_by_id(profile_id)
+    online = profile.connected
     profile_image_data = Profile.get_profile_image(profile.id)
     user_tag_ids = UserTag.find_tags_by_user_id(profile.id)
 
@@ -52,7 +52,7 @@ def go_profile(profile_id: int):
     return render_template('profile.html', profile=profile, state=state, connected=connected,
                            profile_image_data=profile_image_data, received_invitation=received_invitation,
                            sent_invitation=sent_invitation, user_tags=user_tags, user_id=user_id,
-                           nb_notifs=nb_notifs, nb_notifs_msg=nb_notifs_msg, block=block)
+                           nb_notifs=nb_notifs, nb_notifs_msg=nb_notifs_msg, block=block, online=online)
 
 def is_blocked(user_id, profile_id):
     block = False
