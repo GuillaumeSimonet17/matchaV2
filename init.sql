@@ -20,7 +20,7 @@ CREATE TABLE IF NOT EXISTS app_user (
 );
 
 CREATE VIEW app_profile AS
-SELECT id, username, last_name, first_name, age, profile_image, bio, gender, gender_pref, fame_rate, connected, location
+SELECT id, username, last_name, first_name, age, profile_image, bio, gender, gender_pref, fame_rate, connected, location, lng, lat
 FROM app_user;
 
 -- TAGS Many2many -----------------------------------------------------------------------------------

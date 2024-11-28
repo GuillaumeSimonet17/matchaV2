@@ -90,10 +90,6 @@ def fame_rate_calcul(user_id):
     if blocks:
         nb_blocks = len(blocks)
 
-    print('nb_connections = ', nb_connections)
-    print('nb_invitations = ', nb_invitations)
-    print('nb_uninvitations = ', nb_uninvitations)
-
     coef_connections = 2
     coef_invitations = 1.5
     coef_uninvitations = -1

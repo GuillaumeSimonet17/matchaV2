@@ -24,42 +24,204 @@
                 <div class="col-4 col-md-3 my-auto dropdown my-3">
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownOrder"
                             data-bs-toggle="dropdown" aria-expanded="false">
-                        Ordered
+                        Sort by
                     </button>
                     <ul class="dropdown-menu" aria-labelledby="dropdownFilters">
-                        <li><a class="dropdown-item" href="#">Action</a></li>
-                        <li><a class="dropdown-item" href="#">Another action</a></li>
-                        <li><a class="dropdown-item" href="#">Something else here</a></li>
+                        <li id="age-sort-asc" class="ps-2" style="cursor: pointer">Age ASC</li>
+                        <li id="age-sort-dsc" class="ps-2" style="cursor: pointer">Age DSC</li>
+                        <li id="fame-rate-sort" class="ps-2" style="cursor: pointer">Fame rating</li>
+                        <li id="common-tags-sort" class="ps-2" style="cursor: pointer">Common tags</li>
+                        <li id="location-sort" class="ps-2" style="cursor: pointer">Location</li>
                     </ul>
                 </div>
+
+                <span class="d-none" id="user-tags" data-user-tags="{{ user_tags }}"></span>
+                <span class="d-none" id="location" data-user-lat="{{ user_lat }}" data-user-lng="{{ user_lng }}"></span>
 
                 <button class="col-4 col-md-3 my-auto btn btn-primary">Save</button>
             </div>
         </form>
-        <div class="row p-0 m-0 flex-row justify-content-center gap-1">
-                {% if filtered_profiles %}
-                {% for profile in filtered_profiles %}
-                <a id="view-profile" href="/profile/{{ profile.id }}"
-                   class="col-12 col-md-4 card p-2 d-flex justify-content-between" style="min-height: 300px; max-width: 420px;"
-                   data-profile-id="{{ profile.id }}">
-                    <div style="max-height: 200px; overflow: hidden;">
-                        <img class="img-fluid" class="form-control" id="profile_image"
-                             src="data:image/png;base64, {{ profile.profile_image }}" alt="Profile Image">
-                    </div>
-                    <p class="m-0 mt-2 fw-bold">{{ profile.username }}</p>
-                </a>
-                {% endfor %}
-                {% endif %}
+        <div class="row p-0 m-0 flex-row justify-content-center gap-1" id="profile-list">
+
+            {% if filtered_profiles %}
+            {% for profile in filtered_profiles %}
+
+            <a id="view-profile" href="/profile/{{ profile.id }}"
+               class="col-12 col-md-4 card p-2 d-flex justify-content-between"
+               style="min-height: 300px; max-width: 420px;"
+               data-profile="{{ profile }}">
+
+                <div style="max-height: 200px; overflow: hidden;">
+                    <img class="img-fluid" id="profile_image" src="data:image/png;base64, {{ profile.profile_image }}"
+                         alt="Profile Image">
+                </div>
+
+                <p class="m-0 mt-2 fw-bold">{{ profile.username }}</p>
+                <p class="m-0 mt-2 fw-bold">{{ profile.age }}</p>
+
+            </a>
+
+            {% endfor %}
+            {% endif %}
         </div>
     </div>
     <script>
+
         document.querySelector('.row').addEventListener('click', function (event) {
             const target = event.target.closest('a[id="view-profile"]');
 
             if (target) {
-                const profileId = target.getAttribute('data-profile-id');
+                const profile = target.getAttribute('data-profile');
+                const fixedProfile = profile.replace(/'/g, '"');
+                console.log(fixedProfile)
+                const profileObj = JSON.parse(fixedProfile);
+                profileId = profileObj.id;
+
                 socket.emit('view_profile', {'receiver_id': profileId});
             }
+        });
+
+        document.querySelector('#age-sort-asc').addEventListener('click', function (event) {
+            let profiles = Array.from(document.querySelectorAll('#profile-list .card'));
+
+            profiles.sort((a, b) => {
+                const profile_a = a.getAttribute('data-profile');
+                const fixedProfile_a = profile_a.replace(/'/g, '"');
+                const profileObj_a = JSON.parse(fixedProfile_a);
+
+                const profile_b = b.getAttribute('data-profile');
+                const fixedProfile_b = profile_b.replace(/'/g, '"');
+                const profileObj_b = JSON.parse(fixedProfile_b);
+
+
+                return parseInt(profileObj_a.age) - parseInt(profileObj_b.age);
+            });
+
+            const container = document.getElementById('profile-list');
+            profiles.forEach(profile => container.appendChild(profile));
+        })
+
+        document.querySelector('#age-sort-dsc').addEventListener('click', function (event) {
+            let profiles = Array.from(document.querySelectorAll('#profile-list .card'));
+
+            profiles.sort((a, b) => {
+                const profile_a = a.getAttribute('data-profile');
+                const fixedProfile_a = profile_a.replace(/'/g, '"');
+                const profileObj_a = JSON.parse(fixedProfile_a);
+
+                const profile_b = b.getAttribute('data-profile');
+                const fixedProfile_b = profile_b.replace(/'/g, '"');
+                const profileObj_b = JSON.parse(fixedProfile_b);
+
+
+                return parseInt(profileObj_b.age) - parseInt(profileObj_a.age);
+            });
+
+            const container = document.getElementById('profile-list');
+            profiles.forEach(profile => container.appendChild(profile));
+        })
+
+        document.querySelector('#fame-rate-sort').addEventListener('click', function (event) {
+            let profiles = Array.from(document.querySelectorAll('#profile-list .card'));
+
+            profiles.sort((a, b) => {
+                const profile_a = a.getAttribute('data-profile');
+                const fixedProfile_a = profile_a.replace(/'/g, '"');
+                const profileObj_a = JSON.parse(fixedProfile_a);
+
+                const profile_b = b.getAttribute('data-profile');
+                const fixedProfile_b = profile_b.replace(/'/g, '"');
+                const profileObj_b = JSON.parse(fixedProfile_b);
+
+
+                return parseInt(profileObj_b.fame_rate) - parseInt(profileObj_a.fame_rate);
+            });
+
+            const container = document.getElementById('profile-list');
+            profiles.forEach(profile => container.appendChild(profile));
+        })
+
+        document.querySelector('#common-tags-sort').addEventListener('click', function (event) {
+            let profiles = Array.from(document.querySelectorAll('#profile-list .card'));
+            let user_tags = document.querySelector('#user-tags').getAttribute('data-user-tags');
+
+            function countCommonTags(profileTags) {
+                return profileTags.filter(tag => user_tags.includes(tag)).length;
+            }
+
+            profiles.sort((a, b) => {
+                const profile_a = a.getAttribute('data-profile');
+                const fixedProfile_a = profile_a.replace(/'/g, '"');
+                const profileObj_a = JSON.parse(fixedProfile_a);
+                const tagsA = profileObj_a.tags || '[]';
+
+                const profile_b = b.getAttribute('data-profile');
+                const fixedProfile_b = profile_b.replace(/'/g, '"');
+                const profileObj_b = JSON.parse(fixedProfile_b);
+                const tagsB = profileObj_b.tags || '[]';
+
+                const commonTagsA = countCommonTags(tagsA);
+                const commonTagsB = countCommonTags(tagsB);
+
+                return commonTagsB - commonTagsA;
+            });
+
+            const container = document.getElementById('profile-list');
+            profiles.forEach(profile => container.appendChild(profile));
+        })
+
+        document.querySelector('#location-sort').addEventListener('click', function (event) {
+            let profiles = Array.from(document.querySelectorAll('#profile-list .card'));
+
+            let userLatitude = parseFloat(document.querySelector('#location').getAttribute('data-user-lat'));
+            let userLongitude = parseFloat(document.querySelector('#location').getAttribute('data-user-lng'));
+
+            console.log(document.querySelector('#location'))
+
+            // Fonction pour calculer la distance entre deux points (en km)
+            function calculateDistance(lat1, lon1, lat2, lon2) {
+                const R = 6371; // Rayon de la Terre en km
+                const phi1 = lat1 * 0.01745329;
+                const phi2 = lat2 * 0.01745329;
+                const deltaPhi = (lat2 - lat1) * 0.01745329;
+                const deltaLambda = (lon2 - lon1) * 0.01745329;
+
+                const a = Math.sin(deltaPhi / 2) * Math.sin(deltaPhi / 2) +
+                    Math.cos(phi1) * Math.cos(phi2) *
+                    Math.sin(deltaLambda / 2) * Math.sin(deltaLambda / 2);
+                const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+
+                return R * c;
+            }
+
+            // Trier les profils en fonction de la distance à l'utilisateur
+            profiles.sort((a, b) => {
+                const profile_a = a.getAttribute('data-profile');
+                const fixedProfile_a = profile_a.replace(/'/g, '"');
+                const profileObj_a = JSON.parse(fixedProfile_a);
+
+                const profile_b = b.getAttribute('data-profile');
+                const fixedProfile_b = profile_b.replace(/'/g, '"');
+                const profileObj_b = JSON.parse(fixedProfile_b);
+
+                const latA = parseFloat(profileObj_a.lat);
+                const lonA = parseFloat(profileObj_a.lng);
+                const latB = parseFloat(profileObj_b.lat);
+                const lonB = parseFloat(profileObj_b.lng);
+
+                console.log(latA, lonA)
+                console.log(latB, lonB)
+
+
+                const distanceA = calculateDistance(userLatitude, userLongitude, latA, lonA);
+                const distanceB = calculateDistance(userLatitude, userLongitude, latB, lonB);
+
+                return distanceA - distanceB; // Trier du plus proche au plus éloigné
+            });
+
+            // Réinsérer les profils triés dans le DOM
+            const container = document.getElementById('profile-list');
+            profiles.forEach(profile => container.appendChild(profile));
         });
 
     </script>

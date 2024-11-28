@@ -67,9 +67,10 @@ class Notif(Model):
     @classmethod
     def mark_notifs_by_user_id_as_read(cls, user_id: int):
         notifs = cls.find_notifs_by_user(user_id)
-        unread_notifs_ids = [notif.id for notif in notifs if not notif.read and notif.state != 'message']
-        if unread_notifs_ids:
-            cls.mark_as_read(unread_notifs_ids)
+        if notifs:
+            unread_notifs_ids = [notif.id for notif in notifs if not notif.read and notif.state != 'message']
+            if unread_notifs_ids:
+                cls.mark_as_read(unread_notifs_ids)
     
     @classmethod
     def delete_notifs_msg_by_user_id(cls, user_id: int):
