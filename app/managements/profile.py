@@ -1,5 +1,6 @@
 from flask import render_template, session, redirect, url_for
 
+from ORM.tables.user import User
 from ORM.views.profile import Profile
 from ORM.tables.friendship import Friendship
 from ORM.tables.tag import UserTag, Tag
@@ -66,3 +67,44 @@ def is_blocked(user_id, profile_id):
         if are_blocked:
             block = True
     return block
+
+def fame_rate_calcul(user_id):
+    
+    nb_connections = 0
+    connections = Friendship.get_friendship_connections(user_id)
+    if connections:
+        nb_connections = len(connections)
+        
+    nb_invitations = 0
+    invitations = Friendship.get_invitations_received(user_id)
+    if invitations:
+        nb_invitations = len(invitations)
+    
+    nb_uninvitations = 0
+    uninvitations = Friendship.get_uninvitations_received(user_id)
+    if uninvitations:
+        nb_uninvitations = len(uninvitations)
+    
+    nb_blocks = 0
+    blocks = Block.find_blocks_by_user_id(user_id)
+    if blocks:
+        nb_blocks = len(blocks)
+
+    print('nb_connections = ', nb_connections)
+    print('nb_invitations = ', nb_invitations)
+    print('nb_uninvitations = ', nb_uninvitations)
+
+    coef_connections = 2
+    coef_invitations = 1.5
+    coef_uninvitations = -1
+    coef_block = -1
+
+    fame_rate = (
+        (nb_connections * coef_connections) +
+        (nb_invitations * coef_invitations) +
+        (nb_blocks * coef_block) +
+        (nb_uninvitations * coef_uninvitations)
+    )
+    print('fame_rate = ', fame_rate)
+    user = User._find_by_id(user_id)
+    user.update({'fame_rate': fame_rate})

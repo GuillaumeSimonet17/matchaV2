@@ -24,7 +24,7 @@ class Friendship(Model):
             raise ValueError("It has to be one of the possible states.")
         columns = cls.get_all_column_names(columns)
         query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
-                 f"WHERE state = {state} and receiver_id = {user_id} ;")
+                 f"WHERE state = '{state}' and receiver_id = {user_id} ;")
         try:
             res = db.execute(query)
             if res:

@@ -6,9 +6,7 @@ from ORM.tables.notif import Notif
 from ORM.tables.block import Block
 from ORM.tables.channel import Channel
 
-from managements.profile import is_blocked
-
-from routes import send_connection_route
+from managements.profile import is_blocked, fame_rate_calcul
 
 
 def handle_invitation(data):
@@ -26,11 +24,13 @@ def handle_invitation(data):
         return
     friendship = Friendship(None, 'invitation', sender_id, receiver_id)
     friendship.create()
-    
+
     notif = Notif(None, 'invitation', sender_id, receiver_id, False)
     notif.create()
     
     sender = Profile._find_by_id(sender_id)
+    
+    fame_rate_calcul(receiver_id)
     
     emit('receive_invitation',
          {'sender_username': sender.username, 'sender_id': sender.id, 'date': 'Now', 'state': 'invitation'},
@@ -39,12 +39,19 @@ def handle_invitation(data):
 def handle_block(data):
     if (is_blocked(data['sender_id'], data['receiver_id'])):
         return
+ 
     block = Block(None, data['sender_id'], data['receiver_id'])
     block.create()
-    
+ 
+    friendship = Friendship.get_friendship_by_user_ids([data['sender_id'], data['receiver_id']])
+    if friendship:
+        friendship.delete()
+
     channel = Channel.find_channel_by_user_ids(data['sender_id'], data['receiver_id'])
     if channel:
         channel.delete()
+        
+    fame_rate_calcul(data['receiver_id'])
         
 def handle_connection(data):
     sender_id = data.get('sender_id')
@@ -71,6 +78,9 @@ def handle_connection(data):
     
     sender = Profile._find_by_id(sender_id)
     
+    fame_rate_calcul(receiver_id)
+    fame_rate_calcul(sender_id)
+
     emit('receive_connection',
          {'sender_username': sender.username, 'sender_id': sender.id, 'date': 'Now', 'state': 'connected'},
          room=f'user_{receiver_id}')
@@ -99,6 +109,8 @@ def handle_uninvitation(data):
     notif.create()
     
     sender = Profile._find_by_id(sender_id)
+    
+    fame_rate_calcul(receiver_id)
     
     emit('receive_uninvitation',
          {'sender_username': sender.username, 'sender_id': sender.id, 'date': 'Now', 'state': 'uninvitation'},
