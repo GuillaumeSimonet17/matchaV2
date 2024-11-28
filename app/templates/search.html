@@ -1,53 +1,57 @@
 {% extends "index.html" %}
 {% block content %}
 <section id="search" class="mb-5 w-100 {{ 'active' if request.path == '/' else '' }}">
-    <div class="m-0 p-0 container-fluid">
-        <form class="col-12 col-md-8 d-flex mb-4 mt-4 ">
-            <div class="pb-2 col-12 col-md-8 d-flex justify-content-between">
-                <div class="col-4 col-md-3 my-auto dropdown my-3">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownFilters"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                        Filters
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownFilters">
-                        <li class="">
-                            <label for="customRange1" class="form-label">Example range</label>
-                            <input type="range" class="form-range" id="customRange1">
-                        </li>
-                        <li class="">
-                            <label for="customRange2" class="form-label">Example range</label>
-                            <input type="range" class="form-range" id="customRange2">
-                        </li>
-                    </ul>
-                </div>
+    <div class="m-0 p-0 container-fluid d-flex flex-column justify-content-center align-items-center">
+        {% if filtered_profiles %}
+        <div class="row col-6 justify-content-between shadow-sm rounded mb-5 bg-light">
 
-                <div class="col-4 col-md-3 my-auto dropdown my-3">
-                    <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownOrder"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                        Sort by
-                    </button>
-                    <ul class="dropdown-menu" aria-labelledby="dropdownFilters">
-                        <li id="age-sort-asc" class="ps-2" style="cursor: pointer">Age ASC</li>
-                        <li id="age-sort-dsc" class="ps-2" style="cursor: pointer">Age DSC</li>
-                        <li id="fame-rate-sort" class="ps-2" style="cursor: pointer">Fame rating</li>
-                        <li id="common-tags-sort" class="ps-2" style="cursor: pointer">Common tags</li>
-                        <li id="location-sort" class="ps-2" style="cursor: pointer">Location</li>
-                    </ul>
-                </div>
-
-                <span class="d-none" id="user-tags" data-user-tags="{{ user_tags }}"></span>
-                <span class="d-none" id="location" data-user-lat="{{ user_lat }}" data-user-lng="{{ user_lng }}"></span>
-
-                <button class="col-4 col-md-3 my-auto btn btn-primary">Save</button>
+            <div class="col-4 col-md-3 my-auto dropdown my-3">
+                <button style="min-width: 133px;" class="btn btn-light text-secondary dropdown-toggle" type="button" id="dropdownOrder"
+                        data-bs-toggle="dropdown" aria-expanded="false">
+                    Sort by
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="dropdownFilters">
+                    <li id="age-sort-asc" class="link-sort ps-2" style="cursor: pointer">Age ASC</li>
+                    <li id="age-sort-dsc" class="link-sort ps-2" style="cursor: pointer">Age DSC</li>
+                    <li id="fame-rate-sort" class="link-sort ps-2" style="cursor: pointer">Fame rating</li>
+                    <li id="common-tags-sort" class="link-sort ps-2" style="cursor: pointer">Common tags</li>
+                    <li id="location-sort" class="link-sort ps-2" style="cursor: pointer">Location</li>
+                </ul>
             </div>
-        </form>
-        <div class="row p-0 m-0 flex-row justify-content-center gap-1" id="profile-list">
+            <form class="col-12 col-md-6 d-flex mb-4 mt-4">
+                <div class="col-12 d-flex justify-content-around">
+                    <div class="my-auto dropdown my-3">
+                        <button style="min-width: 133px;" class="btn btn-light text-secondary dropdown-toggle" type="button"
+                                id="dropdownFilters"
+                                data-bs-toggle="dropdown" aria-expanded="false">
+                            Filters
+                        </button>
+                        <ul class="dropdown-menu" aria-labelledby="dropdownFilters">
+                            <li class="">
+                                <label for="customRange1" class="form-label">Example range</label>
+                                <input type="range" class="form-range" id="customRange1">
+                            </li>
+                            <li class="">
+                                <label for="customRange2" class="form-label">Example range</label>
+                                <input type="range" class="form-range" id="customRange2">
+                            </li>
+                        </ul>
+                    </div>
 
-            {% if filtered_profiles %}
+                    <span class="d-none" id="user-tags" data-user-tags="{{ user_tags }}"></span>
+                    <span class="d-none" id="location" data-user-lat="{{ user_lat }}"
+                          data-user-lng="{{ user_lng }}"></span>
+
+                    <button style="min-width: 133px;" class="my-auto btn btn-secondary">Save</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="row p-0 m-0 flex-row justify-content-center col-12 gap-1" id="profile-list">
             {% for profile in filtered_profiles %}
 
             <a id="view-profile" href="/profile/{{ profile.id }}"
-               class="col-12 col-md-4 card p-2 d-flex justify-content-between"
+               class="col-12 col-md-4 card shadow p-2 d-flex justify-content-between border-0"
                style="min-height: 300px; max-width: 420px;"
                data-profile="{{ profile }}">
 
@@ -62,6 +66,8 @@
             </a>
 
             {% endfor %}
+            {% else %}
+            <p class="col-12 text-center mt-5">No user found</p>
             {% endif %}
         </div>
     </div>

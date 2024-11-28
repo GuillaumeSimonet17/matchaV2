@@ -32,3 +32,14 @@ nav .active {
     background: #9cc2ff;
     border-radius: 8px;
 }
+
+#search {
+
+    .link-sort {
+        font-weight: bold;
+    }
+
+    .link-sort:hover {
+        color: black !important;
+    }
+}
