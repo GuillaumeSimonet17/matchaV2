@@ -48,7 +48,7 @@
                         <option value="male" {% if user.gender=='male' %}selected="selected" {% endif %}>Male</option>
                         <option value="female" {% if user.gender=='female' %}selected="selected" {% endif %}>Female
                         </option>
-                        <option value="other" {% if user.gender=='other' %}selected="selected" {% endif %}>Other
+                        <option value="unspecified" {% if user.gender=='unspecified' %}selected="selected" {% endif %}>Unspecified
                         </option>
                     </select>
                 </div>
@@ -110,7 +110,7 @@
                         <option value="female" {% if user.gender_pref=='female' %}selected="selected" {% endif %}>
                             Female
                         </option>
-                        <option value="both" {% if user.gender_pref=='both' %}selected="selected" {% endif %}>Other
+                        <option value="unspecified" {% if user.gender_pref=='unspecified' %}selected="selected" {% endif %}>Unspecified
                         </option>
                     </select>
                 </div>
