@@ -103,9 +103,11 @@ def handle_send_message(data):
     print('rece === ', receiver_id)
     if receiver_id != 0:
         channel = Channel.find_channel_by_user_ids(sender_id, receiver_id)
+        if not channel:
+            return
         msg = Message(None, channel.id, sender_id, receiver_id, content, False)
         msg.create()
-    
+
     have_to_notif = False
     notifs_exist = Notif.find_notif('message', sender_id, receiver_id)
     if not notifs_exist:
