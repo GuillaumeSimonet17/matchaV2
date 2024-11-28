@@ -88,13 +88,19 @@ def handle_get_messages(data):
          room=request.sid)
 
 def handle_send_message(data):
+    print( data.get('receiver_id'))
+
+    if data.get('receiver_id') is None or data.get('sender_id') is None:
+        print('\nc coment\n')
+        return
+    
     sender_id = int(data['sender_id'])
     receiver_id = int(data['receiver_id'])
     content = data['content']
     
     if is_blocked(sender_id, receiver_id):
         return
-    
+    print('rece === ', receiver_id)
     if receiver_id != 0:
         channel = Channel.find_channel_by_user_ids(sender_id, receiver_id)
         msg = Message(None, channel.id, sender_id, receiver_id, content, False)

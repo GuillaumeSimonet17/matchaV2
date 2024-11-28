@@ -38,10 +38,14 @@
                 <p>No messages</p>
                 {% endif %}
             </div>
+
+            {% if profile_selected %}
             <div class="d-flex justify-content-between bg-light">
                 <input id="input-msg" placeholder="Send a message..." type="text" class="px-4 col-9 col-md-10 border-0"/>
                 <button data-profile-id="{{ profile_id }}" id="btn-send" class="btn col-3 col-md-2">Send</button>
             </div>
+            {% endif %}
+
         </div>
     </div>
 
