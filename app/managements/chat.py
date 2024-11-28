@@ -1,4 +1,5 @@
-from flask import render_template, session
+from flask import render_template, session, request
+from flask_socketio import emit
 
 from ORM.tables.friendship import Friendship
 from ORM.views.profile import Profile
@@ -66,3 +67,51 @@ def go_chat():
     return render_template('chat.html', profiles=profiles, user_id=user_id, profile_selected=profile_selected,
                            profile_id=profile_id, messages_data=messages_data, nb_notifs=nb_notifs,
                            nb_notifs_msg=nb_notifs_msg)
+
+def handle_get_messages(data):
+    user_id = session.get('user_id')
+    profile_id = data.get('profile_id')
+    
+    profile_selected = Profile._find_by_id(int(profile_id))
+    
+    channel = Channel.find_channel_by_user_ids(int(user_id), int(profile_id))
+    
+    messages_data = []
+    messages = Message.find_messages_by_channel_id(channel.id)
+    
+    if messages:
+        messages_data = [{"receiver_id": msg.receiver_id, "sender_id": msg.sender_id, "content": msg.content,
+                          "created_at": msg.created_at.strftime('%Y-%m-%d %H:%M')} for msg in messages]
+    
+    session['current_channel'] = profile_selected.id
+    emit('display_messages', {'messages': messages_data, 'profile_username': profile_selected.username},
+         room=request.sid)
+
+def handle_send_message(data):
+    sender_id = int(data['sender_id'])
+    receiver_id = int(data['receiver_id'])
+    content = data['content']
+    
+    if is_blocked(sender_id, receiver_id):
+        return
+    
+    if receiver_id != 0:
+        channel = Channel.find_channel_by_user_ids(sender_id, receiver_id)
+        msg = Message(None, channel.id, sender_id, receiver_id, content, False)
+        msg.create()
+    
+    have_to_notif = False
+    notifs_exist = Notif.find_notif('message', sender_id, receiver_id)
+    if not notifs_exist:
+        have_to_notif = True
+    else:
+        for notif_exist in notifs_exist:
+            if notif_exist.read:
+                have_to_notif = True
+    
+    if have_to_notif:
+        notif = Notif(None, 'message', sender_id, receiver_id, False)
+        notif.create()
+    
+    print('ici ', f'user_{receiver_id}')
+    emit('receive_message', {'sender_id': sender_id}, room=f'user_{receiver_id}')

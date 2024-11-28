@@ -11,14 +11,11 @@ from managements.search import go_search
 from managements.historic import go_historic
 from managements.user_management.user import go_user
 from managements.chat import go_chat
+from managements.friendship import handle_invitation, handle_block, handle_connection, handle_uninvitation
+from managements.chat import handle_get_messages, handle_send_message
 
 from ORM.tables.tag import Tag
-from ORM.tables.friendship import Friendship
-from ORM.views.profile import Profile
-from ORM.tables.channel import Channel
-from ORM.tables.message import Message
 from ORM.tables.notif import Notif
-from ORM.tables.block import Block
 from ORM.tables.user import User
 
 from app import socketio
@@ -33,164 +30,47 @@ def on_join(data):
     if user_id:
         join_room(f"user_{user_id}")
 
-# FRIENDSHIP ---------------
+# PROFILE/FRIENDSHIP ---------------
 @socketio.on('send_invitation')
 def send_invitation_route(data):
-    sender_id = data.get('sender_id')
-    receiver_id = data.get('receiver_id')
-
-    if (is_blocked(sender_id, receiver_id)):
-        return
-
-    # check if friendship exist
-    friendship = Friendship.get_friendship_by_user_ids([sender_id, receiver_id])
-    if friendship:
-        if friendship.state == 'invitation':
-            send_connection_route(data)
-        return
-
-    friendship = Friendship(None, 'invitation', sender_id, receiver_id)
-    friendship.create()
-
-    notif = Notif(None, 'invitation', sender_id, receiver_id, False)
-    notif.create()
-    
-    sender = Profile._find_by_id(sender_id)
-    
-    emit('receive_invitation', {'sender_username': sender.username, 'sender_id': sender.id, 'date': 'Now', 'state': 'invitation' }, room=f'user_{receiver_id}')
+    handle_invitation(data)
 
 @socketio.on('send_block')
 def send_block_route(data):
-    if (is_blocked(data['sender_id'], data['receiver_id'])):
-        return
-    block = Block(None, data['sender_id'], data['receiver_id'])
-    block.create()
-    
-    channel = Channel.find_channel_by_user_ids(data['sender_id'], data['receiver_id'])
-    if channel:
-        channel.delete()
+    handle_block(data)
 
 @socketio.on('send_connection')
 def send_connection_route(data):
-    sender_id = data.get('sender_id')
-    receiver_id = data.get('receiver_id')
-    
-    if (is_blocked(sender_id, receiver_id)):
-        return
-    
-    friendship = Friendship.get_friendship_by_user_ids([sender_id, receiver_id])
-
-    # get friendship and check if state is invitation and receiver_id = sender_id
-    if friendship.state != 'invitation' and friendship.sender_id != int(receiver_id):
-        return
-
-    # update state
-    friendship.update({'state': 'connected'})
-
-    # create channel between users
-    channel = Channel(None, sender_id, receiver_id)
-    channel.create()
-
-    notif = Notif(None, 'connection', sender_id, receiver_id, False)
-    notif.create()
-
-    sender = Profile._find_by_id(sender_id)
-    
-    emit('receive_connection', {'sender_username': sender.username, 'sender_id': sender.id, 'date': 'Now', 'state': 'connected' }, room=f'user_{receiver_id}')
-
+    handle_connection(data)
+  
 @socketio.on('send_uninvitation')
 def send_uninvitation_route(data):
-    sender_id = data.get('sender_id')
-    receiver_id = data.get('receiver_id')
+    handle_uninvitation(data)
 
-    if (is_blocked(sender_id, receiver_id)):
-        return
-    
-    channel = Channel.find_channel_by_user_ids(data['sender_id'], data['receiver_id'])
-    if channel:
-        channel.delete()
-
-    # get friendship and check if state is connected
-    friendship = Friendship.get_friendship_by_user_ids([sender_id, receiver_id])
-
-    if friendship.state != 'connected':
-        return
-
-    # update state
-    friendship.update({'state': 'uninvitation', 'sender_id': sender_id, 'receiver_id': receiver_id})
-
-    notif = Notif(None, 'uninvitation', sender_id, receiver_id, False)
-    notif.create()
-
-    sender = Profile._find_by_id(sender_id)
-
-    emit('receive_uninvitation', {'sender_username': sender.username, 'sender_id': sender.id, 'date': 'Now', 'state': 'uninvitation' }, room=f'user_{receiver_id}')
-
-# CHAT ---------------
-@socketio.on('get_messages')
-def get_messages(data):
-    user_id = session.get('user_id')
-    profile_id = data.get('profile_id')
-    
-    profile_selected = Profile._find_by_id(int(profile_id))
-
-    channel = Channel.find_channel_by_user_ids(int(user_id), int(profile_id))
-
-    messages_data = []
-    messages = Message.find_messages_by_channel_id(channel.id)
-
-    if messages:
-        messages_data = [{"receiver_id": msg.receiver_id, "sender_id": msg.sender_id, "content": msg.content,
-                          "created_at": msg.created_at.strftime('%Y-%m-%d %H:%M') } for msg in messages]
-
-    session['current_channel'] = profile_selected.id
-    emit('display_messages', {'messages': messages_data, 'profile_username': profile_selected.username},
-         room=request.sid)
-    
 @socketio.on('view_profile')
 def view_profile(data):
     user_id = session.get('user_id')
     username = session.get('username')
     receiver_id = data['receiver_id']
     
-    emit('receive_view_profile', {'receiver_id': receiver_id, 'sender_id': user_id, 'sender_username': username},
+    emit('receive_view_profile',
+         {'receiver_id': receiver_id, 'sender_id': user_id, 'sender_username': username},
          room=f'user_{int(data['receiver_id'])}')
+
+# CHAT ---------------
+@socketio.on('get_messages')
+def get_messages(data):
+    handle_get_messages(data)
 
 @socketio.on('send_message')
 def send_message(data):
-    sender_id = int(data['sender_id'])
-    receiver_id = int(data['receiver_id'])
-    content = data['content']
-    
-    if is_blocked(sender_id, receiver_id):
-        return
-
-    if receiver_id != 0:
-        channel = Channel.find_channel_by_user_ids(sender_id, receiver_id)
-        msg = Message(None, channel.id, sender_id, receiver_id, content, False)
-        msg.create()
-    
-    have_to_notif = False
-    notifs_exist = Notif.find_notif('message', sender_id, receiver_id)
-    if not notifs_exist:
-        have_to_notif = True
-    else:
-        for notif_exist in notifs_exist:
-            if notif_exist.read:
-                have_to_notif = True
-
-    if have_to_notif:
-        notif = Notif(None, 'message', sender_id, receiver_id, False)
-        notif.create()
-
-    print('ici ', f'user_{receiver_id}')
-    emit('receive_message', {'sender_id': sender_id}, room=f'user_{receiver_id}')
-
+    handle_send_message(data)
+  
 @socketio.on('received_message')
 def received_message(data):
     if data['sender_id'] == session['current_channel']:
         data['profile_id'] = data['sender_id']
-        get_messages(data)
+        handle_get_messages(data)
 
         notifs_exist = Notif.find_notifs('message', int(data['profile_id']), int(session['user_id']))
         if isinstance(notifs_exist, Notif):
@@ -202,7 +82,6 @@ def received_message(data):
 @socketio.on('mark_notifs_as_read')
 def mark_notifs_as_read(data):
     user_id = session['user_id']
-    receiver_id = data['receiver_id']
     Notif.mark_notifs_by_user_id_as_read(user_id)
 
 

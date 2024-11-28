@@ -6,7 +6,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from ORM.tables.user import User
 
 
-
 def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
     # --------------- RECUPERATION DES INFOS ----------------------
     username = request.form.get('username')
@@ -99,7 +98,6 @@ def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
     
     return render_template('user.html', user=user, profile_image_data=profile_image_data,
                            tags=tags, user_tag_ids=user_tag_ids)
-
 
 def change_password(request):
     current_password = request.form.get('current_password')

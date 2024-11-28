@@ -7,7 +7,6 @@ from ORM.tables.notif import Notif
 def delete_notif_by_id(notif_id):
     notif = Notif._find_by_id(notif_id)
     notif.delete()
-    
 
 def get_numbers_of_notifs():
     user_id = session['user_id']
