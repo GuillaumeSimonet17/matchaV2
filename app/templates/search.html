@@ -36,7 +36,7 @@
                 <button class="col-4 col-md-3 my-auto btn btn-primary">Save</button>
             </div>
         </form>
-        <div class="row p-0 m-0 flex-row gap-1">
+        <div class="row p-0 m-0 flex-row justify-content-center gap-1">
                 {% if filtered_profiles %}
                 {% for profile in filtered_profiles %}
                 <a id="view-profile" href="/profile/{{ profile.id }}"

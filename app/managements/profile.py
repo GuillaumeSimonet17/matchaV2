@@ -86,7 +86,7 @@ def fame_rate_calcul(user_id):
         nb_uninvitations = len(uninvitations)
     
     nb_blocks = 0
-    blocks = Block.find_blocks_by_user_id(user_id)
+    blocks = Block.find_blocks_by_receiver_id(user_id)
     if blocks:
         nb_blocks = len(blocks)
 
