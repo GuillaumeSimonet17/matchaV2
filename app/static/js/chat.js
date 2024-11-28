@@ -22,12 +22,15 @@ if (profiles) {
             const username = this.getAttribute('data-username');
             currentProfileId = this.getAttribute('data-profile-id');
 
-            let old_select = document.querySelector('.bg-primary')
+            let old_select = document.querySelector('.bg-secondary')
             if (old_select) {
-                old_select.classList.remove('bg-primary');
+                old_select.classList.remove('bg-secondary');
+                old_select.querySelector('p').classList.remove('text-light');
+                old_select.querySelector('p').classList.add('text-secondary');
             }
-            this.classList.add('bg-primary');
-
+            this.classList.add('bg-secondary');
+            this.querySelector('p').classList.remove('text-secondary');
+            this.querySelector('p').classList.add('text-light');
             socket.emit('get_messages', {profile_id: currentProfileId});
 
         });
@@ -50,11 +53,10 @@ if (btnSend) {
             const chatContainer = document.querySelector('#chat-container');
 
             const msgElement = document.createElement('div');
-            msgElement.classList.add('d-flex', 'flex-column', 'align-items-center', 'rounded', 'mt-1', 'px-2', 'me-auto', 'my-msg');
+            msgElement.classList.add('d-flex', 'flex-column', 'align-items-center', 'mt-2', 'px-3', 'w-100');
             msgElement.innerHTML = `
-                    <p class="text-dark p-2 px-3 m-0 text-end text-break"><strong class="text-dark">
-                        You:</strong> ${message.value}</p>
-                    <small class="text-dark">${new Date().toLocaleString()}</small>
+                    <p class="text-dark p-2 px-3 m-0 text-start text-break rounded me-auto my-msg">${message.value}</p>
+                    <small class="text-muted text-start text-break me-auto">Now</small>
                 `;
             chatContainer.appendChild(msgElement);
 
@@ -99,14 +101,16 @@ socket.on('display_messages', function (data) {
     data.messages.forEach(msg => {
         const msgElement = document.createElement('div');
 
+        msgElement.classList.add('d-flex', 'flex-column', 'align-items-center', 'rounded', 'mt-2', 'px-3', 'w-100');
         if (msg.sender_id == currentUserId)
-            msgElement.classList.add('d-flex', 'flex-column', 'align-items-center', 'rounded', 'mt-1', 'px-2', 'me-auto', 'my-msg');
+            msgElement.innerHTML = `
+                <p class="text-dark p-2 px-3 m-0 text-start text-break rounded me-auto my-msg">${msg.content}</p>
+                <small class="text-muted text-start text-break me-auto">${msg.created_at}</small>
+            `;
         else
-            msgElement.classList.add('d-flex', 'flex-column', 'align-items-center', 'rounded', 'mt-1', 'px-2', 'ms-auto', 'border');
-        msgElement.innerHTML = `
-                <p class="text-dark p-2 px-3 m-0 text-end text-break"><strong class="text-dark">${msg.sender_id == currentUserId ?
-            'You' : data.profile_username}:</strong> ${msg.content}</p>
-                <small class="text-dark">${msg.created_at}</small>
+            msgElement.innerHTML = `
+                <p class="text-dark p-2 px-3 m-0 text-start text-break rounded ms-auto border">${msg.content}</p>
+                <small class="text-muted text-start text-break ms-auto">${msg.created_at}</small>
             `;
 
         chatContainer.appendChild(msgElement);

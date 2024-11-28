@@ -1,9 +1,9 @@
 {% extends "index.html" %}
 {% block content %}
 <section id="search" class="mb-5 w-100 {{ 'active' if request.path == '/' else '' }}">
-    <div class="m-0 p-0 container-fluid border border-dark rounded">
+    <div class="m-0 p-0 container-fluid">
         <form class="col-12 col-md-8 d-flex mb-4 mt-4 ">
-            <div class="pb-2 px-2 border-bottom border-secondary border-2 rounded col-12 col-md-8 d-flex justify-content-between">
+            <div class="pb-2 col-12 col-md-8 d-flex justify-content-between">
                 <div class="col-4 col-md-3 my-auto dropdown my-3">
                     <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownFilters"
                             data-bs-toggle="dropdown" aria-expanded="false">
@@ -36,12 +36,11 @@
                 <button class="col-4 col-md-3 my-auto btn btn-primary">Save</button>
             </div>
         </form>
-        <div class="row p-0 m-0 flex-row">
-            <div class="p-0 m-0 row flex-row">
+        <div class="row p-0 m-0 flex-row gap-1">
                 {% if filtered_profiles %}
                 {% for profile in filtered_profiles %}
                 <a id="view-profile" href="/profile/{{ profile.id }}"
-                   class="col-12 col-md-4 card border p-2 d-flex justify-content-between m-0"
+                   class="col-12 col-md-4 card p-2 d-flex justify-content-between" style="min-height: 300px; max-width: 420px;"
                    data-profile-id="{{ profile.id }}">
                     <div style="max-height: 200px; overflow: hidden;">
                         <img class="img-fluid" class="form-control" id="profile_image"
@@ -51,7 +50,6 @@
                 </a>
                 {% endfor %}
                 {% endif %}
-            </div>
         </div>
     </div>
     <script>

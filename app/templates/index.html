@@ -1,10 +1,51 @@
 {% extends "base.html" %}
 {% block index %}
 
-<main class="container d-flex flex-column justify-content-between align-items-center border border-3 p-1 pb-0 w-100"
+<main class="container d-flex flex-column justify-content-between align-items-center pb-0 w-100"
       style="height: calc(100vh - 75px); overflow: auto; min-height: 90vh;">
 
     {% block content %}{% endblock %}
+
+    <!-- Barre de navigation horizontal -->
+    <nav class="nav bg-light align-items-center justify-content-center rounded-3 shadow fixed-bottom">
+        <a class="nav-link d-flex justify-content-center" href="/logout">
+            <i class="bi bi-box-arrow-in-left {{ 'active' if request.path == '/logout' else '' }}"
+               style="font-size: 2rem"></i>
+        </a>
+        <a class="nav-link d-flex justify-content-center" href="/historic">
+            <i class="bi bi-clock-history {{ 'active' if request.path == '/historic' else '' }}"
+               style="font-size: 2rem"></i>
+        </a>
+        <a class="nav-link mb-2" href="/">
+            <img class="{{ 'active' if request.path == '/' else '' }} mt-2"
+                 style="width: 35px; transform: rotate(180deg);"
+                 src="../static/img/airbnb.png" alt="Card image cap"/>
+        </a>
+        <a class="nav-link d-flex justify-content-center position-relative" href="/notifs">
+            {% if nb_notifs %}
+            <span id="badge-notifs"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            {{nb_notifs}}
+        </span>
+            {% endif %}
+            <i id="notif-icon" class="bi bi-bell {{ 'active' if request.path == '/notifs' else '' }}"
+               style="font-size: 2rem"></i>
+        </a>
+        <a class="nav-link d-flex justify-content-center position-relative" href="/chat">
+            {% if nb_notifs_msg %}
+            <span id="badge-msg-notifs"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
+            <i class="bi bi-bell-fill text-light"></i>
+        </span>
+            {% endif %}
+            <i id="chat-icon" class="{{ 'active' if request.path == '/chat' else '' }} bi bi-chat-left"
+               style="font-size: 2rem;"></i>
+        </a>
+        <a class="nav-link d-flex justify-content-center" href="/user">
+            <i class="bi bi-person {{ 'active' if request.path == '/user' else '' }}" style="font-size: 2rem"></i>
+        </a>
+    </nav>
+    {% endblock %}
 
     <footer class="mt-5">
         <div class="col-12 d-flex flex-wrap bg-light p-4 justify-content-center align-items-center">
@@ -18,38 +59,3 @@
 
 </main>
 
-<!-- Barre de navigation horizontal -->
-<nav class="nav bg-light align-items-center justify-content-center rounded-3 shadow fixed-bottom">
-    <a class="nav-link d-flex justify-content-center" href="/logout">
-        <i class="bi bi-box-arrow-in-left {{ 'active' if request.path == '/logout' else '' }}"
-           style="font-size: 2rem"></i>
-    </a>
-    <a class="nav-link d-flex justify-content-center" href="/historic">
-        <i class="bi bi-clock-history {{ 'active' if request.path == '/historic' else '' }}"
-           style="font-size: 2rem"></i>
-    </a>
-    <a class="nav-link mb-2" href="/">
-        <img class="{{ 'active' if request.path == '/' else '' }} mt-2" style="width: 35px; transform: rotate(180deg);"
-             src="../static/img/airbnb.png" alt="Card image cap"/>
-    </a>
-    <a class="nav-link d-flex justify-content-center position-relative" href="/notifs">
-        {% if nb_notifs %}
-        <span id="badge-notifs" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            {{nb_notifs}}
-        </span>
-        {% endif %}
-        <i id="notif-icon" class="bi bi-bell {{ 'active' if request.path == '/notifs' else '' }}" style="font-size: 2rem"></i>
-    </a>
-    <a class="nav-link d-flex justify-content-center position-relative" href="/chat">
-        {% if nb_notifs_msg %}
-        <span id="badge-msg-notifs" class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
-            <i class="bi bi-bell-fill text-light"></i>
-        </span>
-        {% endif %}
-        <i  id="chat-icon" class="{{ 'active' if request.path == '/chat' else '' }} bi bi-chat-left" style="font-size: 2rem;"></i>
-    </a>
-    <a class="nav-link d-flex justify-content-center" href="/user">
-        <i class="bi bi-person {{ 'active' if request.path == '/user' else '' }}" style="font-size: 2rem"></i>
-    </a>
-</nav>
-{% endblock %}

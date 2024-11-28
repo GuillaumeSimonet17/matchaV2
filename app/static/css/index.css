@@ -1,6 +1,6 @@
 :root {
-    --bs-primary: #59C2FF;
-    --bs-secondary: #f3d291;
+    --bs-secondary: #494949;
+    --bs-primary: #8f8f8f;
 }
 
 ::-webkit-scrollbar {
@@ -29,6 +29,6 @@ nav .active {
 }
 
 .my-msg {
-    background: var(--bs-secondary);
+    background: #9cc2ff;
     border-radius: 8px;
 }
