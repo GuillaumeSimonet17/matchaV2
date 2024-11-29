@@ -104,6 +104,7 @@ def auth_register(request, all_tags):
             'location': location,
             'lng': lng,
             'lat': lat,
+            'allow_geoloc': True
         }
 
         user_id = create_user(data)

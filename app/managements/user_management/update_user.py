@@ -19,6 +19,7 @@ def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
     tag_ids_selected = request.form.getlist('tags[]')
     new_image = request.files.get('new_profile_image')
     location = request.form.get('location')
+    allow_geoloc = request.form.get('allow_geoloc')
 
     
     # --------------- VERIFICATION DES INFOS ----------------------
@@ -31,7 +32,6 @@ def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
     # --------------- INTERCEPTER MODIFICATIONS ----------------------
     user = User._find_by_username(username)
     
-    # print('new_image', new_image.filename)
     if new_image.filename:
         img_read = new_image.read()
         User.save_profile_image(user.id, img_read)
@@ -55,6 +55,8 @@ def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
             data['gender'] = gender
         if gender_pref != user.gender_pref:
             data['gender_pref'] = gender_pref
+        if allow_geoloc != user.allow_geoloc:
+            data['allow_geoloc'] = allow_geoloc
 
         if location != user.location:
             API_KEY = 'ad10d1fa56804356afea60668546b54f'
@@ -85,7 +87,7 @@ def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
         # TODO :
         # if new_tags:
         # update les tags : add new ones and delete old ones that not in new_tags
-        
+
         if data:
             user.update(data)
             user = User._find_by_id(user.id)

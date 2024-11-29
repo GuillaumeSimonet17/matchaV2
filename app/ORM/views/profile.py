@@ -7,11 +7,11 @@ from ORM.database import db
 class Profile(Model):
     table_name = 'app_profile'
     column_names = ['id', 'username', 'last_name', 'first_name', 'age', 'profile_image',
-                    'bio', 'gender', 'gender_pref', 'fame_rate', 'connected', 'location', 'lng', 'lat']
+                    'bio', 'gender', 'gender_pref', 'fame_rate', 'connected', 'location', 'lng', 'lat', 'allow_geoloc']
 
 
     def __init__(self, id, username, last_name, first_name, age,
-                 profile_image, bio, gender, gender_pref, fame_rate, connected, location, lng, lat):
+                 profile_image, bio, gender, gender_pref, fame_rate, connected, location, lng, lat, allow_geoloc):
         self.id = id
         self.username = username
         self.last_name = last_name
@@ -26,6 +26,7 @@ class Profile(Model):
         self.location = location
         self.lng = lng
         self.lat = lat
+        self.allow_geoloc = allow_geoloc
 
     # ------------------------------------ READ
     @classmethod

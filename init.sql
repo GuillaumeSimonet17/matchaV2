@@ -16,11 +16,13 @@ CREATE TABLE IF NOT EXISTS app_user (
     lng DOUBLE PRECISION,
     lat DOUBLE PRECISION,
     location VARCHAR(255),
+    allow_geoloc BOOLEAN DEFAULT TRUE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE VIEW app_profile AS
-SELECT id, username, last_name, first_name, age, profile_image, bio, gender, gender_pref, fame_rate, connected, location, lng, lat
+SELECT id, username, last_name, first_name, age, profile_image, bio, gender, gender_pref, fame_rate, connected,
+       location, lng, lat, allow_geoloc
 FROM app_user;
 
 -- TAGS Many2many -----------------------------------------------------------------------------------
