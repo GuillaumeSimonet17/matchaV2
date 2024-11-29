@@ -1,4 +1,5 @@
 import requests
+import re
 
 from flask import flash, render_template, session, redirect, url_for
 from werkzeug.security import generate_password_hash
@@ -28,7 +29,13 @@ def create_tags(user_id, tag_ids):
         user_tag = UserTag(None, user_id, tag_id)
         user_tag.create()
 
-def auth_register(request):
+def is_valid_username(username):
+    forbidden_chars = r"['\"/\\]"
+    if re.search(forbidden_chars, username):
+        return False
+    return True
+
+def auth_register(request, all_tags):
     valid = True
     
     # --------------- RECUPERATION DES INFOS ----------------------
@@ -44,12 +51,17 @@ def auth_register(request):
     gender = request.form.get('gender')
     gender_pref = request.form.get('gender_pref')
     tags = request.form.getlist('tags[]')
-    
+
     # --------------- VERIFICATION DES INFOS ----------------------
-    if age < 18:
+    if not is_valid_username(username):
         valid = False
+        flash('Choisi un username sans caractères spéciaux stp beau gosse', 'danger')
+    if int(age) < 18:
+        valid = False
+        flash('Qu\'est-ce tu fais là si t\'es mineur frr', 'danger')
     if not tags:
         valid = False
+        flash('Choisi au moins un tag khey stp', 'danger')
     if len(username) < 3:
         valid = False
         flash('Tu sais pas lire enfaite ? C\'est  3 lettres minimum le username...', 'danger')
@@ -106,4 +118,4 @@ def auth_register(request):
             return redirect(url_for('main.home'))
         flash('Username ou email déjà utilisé', 'danger')
     
-    return render_template('register.html')
+    return render_template('register.html', all_tags=all_tags)

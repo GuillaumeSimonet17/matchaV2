@@ -125,10 +125,11 @@ def logout():
 
 @main.route('/register', methods=['GET', 'POST'])
 def register():
+    all_tags = Tag._all()
+
     if request.method == 'POST':
-        return auth_register(request)
-    tags = Tag._all()
-    return render_template('register.html', tags=tags)
+        return auth_register(request, all_tags)
+    return render_template('register.html', all_tags=all_tags)
 
 
 @main.route('/apply_filters', methods=['POST'])
