@@ -87,11 +87,12 @@ def get_profiles_list(is_suggestion_list=True):
     user_tag_ids = UserTag.find_tags_by_user_id(user_id)
     user_tags = []
     tag_ids = []
-    for tag_id in user_tag_ids:
-        tag = Tag._find_by_id(tag_id.tag_id)
-        if tag:
-            tag_ids.append(tag.id)
-            user_tags.append(tag.name)
+    if user_tag_ids:
+        for tag_id in user_tag_ids:
+            tag = Tag._find_by_id(tag_id.tag_id)
+            if tag:
+                tag_ids.append(tag.id)
+                user_tags.append(tag.name)
 
     user_lat = user.lat
     user_lng = user.lng

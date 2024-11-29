@@ -1,4 +1,5 @@
 from ORM.model import Model
+from ORM.database import db
 
 
 class Tag(Model):
@@ -31,6 +32,19 @@ class Tag(Model):
             return None
         return None
 
+    @classmethod
+    def _find_by_name(cls, name):
+        try:
+            res = cls.find_x_by_y('name', name, cls.column_names)
+            if res:
+                tag = res[0]
+                return tag
+        except Exception as e:
+            print(e)
+            return None
+        return None
+
+
 
 class UserTag(Model):
     table_name = 'user_tag'
@@ -45,3 +59,17 @@ class UserTag(Model):
     @classmethod
     def find_tags_by_user_id(cls, user_id: int, columns: list[str] = None):
         return cls.find_x_by_y('user_id', user_id)
+    
+    @classmethod
+    def find_user_tag_by_id(cls, user_id: int, tag_id: int, columns: list[str] = None):
+        columns = cls.get_all_column_names(columns)
+        query = (f"SELECT id FROM {cls.table_name} "
+                 f"WHERE user_id = {user_id} and tag_id = {tag_id};")
+        try:
+            id = db.execute(query)
+            res = cls.get_dict_by_id(int(id[0][0]))
+            if res:
+                return cls(**res)
+        except Exception as e:
+            raise e
+        return None

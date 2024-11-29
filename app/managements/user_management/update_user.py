@@ -4,6 +4,7 @@ from flask import flash, render_template, session
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from ORM.tables.user import User
+from ORM.tables.tag import UserTag
 
 
 def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
@@ -21,16 +22,40 @@ def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
     location = request.form.get('location')
     allow_geoloc = request.form.get('allow_geoloc')
 
+    user = User._find_by_username(username)
+
+    new_tags = []
+    for tag_id_selected in tag_ids_selected:
+        if int(tag_id_selected) not in user_tag_ids:
+            new_tags.append(int(tag_id_selected))
+            user_tag = UserTag(None, user.id, tag_id_selected)
+            user_tag.create()
     
+    tag_ids_selected = [int(tag_id_selected) for tag_id_selected in tag_ids_selected]
+    tags_to_delete = set(user_tag_ids) - set(tag_ids_selected)
+    
+    tags_changed = False
+    if tags_to_delete or new_tags:
+        tags_changed = True
+
+    for tag_to_delete in tags_to_delete:
+        user_tag = UserTag.find_user_tag_by_id(user.id, tag_to_delete)
+        user_tag.delete()
+    
+    user_tag_ids = UserTag.find_tags_by_user_id(user.id)
+    if user_tag_ids:
+        user_tag_ids = [tag.tag_id for tag in user_tag_ids]
+    else:
+        user_tag_ids = []
+
     # --------------- VERIFICATION DES INFOS ----------------------
-    if username == '' or last_name == '' or first_name == '' or age == '' or email == '' or bio == '' \
-            or gender == '' or gender_pref == '' or location == '' or tag_ids_selected == []:
+    if tags_changed == False or username == '' or last_name == '' or first_name == '' or age == '' or email == '' or bio == '' \
+            or gender == '' or gender_pref == '' or location == '':
         flash('Nan gros, t\'as pas compris... T\'as pas le droit à des valeurs null', 'danger')
         return render_template('user.html', user=user, profile_image_data=profile_image_data,
                                user_tag_ids=user_tag_ids, tags=tags)
-    
+
     # --------------- INTERCEPTER MODIFICATIONS ----------------------
-    user = User._find_by_username(username)
     
     if new_image.filename:
         img_read = new_image.read()
@@ -64,7 +89,7 @@ def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
             response = requests.get(url)
             geo = response.json()
             geo = geo['results'][0]
-            print(geo)
+
             if geo['components'].get('city'):
                 city = geo['components']['city'] + ', '
             elif geo['components'].get('county'):
@@ -79,15 +104,6 @@ def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
             data['lng'] = lng
             data['lat'] = lat
 
-        new_tags = []
-        for tag_id_selected in tag_ids_selected:
-            if tag_id_selected not in user_tag_ids:
-                new_tags.append(tag_id_selected)
-        
-        # TODO :
-        # if new_tags:
-        # update les tags : add new ones and delete old ones that not in new_tags
-
         if data:
             user.update(data)
             user = User._find_by_id(user.id)
@@ -97,7 +113,7 @@ def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
             flash('C\'est carré : update image', 'success')
         if not data and not new_image:
             flash('T\'as rien changé, tu vas pas nous la faire', 'danger')
-    
+
     return render_template('user.html', user=user, profile_image_data=profile_image_data,
                            tags=tags, user_tag_ids=user_tag_ids)
 
