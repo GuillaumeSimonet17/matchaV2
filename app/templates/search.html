@@ -6,7 +6,8 @@
         <div class="row col-6 justify-content-between shadow-sm rounded mb-5 bg-light">
 
             <div class="col-4 col-md-3 my-auto dropdown my-3">
-                <button style="min-width: 133px;" class="btn btn-light text-secondary dropdown-toggle" type="button" id="dropdownOrder"
+                <button style="min-width: 133px;" class="btn btn-light text-secondary dropdown-toggle" type="button"
+                        id="dropdownOrder"
                         data-bs-toggle="dropdown" aria-expanded="false">
                     Sort by
                 </button>
@@ -18,33 +19,91 @@
                     <li id="location-sort" class="link-sort ps-2" style="cursor: pointer">Location</li>
                 </ul>
             </div>
-            <form class="col-12 col-md-6 d-flex mb-4 mt-4">
-                <div class="col-12 d-flex justify-content-around">
-                    <div class="my-auto dropdown my-3">
-                        <button style="min-width: 133px;" class="btn btn-light text-secondary dropdown-toggle" type="button"
-                                id="dropdownFilters"
-                                data-bs-toggle="dropdown" aria-expanded="false">
-                            Filters
-                        </button>
-                        <ul class="dropdown-menu" aria-labelledby="dropdownFilters">
-                            <li class="">
-                                <label for="customRange1" class="form-label">Example range</label>
-                                <input type="range" class="form-range" id="customRange1">
-                            </li>
-                            <li class="">
-                                <label for="customRange2" class="form-label">Example range</label>
-                                <input type="range" class="form-range" id="customRange2">
-                            </li>
-                        </ul>
-                    </div>
+            <div class="col-12 col-md-6 d-flex mb-4 mt-4 d-flex justify-content-around">
 
-                    <span class="d-none" id="user-tags" data-user-tags="{{ user_tags }}"></span>
-                    <span class="d-none" id="location" data-user-lat="{{ user_lat }}"
-                          data-user-lng="{{ user_lng }}"></span>
+                <div class="my-auto dropdown my-3">
+                    <button style="min-width: 133px;" class="btn btn-light text-secondary dropdown-toggle"
+                            type="button"
+                            id="dropdownFilters"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                        Filters
+                    </button>
+                    <ul id="filters" class="dropdown-menu p-3" aria-labelledby="dropdownFilters"
+                        style="width: 300px;">
+                        <!-- Filtre par âge -->
+                        <li class="mb-3">
+                            <label for="ageRangeMin" class="form-label d-flex align-items-center">
+                                <input id="age_filter_activated" type="checkbox" class="form-check form-check-inline"/>
+                                Age Range
+                            </label>
+                            <div class="d-flex align-items-center">
+                                <input type="number" id="ageMin" class="form-control me-2" style="width: 80px;"
+                                       value="18" min="18" max="100">
+                                <span class="me-2">to</span>
+                                <input type="number" id="ageMax" class="form-control" style="width: 80px;"
+                                       value="40" min="18" max="100">
+                            </div>
+                            <input type="range" class="form-range" id="ageRangeMin" min="18" max="100" value="18"
+                                   oninput="document.getElementById('ageMin').value = this.value">
+                            <input type="range" class="form-range mt-2" id="ageRangeMax" min="18" max="100"
+                                   value="40"
+                                   oninput="document.getElementById('ageMax').value = this.value">
+                        </li>
 
-                    <button style="min-width: 133px;" class="my-auto btn btn-secondary">Save</button>
+                        <!-- Filtre par localisation -->
+                        <li class="mb-3">
+                            <label for="locationRange" class="form-label d-flex align-items-center">
+                                <input id="location_filter_activated" type="checkbox"
+                                       class="form-check form-check-inline"/>
+                                Location Radius (km)
+                            </label>
+                            <input type="number" id="locationValue" class="form-control mb-2" style="width: 100px;"
+                                   value="5" min="1" max="50">
+                            <input type="range" class="form-range" id="locationRange" min="1" max="50" value="5"
+                                   oninput="document.getElementById('locationValue').value = this.value">
+                        </li>
+
+                        <!-- Filtre par Fame Rating -->
+                        <li>
+                            <label for="fameRange" class="form-label d-flex align-items-center">
+                                <input id="fame_rate_filter_activated" type="checkbox"
+                                       class="form-check form-check-inline"/>
+                                Fame Rating
+                            </label>
+                            <input type="number" id="fameValue" class="form-control mb-2" style="width: 100px;"
+                                   value="0" min="0" max="5" step="0.1">
+                            <input type="range" class="form-range" id="fameRange" min="0" max="5" step="0.1"
+                                   value="0"
+                                   oninput="document.getElementById('fameValue').value = this.value">
+                        </li>
+
+                        {% if all_tags %}
+                        <li>
+                            <label class="form-label d-flex align-items-center">
+                                <input id="tags_filter_activated" type="checkbox" class="form-check form-check-inline"/>
+                                Tags Filter
+                            </label>
+                            {% for tag in all_tags %}
+                            <div id="tagList">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="{{ tag.name }}"
+                                           id="tag_{{ tag.id }}">
+                                    <label class="form-check-label" for="tag_{{ tag.id }}">
+                                        {{ tag.name }}
+                                    </label>
+                                </div>
+                            </div>
+                        </li>
+                        {% endfor %}
+                        {% endif %}
+                    </ul>
                 </div>
-            </form>
+
+                <span class="d-none" id="user-tags" data-user-tags="{{ user_tags }}"></span>
+                <span class="d-none" id="location" data-user-lat="{{ user_lat }}"
+                      data-user-lng="{{ user_lng }}"></span>
+
+            </div>
         </div>
 
         <div class="row p-0 m-0 flex-row justify-content-center col-12 gap-1" id="profile-list">
@@ -79,7 +138,7 @@
             if (target) {
                 const profile = target.getAttribute('data-profile');
                 const fixedProfile = profile.replace(/'/g, '"');
-                console.log(fixedProfile)
+
                 const profileObj = JSON.parse(fixedProfile);
                 profileId = profileObj.id;
 
@@ -229,6 +288,77 @@
             const container = document.getElementById('profile-list');
             profiles.forEach(profile => container.appendChild(profile));
         });
+
+        document.querySelector('#filters').addEventListener('change', function () {
+
+            let userLatitude = parseFloat(document.querySelector('#location').getAttribute('data-user-lat'));
+            let userLongitude = parseFloat(document.querySelector('#location').getAttribute('data-user-lng'));
+
+            const ageMin = document.getElementById('ageMin').value;
+            const ageMax = document.getElementById('ageMax').value;
+            const locationRadius = document.getElementById('locationValue').value;
+            const fameRating = document.getElementById('fameValue').value;
+
+            let selectedTags = [];
+            let checkboxes = document.querySelectorAll('#tagList .form-check-input');
+
+            checkboxes.forEach(function (checkbox) {
+                if (checkbox.checked) {
+                    selectedTags.push(checkbox.value);
+                }
+            });
+
+            const age_filter_activated = document.getElementById('age_filter_activated')?.checked;
+            const location_filter_activated = document.getElementById('location_filter_activated')?.checked;
+            const fame_rate_filter_activated = document.getElementById('fame_rate_filter_activated')?.checked;
+            const tags_filter_activated = document.getElementById('tags_filter_activated')?.checked;
+
+            fetch('/apply_filters', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    age_min: ageMin,
+                    age_max: ageMax,
+                    location_radius: locationRadius,
+                    fame_rating: fameRating,
+                    user_lat: userLatitude,
+                    user_lon: userLongitude,
+                    age_filter_activated: age_filter_activated,
+                    location_filter_activated: location_filter_activated,
+                    fame_rate_filter_activated: fame_rate_filter_activated,
+                    tags_filter_activated: tags_filter_activated,
+                    selected_tags: selectedTags,
+                })
+            })
+                .then(response => {
+                    return response.json();
+                })
+                .then(data => {
+                    const container = document.getElementById('profile-list');
+                    container.innerHTML = '';
+
+                    data.filtered_profiles.forEach(profile => {
+                        const profileCard = document.createElement('a');
+                        profileCard.href = `/profile/${profile.id}`;
+                        profileCard.className = 'col-12 col-md-4 card shadow p-2 d-flex justify-content-between border-0';
+                        profileCard.style = 'min-height: 300px; max-width: 420px;';
+                        profileCard.setAttribute('data-profile', JSON.stringify(profile));
+
+                        profileCard.innerHTML = `
+                            <div style="max-height: 200px; overflow: hidden;">
+                                <img class="img-fluid" id="profile_image" src="data:image/png;base64, ${profile.profile_image}"
+                                     alt="Profile Image">
+                            </div>
+                            <p class="m-0 mt-2 fw-bold">${profile.username}</p>
+                            <p class="m-0 mt-2 fw-bold">${profile.age}</p>
+                        `;
+
+                        container.appendChild(profileCard);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        });
+
 
     </script>
 </section>

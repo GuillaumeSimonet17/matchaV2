@@ -5,9 +5,9 @@ from managements.user_management.auth.login import auth_login
 from managements.user_management.auth.register import auth_register
 from managements.user_management.update_user import change_password
 
-from managements.profile import go_profile, is_blocked
+from managements.profile import go_profile
 from managements.notif import go_notif
-from managements.search import go_search
+from managements.search import go_search, apply_filters
 from managements.historic import go_historic
 from managements.user_management.user import go_user
 from managements.chat import go_chat
@@ -130,7 +130,12 @@ def register():
     tags = Tag._all()
     return render_template('register.html', tags=tags)
 
-@main.route('/')
+
+@main.route('/apply_filters', methods=['POST'])
+def apply_filters_route():
+    return apply_filters(request)
+
+@main.route('/', methods=['POST', 'GET'])
 def home():
     if 'username' not in session or not User._find_by_username(session['username']):
         session.clear()
@@ -141,6 +146,7 @@ def home():
 
     session['current_page'] = 'home'
     session['current_channel'] = None
+
     return go_search()
 
 @main.route('/historic')

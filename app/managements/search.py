@@ -78,11 +78,12 @@ def sort_profiles_by_tags_and_location(user_tags, user_location, profiles):
     # Trier les profils en fonction des critères
     return sorted(profiles, key=compute_profile_score)
 
-def go_search():
+def get_profiles_list():
+    final_profiles = []
 
     user_id = session['user_id']
     user = User._find_by_id(user_id)
-
+    
     user_tag_ids = UserTag.find_tags_by_user_id(user_id)
     user_tags = []
     tag_ids = []
@@ -91,7 +92,7 @@ def go_search():
         if tag:
             tag_ids.append(tag.id)
             user_tags.append(tag.name)
-            
+    
     user_lat = user.lat
     user_lng = user.lng
     location = (user_lat, user_lng)
@@ -99,13 +100,12 @@ def go_search():
     all_profiles = Profile._all()
     all_profiles_without_me = [profile for profile in all_profiles if profile.id != user.id]
     
-    profile_filtered_blocked_ids = filtered_blocked_profiles(user_id, all_profiles_without_me)
+    profile_filtered_blocked_ids = filtered_blocked_profiles(user.id, all_profiles_without_me)
     gendered_profiles = filtered_gender_profiles(user, profile_filtered_blocked_ids)
-
+    
     sorted_profiles_by_tags_and_location = sort_profiles_by_tags_and_location(tag_ids, location, gendered_profiles)
-
+    
     if all_profiles:
-        final_profiles = []
         for profile in sorted_profiles_by_tags_and_location:
 
             profile_tag_ids = UserTag.find_tags_by_user_id(profile.id)
@@ -114,7 +114,7 @@ def go_search():
                 tag = Tag._find_by_id(tag_id.tag_id)
                 if tag:
                     profile_tags.append(tag.name)
-
+            
             image_data = Profile.get_profile_image(profile.id)
             final_profiles.append({
                 'id': profile.id,
@@ -128,9 +128,75 @@ def go_search():
                 'lat': profile.lat,
                 'tags': profile_tags,
             })
+ 
+    return final_profiles, user, user_tags, tag_ids, location, user_lat, user_lng
 
+def go_search():
+
+    all_tags = Tag._all()
+
+    final_profiles, user, user_tags, tag_ids, location, user_lat, user_lng = get_profiles_list()
     nb_notifs = get_numbers_of_notifs()
     nb_notifs_msg = get_numbers_of_notifs_msg()
-    return render_template('search.html', filtered_profiles=final_profiles, user_id=user_id,
-                           nb_notifs=nb_notifs, nb_notifs_msg=nb_notifs_msg, user_tags=user_tags,
+    return render_template('search.html', filtered_profiles=final_profiles, user_id=user.id,
+                           nb_notifs=nb_notifs, nb_notifs_msg=nb_notifs_msg, user_tags=user_tags, all_tags=all_tags,
                            user_lat=user_lat, user_lng=user_lng)
+
+def apply_filters(request):
+    all_profiles_filtered = []
+    filters_data = request.get_json()
+    if filters_data:
+        
+        final_profiles, user, user_tags, tag_ids, location, user_lat, user_lng = get_profiles_list()
+        all_profiles_filtered = final_profiles
+        age_min = filters_data.get('age_min', 18)
+        age_max = filters_data.get('age_max', 100)
+        location_radius = filters_data.get('location_radius', 50)
+        fame_rating_min = filters_data.get('fame_rating', 3.0)
+
+        user_lat = filters_data.get('user_lat')
+        user_lon = filters_data.get('user_lon')
+
+        if user_lat is None or user_lon is None:
+            return jsonify({
+                "success": False,
+                "message": "User location (latitude and longitude) is required for location filtering."
+            }), 400
+        
+        if filters_data.get('location_filter_activated'):
+            distance = 0
+            for profile in final_profiles:
+                profile_lat = profile.get('lat')
+                profile_lon = profile.get('lng')
+    
+                if profile_lat is None or profile_lon is None:
+                    continue
+    
+                distance = calculate_distance(float(user_lat), float(user_lon), float(profile_lat), float(profile_lon))
+        
+            all_profiles_filtered = [profile for profile in final_profiles if distance <= float(location_radius)]
+
+        if filters_data.get('fame_rate_filter_activated'):
+            all_profiles_filtered = [profile for profile in final_profiles if profile['fame_rate'] >= float(fame_rating_min)]
+
+        if filters_data.get('age_filter_activated'):
+            all_profiles_filtered = [profile for profile in final_profiles if int(age_min) <= profile['age'] <= int(age_max)]
+
+        if filters_data.get('tags_filter_activated'):
+            if len(filters_data.get('selected_tags')) > 0:
+                for profile in all_profiles_filtered:
+                    profile_tag_ids = UserTag.find_tags_by_user_id(profile['id'])
+                    profile_tags = []
+                    for tag_id in profile_tag_ids:
+                        tag = Tag._find_by_id(tag_id.tag_id)
+                        if tag:
+                            profile_tags.append(tag.name)
+                    if not any(tag in filters_data.get('selected_tags') for tag in profile_tags):
+                        all_profiles_filtered.remove(profile)
+
+    response = {
+        "success": True,
+        "message": "Filters applied successfully!",
+        "filtered_profiles": all_profiles_filtered
+    }
+    return jsonify(response), 200
