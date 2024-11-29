@@ -46,6 +46,8 @@ def auth_register(request):
     tags = request.form.getlist('tags[]')
     
     # --------------- VERIFICATION DES INFOS ----------------------
+    if age < 18:
+        valid = False
     if not tags:
         valid = False
     if len(username) < 3:
