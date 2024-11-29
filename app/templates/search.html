@@ -2,9 +2,12 @@
 {% block content %}
 <section id="search" class="mb-5 w-100 {{ 'active' if request.path == '/' else '' }}">
     <div class="m-0 p-0 container-fluid d-flex flex-column justify-content-center align-items-center">
+        <div class="w-100 d-flex justify-content-center align-items-center">
+            <input id="help_me" type="checkbox" checked>
+            <p class="ps-1 m-0">Suggère moi que des BG</p></input>
+        </div>
         {% if filtered_profiles %}
         <div class="row col-6 justify-content-between shadow-sm rounded mb-5 bg-light">
-
             <div class="col-4 col-md-3 my-auto dropdown my-3">
                 <button style="min-width: 133px;" class="btn btn-light text-secondary dropdown-toggle" type="button"
                         id="dropdownOrder"
@@ -289,8 +292,7 @@
             profiles.forEach(profile => container.appendChild(profile));
         });
 
-        document.querySelector('#filters').addEventListener('change', function () {
-
+        function display_filtered_list() {
             let userLatitude = parseFloat(document.querySelector('#location').getAttribute('data-user-lat'));
             let userLongitude = parseFloat(document.querySelector('#location').getAttribute('data-user-lng'));
 
@@ -313,6 +315,8 @@
             const fame_rate_filter_activated = document.getElementById('fame_rate_filter_activated')?.checked;
             const tags_filter_activated = document.getElementById('tags_filter_activated')?.checked;
 
+            const help = document.getElementById('help_me').checked;
+
             fetch('/apply_filters', {
                 method: 'POST',
                 headers: {'Content-Type': 'application/json'},
@@ -328,6 +332,7 @@
                     fame_rate_filter_activated: fame_rate_filter_activated,
                     tags_filter_activated: tags_filter_activated,
                     selected_tags: selectedTags,
+                    help: help
                 })
             })
                 .then(response => {
@@ -357,8 +362,15 @@
                     });
                 })
                 .catch(error => console.error('Error:', error));
+        }
+
+        document.querySelector('#filters').addEventListener('change', function () {
+            display_filtered_list()
         });
 
+        document.querySelector('#help_me').addEventListener('change', function () {
+            display_filtered_list()
+        })
 
     </script>
 </section>

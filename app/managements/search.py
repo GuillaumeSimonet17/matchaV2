@@ -78,7 +78,7 @@ def sort_profiles_by_tags_and_location(user_tags, user_location, profiles):
     # Trier les profils en fonction des critères
     return sorted(profiles, key=compute_profile_score)
 
-def get_profiles_list():
+def get_profiles_list(is_suggestion_list=True):
     final_profiles = []
 
     user_id = session['user_id']
@@ -92,21 +92,23 @@ def get_profiles_list():
         if tag:
             tag_ids.append(tag.id)
             user_tags.append(tag.name)
-    
+
     user_lat = user.lat
     user_lng = user.lng
     location = (user_lat, user_lng)
 
     all_profiles = Profile._all()
     all_profiles_without_me = [profile for profile in all_profiles if profile.id != user.id]
-    
     profile_filtered_blocked_ids = filtered_blocked_profiles(user.id, all_profiles_without_me)
-    gendered_profiles = filtered_gender_profiles(user, profile_filtered_blocked_ids)
-    
-    sorted_profiles_by_tags_and_location = sort_profiles_by_tags_and_location(tag_ids, location, gendered_profiles)
-    
+
+    profile_list = profile_filtered_blocked_ids
+    if is_suggestion_list:
+        gendered_profiles = filtered_gender_profiles(user, profile_filtered_blocked_ids)
+        sorted_profiles_by_tags_and_location = sort_profiles_by_tags_and_location(tag_ids, location, gendered_profiles)
+        profile_list = sorted_profiles_by_tags_and_location
+
     if all_profiles:
-        for profile in sorted_profiles_by_tags_and_location:
+        for profile in profile_list:
 
             profile_tag_ids = UserTag.find_tags_by_user_id(profile.id)
             profile_tags = []
@@ -147,7 +149,9 @@ def apply_filters(request):
     filters_data = request.get_json()
     if filters_data:
         
-        final_profiles, user, user_tags, tag_ids, location, user_lat, user_lng = get_profiles_list()
+        is_suggestion_list = filters_data.get('help')
+        print('is_suggestion_list = ', is_suggestion_list)
+        final_profiles, user, user_tags, tag_ids, location, user_lat, user_lng = get_profiles_list(is_suggestion_list)
         all_profiles_filtered = final_profiles
         age_min = filters_data.get('age_min', 18)
         age_max = filters_data.get('age_max', 100)
