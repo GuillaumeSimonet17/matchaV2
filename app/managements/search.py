@@ -153,6 +153,7 @@ def apply_filters(request):
         is_suggestion_list = filters_data.get('help')
         print('is_suggestion_list = ', is_suggestion_list)
         final_profiles, user, user_tags, tag_ids, location, user_lat, user_lng = get_profiles_list(is_suggestion_list)
+        
         all_profiles_filtered = final_profiles
         age_min = filters_data.get('age_min', 18)
         age_max = filters_data.get('age_max', 100)
@@ -161,13 +162,13 @@ def apply_filters(request):
 
         user_lat = filters_data.get('user_lat')
         user_lon = filters_data.get('user_lon')
-
+        
         if user_lat is None or user_lon is None:
             return jsonify({
                 "success": False,
                 "message": "User location (latitude and longitude) is required for location filtering."
             }), 400
-        
+
         if filters_data.get('location_filter_activated'):
             distance = 0
             for profile in final_profiles:

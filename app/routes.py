@@ -28,6 +28,9 @@ main = Blueprint('main', __name__)
 
 connected_users = {}
 
+@socketio.on('connection')
+def handle_connection():
+    handle_connect()
 
 @socketio.on('connect')
 def handle_connect():

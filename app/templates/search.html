@@ -6,7 +6,7 @@
             <input id="help_me" type="checkbox" checked>
             <p class="ps-1 m-0">Suggère moi que des BG</p></input>
         </div>
-        {% if filtered_profiles %}
+
         <div class="row col-6 justify-content-between shadow-sm rounded mb-5 bg-light">
             <div class="col-4 col-md-3 my-auto dropdown my-3">
                 <button style="min-width: 133px;" class="btn btn-light text-secondary dropdown-toggle" type="button"
@@ -128,14 +128,12 @@
             </a>
 
             {% endfor %}
-            {% else %}
-            <p class="col-12 text-center mt-5">No user found</p>
-            {% endif %}
+
         </div>
     </div>
     <script>
 
-        document.querySelector('.row').addEventListener('click', function (event) {
+        document.querySelector('.row')?.addEventListener('click', function (event) {
             const target = event.target.closest('a[id="view-profile"]');
 
             if (target) {
@@ -149,7 +147,7 @@
             }
         });
 
-        document.querySelector('#age-sort-asc').addEventListener('click', function (event) {
+        document.querySelector('#age-sort-asc')?.addEventListener('click', function (event) {
             let profiles = Array.from(document.querySelectorAll('#profile-list .card'));
 
             profiles.sort((a, b) => {
@@ -169,7 +167,7 @@
             profiles.forEach(profile => container.appendChild(profile));
         })
 
-        document.querySelector('#age-sort-dsc').addEventListener('click', function (event) {
+        document.querySelector('#age-sort-dsc')?.addEventListener('click', function (event) {
             let profiles = Array.from(document.querySelectorAll('#profile-list .card'));
 
             profiles.sort((a, b) => {
@@ -189,7 +187,7 @@
             profiles.forEach(profile => container.appendChild(profile));
         })
 
-        document.querySelector('#fame-rate-sort').addEventListener('click', function (event) {
+        document.querySelector('#fame-rate-sort')?.addEventListener('click', function (event) {
             let profiles = Array.from(document.querySelectorAll('#profile-list .card'));
 
             profiles.sort((a, b) => {
@@ -209,7 +207,7 @@
             profiles.forEach(profile => container.appendChild(profile));
         })
 
-        document.querySelector('#common-tags-sort').addEventListener('click', function (event) {
+        document.querySelector('#common-tags-sort')?.addEventListener('click', function (event) {
             let profiles = Array.from(document.querySelectorAll('#profile-list .card'));
             let user_tags = document.querySelector('#user-tags').getAttribute('data-user-tags');
 
@@ -238,13 +236,17 @@
             profiles.forEach(profile => container.appendChild(profile));
         })
 
-        document.querySelector('#location-sort').addEventListener('click', function (event) {
+        document.querySelector('#location-sort')?.addEventListener('click', function (event) {
             let profiles = Array.from(document.querySelectorAll('#profile-list .card'));
 
-            let userLatitude = parseFloat(document.querySelector('#location').getAttribute('data-user-lat'));
-            let userLongitude = parseFloat(document.querySelector('#location').getAttribute('data-user-lng'));
-
-            console.log(document.querySelector('#location'))
+            let userLatitude = document.querySelector('#location');
+            if (userLatitude) {
+                userLatitude = parseFloat(userLatitude.getAttribute('data-user-lat'));
+            }
+            let userLongitude = document.querySelector('#location');
+            if (userLongitude) {
+                userLongitude = parseFloat(userLongitude.getAttribute('data-user-lng'));
+            }
 
             // Fonction pour calculer la distance entre deux points (en km)
             function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -263,7 +265,7 @@
             }
 
             // Trier les profils en fonction de la distance à l'utilisateur
-            profiles.sort((a, b) => {
+            profiles?.sort((a, b) => {
                 const profile_a = a.getAttribute('data-profile');
                 const fixedProfile_a = profile_a.replace(/'/g, '"');
                 const profileObj_a = JSON.parse(fixedProfile_a);
@@ -293,13 +295,19 @@
         });
 
         function display_filtered_list() {
-            let userLatitude = parseFloat(document.querySelector('#location').getAttribute('data-user-lat'));
-            let userLongitude = parseFloat(document.querySelector('#location').getAttribute('data-user-lng'));
+            let userLatitude = document.querySelector('#location');
 
-            const ageMin = document.getElementById('ageMin').value;
-            const ageMax = document.getElementById('ageMax').value;
-            const locationRadius = document.getElementById('locationValue').value;
-            const fameRating = document.getElementById('fameValue').value;
+            if (userLatitude) {
+                userLatitude = parseFloat(userLatitude.getAttribute('data-user-lat'));
+            }
+            let userLongitude = document.querySelector('#location');
+            if (userLongitude) {
+                userLongitude = parseFloat(userLongitude.getAttribute('data-user-lng'));
+            }
+            const ageMin = document.getElementById('ageMin')?.value;
+            const ageMax = document.getElementById('ageMax')?.value;
+            const locationRadius = document.getElementById('locationValue')?.value;
+            const fameRating = document.getElementById('fameValue')?.value;
 
             let selectedTags = [];
             let checkboxes = document.querySelectorAll('#tagList .form-check-input');
@@ -342,7 +350,7 @@
                     const container = document.getElementById('profile-list');
                     container.innerHTML = '';
 
-                    data.filtered_profiles.forEach(profile => {
+                    data.filtered_profiles?.forEach(profile => {
                         const profileCard = document.createElement('a');
                         profileCard.href = `/profile/${profile.id}`;
                         profileCard.className = 'col-12 col-md-4 card shadow p-2 d-flex justify-content-between border-0';
@@ -364,7 +372,7 @@
                 .catch(error => console.error('Error:', error));
         }
 
-        document.querySelector('#filters').addEventListener('change', function () {
+        document.querySelector('#filters')?.addEventListener('change', function () {
             display_filtered_list()
         });
 

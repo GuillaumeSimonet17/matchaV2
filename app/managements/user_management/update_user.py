@@ -55,8 +55,6 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
     else:
         user_tag_ids = []
 
-    print('user_tag_ids = ', user_tag_ids)
-
     # --------------- VERIFICATION DES INFOS ----------------------
     if user_tag_ids == [] or username == '' or last_name == '' or first_name == '' or age == '' or email == '' or bio == '' \
             or gender == '' or gender_pref == '' or location == '':
@@ -114,7 +112,6 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
             data['lat'] = lat
 
 
-        print('=============================================================', data)
         if data or not no_tags_selected:
             if data:
                 user.update(data)
