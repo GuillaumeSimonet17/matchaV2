@@ -79,8 +79,49 @@
             </div>
             {% endif %}
 
+            <a href="#" class="btn btn-danger mt-5" id="report-button">Report a fake
+                account</a>
+            <div class="alert alert-success d-none mt-3" role="alert" id="confirmation-label">Sent !</div>
+
         </div>
     </div>
+
+    <script>
+        const reportButton = document.getElementById('report-button');
+        const confirmationLabel = document.getElementById('confirmation-label');
+
+        reportButton.addEventListener('click', function (e) {
+            e.preventDefault();
+            const profileId = '{{ profile.id }}';
+
+            fetch(`/report-fake-account/${profileId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    profile_id: profileId,
+                    action: 'report_fake_account'
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        confirmationLabel.classList.remove('d-none');
+
+                        setTimeout(function () {
+                            confirmationLabel.classList.add('d-none');
+                        }, 5000);
+                    } else {
+                        console.log('Error:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+        });
+    </script>
+
 </section>
 
 {% endblock %}

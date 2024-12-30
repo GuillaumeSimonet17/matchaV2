@@ -1,6 +1,7 @@
 from flask import Blueprint, flash, request, render_template, session, redirect, url_for, jsonify
 from flask_socketio import emit, join_room
 from itsdangerous import SignatureExpired, BadTimeSignature
+from flask_mail import Message
 
 from managements.user_management.auth.login import auth_login
 from managements.user_management.auth.register import auth_register
@@ -19,7 +20,7 @@ from ORM.tables.tag import Tag
 from ORM.tables.notif import Notif
 from ORM.tables.user import User
 
-from app import socketio, serializer
+from app import socketio, serializer, mail
 
 main = Blueprint('main', __name__)
 
@@ -118,6 +119,16 @@ def mark_notifs_as_read(data):
 
 
 # --------------------------- HTTP ---------------------------
+
+@main.route('/report-fake-account/<int:profile_id>', methods=['POST'])
+def report_fake_account(profile_id):
+    try:
+        msg = Message("Reporting fake account", recipients=['gui_le_boat@gmail.com'], sender='gui_le_boat@gmail.com')
+        msg.body = f"User with ID {profile_id} has been report as fake account."
+        mail.send(msg)
+        return jsonify({"status": "success", "message": "Report successfully submitted!"}), 200
+    except Exception as e:
+        return jsonify({"status": "error", "message": str(e)}), 500
 
 @main.route('/confirm/<token>')
 def confirm_email(token):
