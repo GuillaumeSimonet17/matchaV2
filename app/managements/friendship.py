@@ -20,7 +20,7 @@ def handle_invitation(data):
     friendship = Friendship.get_friendship_by_user_ids([sender_id, receiver_id])
     if friendship:
         if friendship.state == 'invitation':
-            handle_connection(data)
+            handle_connection_friendship(data)
         return
     friendship = Friendship(None, 'invitation', sender_id, receiver_id)
     friendship.create()
@@ -53,7 +53,7 @@ def handle_block(data):
         
     fame_rate_calcul(data['receiver_id'])
         
-def handle_connection(data):
+def handle_connection_friendship(data):
     sender_id = data.get('sender_id')
     receiver_id = data.get('receiver_id')
     

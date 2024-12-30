@@ -27,19 +27,13 @@
 
     <script>
         const socket = io();
-        const user_id = "{{ user_id }}";
 
-        socket.on('connect', function () {
-            if (user_id) {
-                console.log('connected')
-                socket.emit('connection', {user_id: user_id});
-            }
-        });
-
-        socket.on('disconnect', function () {
-            console.log('disconnected')
-            socket.emit('disconnection', {user_id: user_id});
-        });
+        window.onbeforeunload = function () {
+            socket.emit('disconnect');
+        };
+        window.onload = function () {
+            socket.emit('connect');
+        };
     </script>
 </body>
 

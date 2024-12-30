@@ -36,10 +36,6 @@ class Database:
                 logging.error(f"Query failed: {e}")
                 self.connection.rollback()
                 raise e
-        
-    # def close(self):
-    #     self.cursor.close()
-    #     self.connection.close()
 
 
 db = None

@@ -8,11 +8,9 @@ const currentUserId = currentUserIdElement ? currentUserIdElement.getAttribute('
 const btnSendInvit = document.getElementById('btn-send-invit')
 if (btnSendInvit) {
     btnSendInvit.onclick = function () {
-
         const receiver_id = this.getAttribute('data-profile-id');
 
         socket.emit('send_invitation', {
-            sender_id: currentUserId,
             receiver_id: receiver_id
         });
 
@@ -29,7 +27,6 @@ if (btnSendBlock) {
         const receiver_id = this.getAttribute('data-profile-id');
 
         socket.emit('send_block', {
-            sender_id: currentUserId,
             receiver_id: receiver_id
         });
 
@@ -53,7 +50,6 @@ if (btnSendConnect) {
         const receiver_id = this.getAttribute('data-profile-id');
 
         socket.emit('send_connection', {
-            sender_id: currentUserId,
             receiver_id: receiver_id
         });
 
@@ -70,7 +66,6 @@ if (btnSendUninvit) {
         const receiver_id = this.getAttribute('data-profile-id');
 
         socket.emit('send_uninvitation', {
-            sender_id: currentUserId,
             receiver_id: receiver_id
         });
 

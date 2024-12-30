@@ -15,7 +15,7 @@ from managements.search import go_search, apply_filters
 from managements.historic import go_historic
 from managements.user_management.user import go_user
 from managements.chat import go_chat
-from managements.friendship import handle_invitation, handle_block, handle_connection, handle_uninvitation
+from managements.friendship import handle_invitation, handle_block, handle_connection_friendship, handle_uninvitation
 from managements.chat import handle_get_messages, handle_send_message
 
 from ORM.tables.tag import Tag
@@ -29,24 +29,17 @@ main = Blueprint('main', __name__)
 connected_users = {}
 
 
-@socketio.on('connection')
-def on_join(data):
-    user_id = data.get('user_id')
-    if user_id:
-        join_room(f"user_{user_id}")
-
-
 @socketio.on('connect')
 def handle_connect():
     print("Client connected")
-
-@socketio.on('connection')
-def handle_connection(data):
-    user_id = data.get("user_id")
+    user_id = session.get("user_id")
     sid = request.sid
     if user_id:
         connected_users[sid] = user_id
-        print(f"User {user_id} connected with SID {sid}")
+        user = User._find_by_id(user_id)
+        if session.get("user_id"):
+            user.update({'connected': True})
+        join_room(f"user_{user_id}")
 
 
 @socketio.on('disconnect')
@@ -61,22 +54,34 @@ def handle_disconnect():
 # PROFILE/FRIENDSHIP ---------------
 @socketio.on('send_invitation')
 def send_invitation_route(data):
-    handle_invitation(data)
+    user_id = session['user_id']
+    if user_id:
+        data['sender_id'] = user_id
+        handle_invitation(data)
 
 
 @socketio.on('send_block')
 def send_block_route(data):
-    handle_block(data)
+    user_id = session['user_id']
+    if user_id:
+        data['sender_id'] = user_id
+        handle_block(data)
 
 
 @socketio.on('send_connection')
 def send_connection_route(data):
-    handle_connection(data)
+    user_id = session['user_id']
+    if user_id:
+        data['sender_id'] = user_id
+        handle_connection_friendship(data)
 
 
 @socketio.on('send_uninvitation')
 def send_uninvitation_route(data):
-    handle_uninvitation(data)
+    user_id = session['user_id']
+    if user_id:
+        data['sender_id'] = user_id
+        handle_uninvitation(data)
 
 
 @socketio.on('view_profile')
@@ -88,6 +93,7 @@ def view_profile(data):
     emit('receive_view_profile',
          {'receiver_id': receiver_id, 'sender_id': user_id, 'sender_username': username},
          room=f'user_{int(data['receiver_id'])}')
+
 
 # CHAT ---------------
 @socketio.on('get_messages')
@@ -117,7 +123,8 @@ def received_message(data):
 @socketio.on('mark_notifs_as_read')
 def mark_notifs_as_read(data):
     user_id = session['user_id']
-    Notif.mark_notifs_by_user_id_as_read(user_id)
+    if user_id:
+        Notif.mark_notifs_by_user_id_as_read(user_id)
 
 
 # --------------------------- HTTP ---------------------------
@@ -185,7 +192,9 @@ def logout():
     
     user = User._find_by_id(session['user_id'])
     user.update({'connected': False})
-    
+
+    session.pop('user_id', None)
+
     return redirect(url_for('main.login'))
 
 @main.route('/register', methods=['GET', 'POST'])
@@ -234,7 +243,6 @@ def reset_password():
             if not user:
                 flash('Email not found', 'danger')
             else:
-                print(user)
                 user.update({'password': reset_hashed_password})
     
                 msg = Message("Reset Password", recipients=[email], sender='gui_le_boat@gmail.com')

@@ -25,9 +25,9 @@ class Message(Model):
     def find_receiver_messages_by_channel_id(cls, channel_id: int, receiver_id: int, columns: list[str] = None):
         columns = cls.get_all_column_names(columns)
         query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
-                 f"WHERE channel_id = {channel_id} and receiver_id = {receiver_id} ;")
+                 f"WHERE channel_id = %s and receiver_id = %s ;")
         try:
-            messages = db.execute(query)
+            messages = db.execute(query, (channel_id, receiver_id))
             if messages:
                 datas = cls.get_dicts_by_res(messages, columns)
                 return [cls(**row) for row in datas]
@@ -49,10 +49,10 @@ class Message(Model):
     def find_last_message_by_channel_id(cls, channel_id: int, columns: list[str] = None):
         columns = cls.get_all_column_names(columns)
         query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
-                 f"WHERE channel_id = {channel_id} "
+                 f"WHERE channel_id = %s "
                  f"ORDER BY created_at DESC LIMIT 1;")
         try:
-            res = db.execute(query)
+            res = db.execute(query, (channel_id, ))
             if res:
                 data = cls.get_dicts_by_res(res, columns)
                 return cls(**data[0])
@@ -63,10 +63,10 @@ class Message(Model):
     @classmethod
     def find_last_channel_id(cls, user_id: int):
         query = (f"SELECT sender_id, receiver_id, channel_id FROM {cls.table_name} "
-                 f"WHERE sender_id = {user_id} or receiver_id = {user_id} "
+                 f"WHERE sender_id = %s or receiver_id = %s "
                  f"ORDER BY created_at DESC LIMIT 1;")
         try:
-            res = db.execute(query)
+            res = db.execute(query, (user_id, user_id))
             if res:
                 if user_id == res[0][0]:
                     return {'profile_id': res[0][1], 'channel_id': res[0][2]}

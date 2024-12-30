@@ -13,7 +13,10 @@ from managements.notif import get_numbers_of_notifs, get_numbers_of_notifs_msg
 def go_profile(profile_id: int):
     user_id = session['user_id']
     session['profile_id'] = profile_id
+
     profile = Profile._find_by_id(profile_id)
+    if not profile:
+        return render_template('404.html'), 404
 
     if is_blocked(user_id, profile_id):
         return redirect(url_for('main.home'))
@@ -59,6 +62,7 @@ def go_profile(profile_id: int):
 
 def is_blocked(user_id, profile_id):
     block = False
+
     are_blocked = Block.find_block(user_id, profile_id)
     if are_blocked:
         block = True

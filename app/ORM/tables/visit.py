@@ -28,9 +28,9 @@ class Visit(Model):
     @classmethod
     def find_visit(cls, sender_id: int, receiver_id: int):
         query = (f"SELECT id FROM {cls.table_name} "
-                 f"WHERE sender_id = {sender_id} and receiver_id = {receiver_id};")
+                 f"WHERE sender_id = %s and receiver_id = %s ;")
         try:
-            res = db.execute(query)
+            res = db.execute(query, (sender_id, receiver_id))
             if res:
                 results = cls.get_dict_by_id(res[0])
                 return [cls(**results)]

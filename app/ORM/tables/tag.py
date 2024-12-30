@@ -64,9 +64,9 @@ class UserTag(Model):
     def find_user_tag_by_id(cls, user_id: int, tag_id: int, columns: list[str] = None):
         columns = cls.get_all_column_names(columns)
         query = (f"SELECT id FROM {cls.table_name} "
-                 f"WHERE user_id = {user_id} and tag_id = {tag_id};")
+                 f"WHERE user_id = %s and tag_id = %s ;")
         try:
-            id = db.execute(query)
+            id = db.execute(query, (user_id, tag_id))
             res = cls.get_dict_by_id(int(id[0][0]))
             if res:
                 return cls(**res)

@@ -39,9 +39,9 @@ class Channel(Model):
             raise ValueError('user_id cannot be None')
         columns = cls.get_all_column_names(columns)
         query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
-                 f"WHERE user_a = {user_id} or user_b = {user_id};")
+                 f"WHERE user_a = %s or user_b = %s;")
         try:
-            res = db.execute(query)
+            res = db.execute(query, (user_id, user_id))
             if res:
                 datas = cls.get_dicts_by_res(res, columns)
                 return [cls(**row) for row in datas]
@@ -72,9 +72,9 @@ class Channel(Model):
     def find_channel_by_user_ids(cls, user_1: int, user_2: int):
         query = (f"SELECT id FROM {cls.table_name} WHERE "
                  f"(user_a = {user_1} or user_a = {user_2}) "
-                 f"and (user_b = {user_1} or user_b = {user_2});")
+                 f"and (user_b = %s or user_b = %s);")
         try:
-            res = db.execute(query)
+            res = db.execute(query, (user_1, user_2))
             if res:
                 results = cls.get_dict_by_id(res[0])
                 return cls(**results)

@@ -33,9 +33,9 @@ class Notif(Model):
         if state not in cls.possible_states:
             raise ValueError(f"State {state} is not valid")
         query = (f"SELECT id FROM {cls.table_name} "
-                 f"WHERE state = '{state}' and sender_id = {sender_id} and receiver_id = {receiver_id};")
+                 f"WHERE state = %s and sender_id = %s and receiver_id = %s ;")
         try:
-            res = db.execute(query)
+            res = db.execute(query, (state, sender_id, receiver_id))
             if res or len(res) > 0:
                 results = cls.get_dict_by_id(res[0])
                 
@@ -50,9 +50,9 @@ class Notif(Model):
             raise ValueError(f"State {state} is not valid")
         columns = cls.get_all_column_names(columns)
         query = (f"SELECT {', '.join(columns)} FROM {cls.table_name} "
-                 f"WHERE state = '{state}' and sender_id = {sender_id} and receiver_id = {receiver_id};")
+                 f"WHERE state = %s and sender_id = %s and receiver_id = %s ;")
         try:
-            res = db.execute(query)
+            res = db.execute(query, (state, sender_id, receiver_id))
             if res:
                 datas = cls.get_dicts_by_res(res, columns)
                 return [cls(**row) for row in datas]
