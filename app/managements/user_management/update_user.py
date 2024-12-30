@@ -7,7 +7,7 @@ from ORM.tables.user import User
 from ORM.tables.tag import UserTag
 
 
-def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
+def update_user_infos(request, profile_image_data, user_tag_ids, tags):
     # --------------- RECUPERATION DES INFOS ----------------------
     username = request.form.get('username')
     last_name = request.form.get('last_name')
@@ -21,6 +21,8 @@ def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
     new_image = request.files.get('new_profile_image')
     location = request.form.get('location')
     allow_geoloc = request.form.get('allow_geoloc')
+    if allow_geoloc == 'on':
+        allow_geoloc = True
 
     user = User._find_by_username(username)
 
@@ -30,14 +32,19 @@ def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
             new_tags.append(int(tag_id_selected))
             user_tag = UserTag(None, user.id, tag_id_selected)
             user_tag.create()
-    
+
+    if len(tag_ids_selected) == 0:
+        flash('Nan gros, t\'as pas compris... T\'as pas le droit à des valeurs null', 'danger')
+        return render_template('user.html', user=user, profile_image_data=profile_image_data,
+                               user_tag_ids=user_tag_ids, tags=tags)
+
     tag_ids_selected = [int(tag_id_selected) for tag_id_selected in tag_ids_selected]
     tags_to_delete = set(user_tag_ids) - set(tag_ids_selected)
     
-    tags_changed = False
-    if tags_to_delete or new_tags:
-        tags_changed = True
-
+    no_tags_selected = False
+    if not tags_to_delete and not new_tags:
+        no_tags_selected = True
+        
     for tag_to_delete in tags_to_delete:
         user_tag = UserTag.find_user_tag_by_id(user.id, tag_to_delete)
         user_tag.delete()
@@ -48,8 +55,10 @@ def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
     else:
         user_tag_ids = []
 
+    print('user_tag_ids = ', user_tag_ids)
+
     # --------------- VERIFICATION DES INFOS ----------------------
-    if tags_changed == False or username == '' or last_name == '' or first_name == '' or age == '' or email == '' or bio == '' \
+    if user_tag_ids == [] or username == '' or last_name == '' or first_name == '' or age == '' or email == '' or bio == '' \
             or gender == '' or gender_pref == '' or location == '':
         flash('Nan gros, t\'as pas compris... T\'as pas le droit à des valeurs null', 'danger')
         return render_template('user.html', user=user, profile_image_data=profile_image_data,
@@ -104,14 +113,17 @@ def update_user_infos(request, user, profile_image_data, user_tag_ids, tags):
             data['lng'] = lng
             data['lat'] = lat
 
-        if data:
-            user.update(data)
-            user = User._find_by_id(user.id)
-            session['username'] = user.username
+
+        print('=============================================================', data)
+        if data or not no_tags_selected:
+            if data:
+                user.update(data)
+                user = User._find_by_id(user.id)
+                session['username'] = user.username
             flash('C\'est carré : update infos', 'success')
         if new_image.filename:
             flash('C\'est carré : update image', 'success')
-        if not data and not new_image:
+        if not data and not new_image and no_tags_selected:
             flash('T\'as rien changé, tu vas pas nous la faire', 'danger')
 
     return render_template('user.html', user=user, profile_image_data=profile_image_data,

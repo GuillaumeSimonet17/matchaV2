@@ -14,7 +14,7 @@ def go_user():
     if user_tags:
         user_tag_ids = [tag.tag_id for tag in user_tags]
     if request.method == 'POST':
-        return update_user_infos(request, user=user, profile_image_data=profile_image_data, user_tag_ids=user_tag_ids,
+        return update_user_infos(request, profile_image_data=profile_image_data, user_tag_ids=user_tag_ids,
                                  tags=tags)
 
     nb_notifs = get_numbers_of_notifs()
