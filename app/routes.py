@@ -2,6 +2,8 @@ from flask import Blueprint, flash, request, render_template, session, redirect,
 from flask_socketio import emit, join_room
 from itsdangerous import SignatureExpired, BadTimeSignature
 from flask_mail import Message
+from werkzeug.security import generate_password_hash
+from random import choice, randint
 
 from managements.user_management.auth.login import auth_login
 from managements.user_management.auth.register import auth_register
@@ -186,7 +188,6 @@ def logout():
     
     return redirect(url_for('main.login'))
 
-
 @main.route('/register', methods=['GET', 'POST'])
 def register():
     all_tags = Tag._all()
@@ -194,6 +195,54 @@ def register():
     if request.method == 'POST':
         return auth_register(request, all_tags)
     return render_template('register.html', all_tags=all_tags)
+
+def get_random_pwd(n):
+    alphabet_min = [chr(i) for i in range(97, 123)]
+    alphabet_maj = [chr(i) for i in range(65, 91)]
+    chiffres = [chr(i) for i in range(48, 58)]
+    caracteres_speciaux = ['%', '_', '-', '!', '$', '^', '&', '#', '(', ')', '[', ']', '=', '@']
+    
+    alphabets = dict()
+    key = 0
+    alphabets[key] = alphabet_min
+    key += 1
+    alphabets[key] = alphabet_maj
+    key += 1
+    alphabets[key] = chiffres
+    key += 1
+    alphabets[key] = caracteres_speciaux
+    key += 1
+    
+    mdp = ''
+    for i in range(n):
+        s = randint(0, key - 1)
+        mdp += choice(alphabets[s])
+    
+    return mdp
+
+@main.route('/reset_password', methods=['GET', 'POST'])
+def reset_password():
+    if request.method == 'GET':
+        return render_template('reset_password.html')
+    if request.method == 'POST':
+        email = request.form.get('email')
+        if email:
+            reset_password = get_random_pwd(20)
+            reset_hashed_password = generate_password_hash(reset_password)
+
+            user = User._find_by_email(email)
+            if not user:
+                flash('Email not found', 'danger')
+            else:
+                print(user)
+                user.update({'password': reset_hashed_password})
+    
+                msg = Message("Reset Password", recipients=[email], sender='gui_le_boat@gmail.com')
+                msg.body = (f"Hello, here is your new password: {reset_password}\n"
+                            f"Don't forget to change it once you're logged in.")
+                mail.send(msg)
+                flash('Mail sent', 'success')
+            return render_template('reset_password.html')
 
 
 @main.route('/apply_filters', methods=['POST'])
