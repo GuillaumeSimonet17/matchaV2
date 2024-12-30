@@ -17,6 +17,7 @@ CREATE TABLE IF NOT EXISTS app_user (
     lat DOUBLE PRECISION,
     location VARCHAR(255),
     allow_geoloc BOOLEAN DEFAULT TRUE,
+    is_verified BOOL DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 

@@ -7,6 +7,9 @@ from werkzeug.security import generate_password_hash
 from ORM.tables.user import User
 from ORM.tables.tag import UserTag
 
+from flask_mail import Message
+from app import mail, serializer
+
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ['jpg', 'jpeg', 'png', 'webp']
@@ -77,7 +80,7 @@ def auth_register(request, all_tags):
     # --------------- CREATE USER OR DISPLAY ERROR MESSAGE ----------------------
     if valid == True:
         hashed_password = generate_password_hash(password)
-        
+
         location = request.form.get('location')
         API_KEY = 'ad10d1fa56804356afea60668546b54f'
         url = f"https://api.opencagedata.com/geocode/v1/json?q={location}&key={API_KEY}"
@@ -87,7 +90,7 @@ def auth_register(request, all_tags):
         geo = geo['results'][0]
         lng = geo['geometry']['lng']
         lat = geo['geometry']['lat']
-        
+
         data = {
             'username': username,
             'password': hashed_password,
@@ -100,11 +103,12 @@ def auth_register(request, all_tags):
             'gender': gender,
             'gender_pref': gender_pref,
             'fame_rate': 0,
-            'connected': True,
+            'connected': False,
             'location': location,
             'lng': lng,
             'lat': lat,
-            'allow_geoloc': True
+            'allow_geoloc': True,
+            'is_verified': False,
         }
 
         user_id = create_user(data)
@@ -112,11 +116,18 @@ def auth_register(request, all_tags):
         if user_id:
             User.save_profile_image(user_id, image_data)
             create_tags(user_id, tags)
-            session['username'] = username
-            session['user_id'] = user_id
-            print('IN CREATE USER == USER_ID ==> ', user_id)
-            session['current_page'] = 'home'
-            return redirect(url_for('main.home'))
-        flash('Username ou email déjà utilisé', 'danger')
+
+            token = serializer.dumps(email, salt='email-confirm')
+            
+            confirm_url = url_for('main.confirm_email', token=token, _external=True)
+            
+            msg = Message("Confirm Your Account", recipients=[email], sender='gui_le_boat@gmail.com')
+            msg.body = f"Hello, please confirm your account by clicking on the link: {confirm_url}"
+            mail.send(msg)
+            
+            flash('A confirmation email has been sent to your address.', 'success')
+        
+        else:
+            flash('Username ou email déjà utilisé', 'danger')
     
     return render_template('register.html', all_tags=all_tags)

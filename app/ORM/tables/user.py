@@ -8,12 +8,12 @@ class User(Model):
     table_name = 'app_user'
     column_names = ['id', 'username', 'last_name', 'first_name', 'age', 'password', 'email',
                     'profile_image', 'bio', 'gender', 'gender_pref', 'fame_rate', 'connected',
-                    'location', 'lng', 'lat', 'allow_geoloc', 'created_at']
+                    'location', 'lng', 'lat', 'allow_geoloc', 'is_verified', 'created_at']
 
 
     def __init__(self, id, username, last_name, first_name, age, password,
                  email, profile_image, bio, gender, gender_pref, fame_rate,
-                 connected, location, lng, lat, allow_geoloc=True,
+                 connected, location, lng, lat, allow_geoloc=True, is_verified=False,
                  created_at=None):
 
         self.id = id
@@ -33,6 +33,7 @@ class User(Model):
         self.lng = lng
         self.lat = lat
         self.allow_geoloc = allow_geoloc
+        self.is_verified = is_verified
         self.created_at = created_at
 
 
@@ -64,6 +65,18 @@ class User(Model):
             if res:
                 usr = res[0]
                 # print(usr)
+                return usr
+        except Exception as e:
+            print(e)
+            return None
+        return None
+    
+    @classmethod
+    def _find_by_email(cls, email):
+        try:
+            res = cls.find_x_by_y('email', email, cls.column_names)
+            if res:
+                usr = res[0]
                 return usr
         except Exception as e:
             print(e)

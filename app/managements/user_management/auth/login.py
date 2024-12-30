@@ -12,6 +12,8 @@ def auth_login(request):
     user = User._find_by_username(username)
     if user:
         if check_password_hash(user.password, password):
+            if not user.is_verified:
+                return False, 'Veuillez confirmer votre compte.'
             session['username'] = username
             session['user_id'] = user.id
             
@@ -41,6 +43,6 @@ def auth_login(request):
                 data['lat'] = lat
 
                 user.update(data)
-            return True
+            return True, ''
     
-    return False
+    return False, 'Ecris mieux stp.'
