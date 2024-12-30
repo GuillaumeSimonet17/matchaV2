@@ -22,13 +22,35 @@ from app import socketio
 
 main = Blueprint('main', __name__)
 
+connected_users = {}
+
 # --------------------------- SOCKET ---------------------------
 
-@socketio.on('join')
+@socketio.on('connection')
 def on_join(data):
     user_id = data.get('user_id')
     if user_id:
         join_room(f"user_{user_id}")
+
+@socketio.on('connect')
+def handle_connect():
+    print("Client connected")
+    
+@socketio.on('connection')
+def handle_connection(data):
+    user_id = data.get("user_id")
+    sid = request.sid
+    if user_id:
+        connected_users[sid] = user_id
+        print(f"User {user_id} connected with SID {sid}")
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    sid = request.sid
+    user_id = connected_users.pop(sid, None)
+    if user_id:
+        logout()
+        print(f"User {user_id} disconnected")
 
 # PROFILE/FRIENDSHIP ---------------
 @socketio.on('send_invitation')
@@ -52,7 +74,7 @@ def view_profile(data):
     user_id = session.get('user_id')
     username = session.get('username')
     receiver_id = data['receiver_id']
-    
+
     emit('receive_view_profile',
          {'receiver_id': receiver_id, 'sender_id': user_id, 'sender_username': username},
          room=f'user_{int(data['receiver_id'])}')
@@ -83,7 +105,6 @@ def received_message(data):
 def mark_notifs_as_read(data):
     user_id = session['user_id']
     Notif.mark_notifs_by_user_id_as_read(user_id)
-
 
 # --------------------------- HTTP ---------------------------
 
@@ -120,7 +141,7 @@ def logout():
     
     user = User._find_by_id(session['user_id'])
     user.update({'connected': False})
-    
+
     return redirect(url_for('main.login'))
 
 @main.route('/register', methods=['GET', 'POST'])
@@ -130,7 +151,6 @@ def register():
     if request.method == 'POST':
         return auth_register(request, all_tags)
     return render_template('register.html', all_tags=all_tags)
-
 
 @main.route('/apply_filters', methods=['POST'])
 def apply_filters_route():
