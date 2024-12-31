@@ -26,11 +26,11 @@ def go_profile(profile_id: int):
     user_tag_ids = UserTag.find_tags_by_user_id(profile.id)
 
     user_tags = []
-
-    for tag_id in user_tag_ids:
-        tag = Tag._find_by_id(tag_id.tag_id)
-        if tag:
-            user_tags.append(tag)
+    if user_tag_ids:
+        for tag_id in user_tag_ids:
+            tag = Tag._find_by_id(tag_id.tag_id)
+            if tag:
+                user_tags.append(tag)
 
     friendship = Friendship.get_friendship_by_user_ids([user_id, profile_id])
     state, connected, received_invitation, sent_invitation = False, False, False, False
