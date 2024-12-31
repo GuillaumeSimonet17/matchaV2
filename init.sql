@@ -9,7 +9,7 @@ CREATE TABLE IF NOT EXISTS app_user (
     email VARCHAR(255) UNIQUE NOT NULL,
     profile_image BYTEA,
     bio TEXT,
-    gender VARCHAR(10) NOT NULL,
+    gender VARCHAR(255) NOT NULL,
     gender_pref VARCHAR(10) NOT NULL,
     fame_rate DOUBLE PRECISION,
     connected BOOLEAN DEFAULT FALSE,
