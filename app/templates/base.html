@@ -12,6 +12,7 @@
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@opencage/geosearch-bundle/dist/css/autocomplete-theme-classic.min.css"
     />
+    <link rel="icon" href="/static/img/airbnb.png" type="image/x-icon">
 
 </head>
 
@@ -29,7 +30,7 @@
         const socket = io();
 
         window.onbeforeunload = function () {
-            socket.emit('disconnect');
+            socket.emit('disconnection');
         };
         window.onload = function () {
             socket.emit('connection');
