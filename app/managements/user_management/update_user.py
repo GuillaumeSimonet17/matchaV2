@@ -5,8 +5,18 @@ from werkzeug.security import generate_password_hash, check_password_hash
 
 from ORM.tables.user import User
 from ORM.tables.tag import UserTag
+import magic
 
 def update_user_infos(request, profile_image_data, user_tag_ids, tags):
+
+    session_username = session.get('username')
+    if not session_username:
+        return False
+
+    user = User._find_by_username(session.get('username'))
+    if not session_username:
+        return False
+
     # --------------- RECUPERATION DES INFOS ----------------------
     username = request.form.get('username')
     last_name = request.form.get('last_name')
@@ -18,18 +28,25 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
     gender_pref = request.form.get('gender_pref')
     tag_ids_selected = request.form.getlist('tags[]')
     new_image = request.files.get('new_profile_image')
+
+    new_image_filename = new_image.filename
+    mime = magic.Magic(mime=True)
+    new_image = new_image.read()
+    mime_type = mime.from_buffer(new_image)
+
+    if not mime_type.startswith('image/'):
+        flash('C\'est pas une image, tu vas pas nous l\'a faire !', 'danger')
+        return render_template('user.html', user=user, profile_image_data=profile_image_data,
+                               user_tag_ids=user_tag_ids, tags=tags)
+
+    if new_image_filename:
+        User.save_profile_image(user.id, new_image)
+        profile_image_data = User.get_profile_image(user.id)
+
     location = request.form.get('location')
     allow_geoloc = request.form.get('allow_geoloc')
     if allow_geoloc == 'on':
         allow_geoloc = True
-
-    session_username = session.get('username')
-    if not session_username:
-        return False
-
-    user = User._find_by_username(session.get('username'))
-    if not session_username:
-        return False
 
     new_tags = []
     for tag_id_selected in tag_ids_selected:
@@ -68,11 +85,6 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
                                user_tag_ids=user_tag_ids, tags=tags)
 
     # --------------- INTERCEPTER MODIFICATIONS ----------------------
-    
-    if new_image.filename:
-        img_read = new_image.read()
-        User.save_profile_image(user.id, img_read)
-        profile_image_data = User.get_profile_image(user.id)
 
     if user:
         data = {}
@@ -124,7 +136,7 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
                 user = User._find_by_id(user.id)
                 session['username'] = user.username
             flash('C\'est carré : update infos', 'success')
-        if new_image.filename:
+        if new_image_filename:
             flash('C\'est carré : update image', 'success')
         if not data and not new_image and no_tags_selected:
             flash('T\'as rien changé, tu vas pas nous la faire', 'danger')
