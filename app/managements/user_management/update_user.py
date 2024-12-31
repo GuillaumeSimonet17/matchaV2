@@ -6,7 +6,6 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from ORM.tables.user import User
 from ORM.tables.tag import UserTag
 
-
 def update_user_infos(request, profile_image_data, user_tag_ids, tags):
     # --------------- RECUPERATION DES INFOS ----------------------
     username = request.form.get('username')
@@ -24,7 +23,13 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
     if allow_geoloc == 'on':
         allow_geoloc = True
 
-    user = User._find_by_username(username)
+    session_username = session.get('username')
+    if not session_username:
+        return False
+
+    user = User._find_by_username(session.get('username'))
+    if not session_username:
+        return False
 
     new_tags = []
     for tag_id_selected in tag_ids_selected:
@@ -114,6 +119,7 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
 
         if data or not no_tags_selected:
             if data:
+                print('\n', data)
                 user.update(data)
                 user = User._find_by_id(user.id)
                 session['username'] = user.username
