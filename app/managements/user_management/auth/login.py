@@ -1,8 +1,9 @@
 from werkzeug.security import check_password_hash
 from flask import session
+import requests
+import os
 
 from ORM.tables.user import User
-import requests
 
 def auth_login(request):
     username = request.form['username']
@@ -19,10 +20,9 @@ def auth_login(request):
             
             if location != user.location:
                 data = {}
-                
-                # TODO : mettre en maskey
-                API_KEY = 'ad10d1fa56804356afea60668546b54f'
-                url = f"https://api.opencagedata.com/geocode/v1/json?q={location}&key={API_KEY}"
+
+                API_LOC_KEY = os.getenv('API_LOC_KEY')
+                url = f"https://api.opencagedata.com/geocode/v1/json?q={location}&key={API_LOC_KEY}"
                 response = requests.get(url)
                 geo = response.json()
                 geo = geo['results'][0]

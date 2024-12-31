@@ -36,12 +36,15 @@
 </div>
 
 <script>
-    fetch('https://api.opencagedata.com/geocode/v1/json?q=auto&key=ad10d1fa56804356afea60668546b54f')
+    fetch('/get_location')
         .then(response => response.json())
         .then(data => {
-            if (data.results.length > 0) {
-                const country = data.results[0].components.country;
-                let city = data.results[0].components.city;
+
+            if (data) {
+                const country = data.country_name;
+                console.log(country)
+                let city = data.city;
+                console.log(city)
 
                 if (city === undefined) {
                     location_name = country;

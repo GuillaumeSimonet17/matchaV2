@@ -1,4 +1,5 @@
 import requests
+import os
 
 from flask import flash, render_template, session
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -6,6 +7,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from ORM.tables.user import User
 from ORM.tables.tag import UserTag
 import magic
+
+API_IPFLARE_KEY = os.getenv('API_IPFLARE_KEY')
 
 def update_user_infos(request, profile_image_data, user_tag_ids, tags):
 
@@ -28,22 +31,25 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
     gender_pref = request.form.get('gender_pref')
     tag_ids_selected = request.form.getlist('tags[]')
     new_image = request.files.get('new_profile_image')
-
-    new_image_filename = new_image.filename
-    mime = magic.Magic(mime=True)
-    new_image = new_image.read()
-    mime_type = mime.from_buffer(new_image)
-
-    if not mime_type.startswith('image/'):
-        flash('C\'est pas une image, tu vas pas nous l\'a faire !', 'danger')
-        return render_template('user.html', user=user, profile_image_data=profile_image_data,
-                               user_tag_ids=user_tag_ids, tags=tags)
-
-    if new_image_filename:
-        User.save_profile_image(user.id, new_image)
-        profile_image_data = User.get_profile_image(user.id)
+    
+    new_image_filename = False
+    if new_image:
+        new_image_filename = new_image.filename
+        mime = magic.Magic(mime=True)
+        new_image = new_image.read()
+        mime_type = mime.from_buffer(new_image)
+    
+        if not mime_type.startswith('image/'):
+            flash('C\'est pas une image, tu vas pas nous la faire !', 'danger')
+            return render_template('user.html', user=user, profile_image_data=profile_image_data,
+                                   user_tag_ids=user_tag_ids, tags=tags)
+    
+        if new_image_filename:
+            User.save_profile_image(user.id, new_image)
+            profile_image_data = User.get_profile_image(user.id)
 
     location = request.form.get('location')
+
     allow_geoloc = request.form.get('allow_geoloc')
     if allow_geoloc == 'on':
         allow_geoloc = True
@@ -83,6 +89,10 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
         flash('Nan gros, t\'as pas compris... T\'as pas le droit à des valeurs null', 'danger')
         return render_template('user.html', user=user, profile_image_data=profile_image_data,
                                user_tag_ids=user_tag_ids, tags=tags)
+    if int(age) < 18:
+        flash('Opopop ! Qu\'est ce que tu fais là si t\'es mineur', 'danger')
+        return render_template('user.html', user=user, profile_image_data=profile_image_data,
+                               user_tag_ids=user_tag_ids, tags=tags)
 
     # --------------- INTERCEPTER MODIFICATIONS ----------------------
 
@@ -107,11 +117,12 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
         if allow_geoloc != user.allow_geoloc:
             data['allow_geoloc'] = allow_geoloc
 
-        if location != user.location:
-            API_KEY = 'ad10d1fa56804356afea60668546b54f'
-            url = f"https://api.opencagedata.com/geocode/v1/json?q={location}&key={API_KEY}"
+        if allow_geoloc and location:
+            API_LOC_KEY = os.getenv('API_LOC_KEY')
+            url = f"https://api.opencagedata.com/geocode/v1/json?q={location}&key={API_LOC_KEY}"
             response = requests.get(url)
             geo = response.json()
+
             geo = geo['results'][0]
 
             if geo['components'].get('city'):
@@ -122,12 +133,46 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
                 city = ''
             country = geo['components']['country']
             location = city + country
+            print('location = '
+                  '', location)
+
             lng = geo['geometry']['lng']
             lat = geo['geometry']['lat']
             data['location'] = location
             data['lng'] = lng
             data['lat'] = lat
 
+        if not location:
+            def get_public_ip():
+                response = requests.get('https://api.ipify.org?format=json')
+                if response.status_code == 200:
+                    return response.json()["ip"]
+                else:
+                    return "Erreur lors de la récupération de l'adresse IP publique."
+            
+            ip = get_public_ip()
+            header = {'X-API-Key': API_IPFLARE_KEY}
+            geo = requests.get(
+                f"https://api.ipflare.io/{ip}",
+                headers=header,
+            ).json()
+            
+            if geo.get('city'):
+                city = geo['city'] + ', '
+            elif geo.get('country_name'):
+                city = geo['country_name'] + ', '
+            else:
+                city = ''
+            country = geo['country_name']
+            location = city + country
+            print('location = '
+                  '', location)
+
+            lng = geo['longitude']
+            lat = geo['latitude']
+            data['location'] = location
+            data['lng'] = lng
+            data['lat'] = lat
 
         if data or not no_tags_selected:
             if data:

@@ -1,5 +1,7 @@
 import requests
 import re
+import os
+import magic
 
 from flask import flash, render_template, session, redirect, url_for
 from werkzeug.security import generate_password_hash
@@ -49,13 +51,26 @@ def auth_register(request, all_tags):
     password = request.form.get('password')
     confirm_password = request.form.get('confirm_password')
     email = request.form.get('email')
-    image = request.files.get('profile_image')
     bio = request.form.get('bio')
     gender = request.form.get('gender')
     gender_pref = request.form.get('gender_pref')
     tags = request.form.getlist('tags[]')
+    image = request.files.get('profile_image')
 
     # --------------- VERIFICATION DES INFOS ----------------------
+    if not image:
+        valid = False
+        flash('Met une image frère', 'danger')
+
+    if image and allowed_file(image.filename):
+        mime = magic.Magic(mime=True)
+        image = image.read()
+        mime_type = mime.from_buffer(image)
+
+        if not mime_type.startswith('image/'):
+            valid = False
+            flash('C\'est pas une image, tu vas pas nous la faire !', 'danger')
+
     if not is_valid_username(username):
         valid = False
         flash('Choisi un username sans caractères spéciaux stp beau gosse', 'danger')
@@ -71,19 +86,14 @@ def auth_register(request, all_tags):
     if password != confirm_password:
         valid = False
         flash('T\'as pas mis les même mots de passe.. T\'es con enfaite ?', 'danger')
-    if not image:
-        valid = False
-        flash('Met une image frère', 'danger')
-    if image and allowed_file(image.filename):
-        image_data = image.read()
     
     # --------------- CREATE USER OR DISPLAY ERROR MESSAGE ----------------------
     if valid == True:
         hashed_password = generate_password_hash(password)
 
         location = request.form.get('location')
-        API_KEY = 'ad10d1fa56804356afea60668546b54f'
-        url = f"https://api.opencagedata.com/geocode/v1/json?q={location}&key={API_KEY}"
+        API_LOC_KEY = os.getenv('API_LOC_KEY')
+        url = f"https://api.opencagedata.com/geocode/v1/json?q={location}&key={API_LOC_KEY}"
         response = requests.get(url)
 
         geo = response.json()
@@ -114,7 +124,7 @@ def auth_register(request, all_tags):
         user_id = create_user(data)
 
         if user_id:
-            User.save_profile_image(user_id, image_data)
+            User.save_profile_image(user_id, image)
             create_tags(user_id, tags)
 
             token = serializer.dumps(email, salt='email-confirm')

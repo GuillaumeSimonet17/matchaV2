@@ -4,6 +4,7 @@ from itsdangerous import SignatureExpired, BadTimeSignature
 from flask_mail import Message
 from werkzeug.security import generate_password_hash
 from random import choice, randint
+import os, requests
 
 from managements.user_management.auth.login import auth_login
 from managements.user_management.auth.register import auth_register
@@ -135,6 +136,27 @@ def mark_notifs_as_read(data):
 
 
 # --------------------------- HTTP ---------------------------
+
+
+API_IPFLARE_KEY = os.getenv('API_IPFLARE_KEY')
+
+
+def get_public_ip():
+    response = requests.get('https://api.ipify.org?format=json')
+    if response.status_code == 200:
+        return response.json()["ip"]
+    else:
+        return "Erreur lors de la récupération de l'adresse IP publique."
+
+@main.route('/get_location', methods=['GET'])
+def get_location():
+    ip = get_public_ip()
+    header = {'X-API-Key': API_IPFLARE_KEY}
+    response = requests.get(
+        f"https://api.ipflare.io/{ip}",
+        headers=header,
+    )
+    return response.json()
 
 @main.route('/report-fake-account/<int:profile_id>', methods=['POST'])
 def report_fake_account(profile_id):

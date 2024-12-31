@@ -160,12 +160,12 @@
 </div>
 
 <script>
-    fetch('https://api.opencagedata.com/geocode/v1/json?q=auto&key=ad10d1fa56804356afea60668546b54f')
+    fetch('/get_location')
         .then(response => response.json())
         .then(data => {
-            if (data.results.length > 0) {
-                const country = data.results[0].components.country;
-                let city = data.results[0].components.city;
+            if (data) {
+                const country = data.country_name;
+                let city = data.city;
 
                 if (city === undefined) {
                     location_name = country;
@@ -180,8 +180,8 @@
                 document.getElementById('form-register').insertAdjacentHTML('afterbegin', location_balise);
 
                 data['location'] = location
-                data['lng'] = data.results[0].geometry.lng
-                data['lat'] = data.results[0].geometry.lat
+                data['lng'] = data.longitude
+                data['lat'] = data.latitude
             }
         })
         .catch(error => {
