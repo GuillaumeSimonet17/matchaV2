@@ -4,7 +4,7 @@
     <p id="current-user" data-current-user-id="{{ user_id }}"/>
     <p id="current-profile" data-profile-id="{{ profile_id }}"/>
     <div class="container  p-0 rounded d-flex" style="min-height: 90vh">
-        <div class="col-3 col-md-3">
+        <div class="col-2 col-md-3">
             <nav id="profile-chat-container" class="nav flex-column bg-light h-100 rounded-3 shadow sticky-top">
                 {% for profile in profiles %}
                 <div class="nav-link d-flex justify-content-between align-items-center border-bottom user-profile
@@ -12,7 +12,7 @@
                      data-username="{{ profile.username }}" data-profile-id="{{ profile.id }}">
                     <img style="width: 30px;" src="data:image/png;base64, {{ profile.image_data }}"
                          alt="Profile image"/>
-                    <p class="m-0 {% if profile_id == profile.id %}text-light{% endif %} fw-bold">{{ profile.username }}</p>
+                    <p class="d-none d-sm-block m-0 {% if profile_id == profile.id %}text-light{% endif %} fw-bold">{{ profile.username }}</p>
                 </div>
                 {% endfor %}
             </nav>
