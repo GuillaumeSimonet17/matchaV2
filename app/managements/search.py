@@ -64,14 +64,16 @@ def sort_profiles_by_tags_and_location(user_tags, user_location, profiles):
     def compute_profile_score(profile):
         # Nombre de tags en commun
         profile_tag_ids = UserTag.find_tags_by_user_id(profile.id)
-        profile_tags = [tag_id.tag_id for tag_id in profile_tag_ids]
-        common_tags_count = len(set(profile_tags) & set(user_tags))
+        common_tags_count = 0
+        if profile_tag_ids:
+            profile_tags = [tag_id.tag_id for tag_id in profile_tag_ids]
+            common_tags_count = len(set(profile_tags) & set(user_tags))
 
         # Distance géographique
         profile_lat = profile.lat
         profile_lon = profile.lng
-        distance = calculate_distance(user_lat, user_lon, profile_lat, profile_lon)
 
+        distance = calculate_distance(user_lat, user_lon, profile_lat, profile_lon)
         # Retourne les deux critères pour le tri
         return (-common_tags_count, distance)  # Note : -common_tags_count pour un tri décroissant
 
@@ -113,10 +115,11 @@ def get_profiles_list(is_suggestion_list=True):
 
             profile_tag_ids = UserTag.find_tags_by_user_id(profile.id)
             profile_tags = []
-            for tag_id in profile_tag_ids:
-                tag = Tag._find_by_id(tag_id.tag_id)
-                if tag:
-                    profile_tags.append(tag.name)
+            if profile_tag_ids:
+                for tag_id in profile_tag_ids:
+                    tag = Tag._find_by_id(tag_id.tag_id)
+                    if tag:
+                        profile_tags.append(tag.name)
             
             image_data = Profile.get_profile_image(profile.id)
             final_profiles.append({
@@ -131,7 +134,6 @@ def get_profiles_list(is_suggestion_list=True):
                 'lat': profile.lat,
                 'tags': profile_tags,
             })
- 
     return final_profiles, user, user_tags, tag_ids, location, user_lat, user_lng
 
 def go_search():
@@ -151,7 +153,7 @@ def apply_filters(request):
     if filters_data:
         
         is_suggestion_list = filters_data.get('help')
-        print('is_suggestion_list = ', is_suggestion_list)
+
         final_profiles, user, user_tags, tag_ids, location, user_lat, user_lng = get_profiles_list(is_suggestion_list)
         
         all_profiles_filtered = final_profiles
@@ -171,6 +173,7 @@ def apply_filters(request):
 
         if filters_data.get('location_filter_activated'):
             distance = 0
+            allow_perimeter = {}
             for profile in final_profiles:
                 profile_lat = profile.get('lat')
                 profile_lon = profile.get('lng')
@@ -179,8 +182,10 @@ def apply_filters(request):
                     continue
     
                 distance = calculate_distance(float(user_lat), float(user_lon), float(profile_lat), float(profile_lon))
-        
-            all_profiles_filtered = [profile for profile in final_profiles if distance <= float(location_radius)]
+
+                allow_perimeter[profile['id']] = distance
+
+            all_profiles_filtered = [profile for profile in final_profiles if allow_perimeter[profile['id']] <= float(location_radius)]
 
         if filters_data.get('fame_rate_filter_activated'):
             all_profiles_filtered = [profile for profile in final_profiles if profile['fame_rate'] >= float(fame_rating_min)]
