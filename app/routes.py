@@ -45,6 +45,10 @@ def handle_connect():
         join_room(f"user_{user_id}")
 
 
+@socketio.on('disconnection')
+def handle_disconnection():
+    handle_disconnect()
+
 @socketio.on('disconnect')
 def handle_disconnect():
     sid = request.sid
