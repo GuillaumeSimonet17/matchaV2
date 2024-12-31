@@ -1,50 +1,66 @@
 #!/bin/bash
 
-# Arrêter le script si une commande échoue
-set -e
+# Variables
+COMPOSE_FILE="docker-compose.yml"
+DB_NAME="matchadb"
+DB_USER="guillaume"
+DB_PASSWORD="admin"
+DB_PORT="5432"
+DB_HOST="127.0.0.1"
+VENV_DIR=".venv"
+REQUIREMENTS_FILE="requirements.txt"
 
-export $(grep -v '^#' .env | xargs)
+# Construire les services Docker
+echo "Building Docker Compose services..."
+docker compose -f $COMPOSE_FILE build
 
-# Vérifier si le venv existe, sinon le créer
-if [ ! -d ".venv" ]; then
-  echo "Virtual environment (venv) not found. Creating venv..."
-  python3 -m venv .venv
-fi
+# Lancer les services Docker en arrière-plan
+echo "Starting Docker Compose services..."
+docker compose -f $COMPOSE_FILE up -d
 
-# Activer l'environnement virtuel
-echo "Activating virtual environment..."
-source .venv/bin/activate
-
-# Installer les dépendances si elles ne sont pas déjà installées
-if ! pip freeze | grep -q Flask; then
-  echo "Installing dependencies from requirements.txt..."
-  pip install -r requirements.txt
-fi
-
-# Lancer Docker Compose pour démarrer PostgreSQL
-echo "Starting Docker Compose for PostgreSQL..."
-docker compose up -d
-
-# Attendre que la base de données PostgreSQL soit prête
+# Attendre que PostgreSQL soit prêt
 echo "Waiting for PostgreSQL to be ready..."
-while ! pg_isready -h "$POSTGRES_HOST" -p "$POSTGRES_PORT" > /dev/null 2>&1; do
-  sleep 1
+until psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -c '\q'; do
+  echo "PostgreSQL is not ready yet. Waiting..."
+  sleep 2
 done
-echo "PostgreSQL is ready!"
+echo "PostgreSQL is ready."
 
-echo "Creating database if it doesn't exist..."
-if ! psql -h localhost -p 5432 -U guillaume matcha; then
-  psql -h localhost -p 5432 -U guillaume -d postgres -c "CREATE DATABASE matcha;"
-  echo "Database 'matcha' created."
+# Créer la base de données si elle n'existe pas
+echo "Checking if database $DB_NAME exists..."
+if ! psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d postgres -c "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'" | grep -q 1; then
+  echo "Database '$DB_NAME' does not exist. Creating it..."
+  psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d postgres -c "CREATE DATABASE $DB_NAME;"
 else
-  echo "Database 'matcha' already exists."
+  echo "Database '$DB_NAME' already exists."
 fi
 
-echo "Init.sql run"
-cat init.sql | psql -h localhost -p 5432 -U guillaume matcha
-echo "Init.sql done"
+# Appliquer le dump SQL
+echo "Running dump.sql to populate the database..."
+psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -f ./init.sql
 
-# Lancer l'application Flask
+# Installer les dépendances Flask dans l'environnement virtuel
+if [ ! -d "$VENV_DIR" ]; then
+  echo "Creating virtual environment..."
+  python3 -m venv $VENV_DIR
+fi
+
+echo "Activating virtual environment..."
+source $VENV_DIR/bin/activate
+
+# Installer les requirements si ce n'est pas déjà fait
+if [ -f "$REQUIREMENTS_FILE" ]; then
+  echo "Installing requirements from $REQUIREMENTS_FILE..."
+  pip install -r $REQUIREMENTS_FILE
+else
+  echo "No $REQUIREMENTS_FILE found, skipping installation of dependencies."
+fi
+
+# Démarrer l'application Flask
 echo "Starting Flask application..."
-cd app
-flask run --debug
+export FLASK_APP=./app/app.py     # Remplace 'app.py' par le fichier de ton application Flask
+export FLASK_ENV=development  # Utilise 'production' si tu veux déployer en mode production
+flask run --host=0.0.0.0 --port=5000 --debug
+
+# Fin du script
+echo "Flask app is running on http://localhost:5000"

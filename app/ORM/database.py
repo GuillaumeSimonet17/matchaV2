@@ -8,7 +8,7 @@ db_lock = threading.Lock()
 class Database:
 
 
-    def __init__(self, dbname, user, password, host, port):
+    def __init__(self, dbname, user, password, host='matchadb', port=5432):
         self.connection = psycopg2.connect(
             dbname=dbname,
             user=user,
