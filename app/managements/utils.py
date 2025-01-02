@@ -43,7 +43,9 @@ def token_required(f):
     @wraps(f)
     def wrapper(*args, **kwargs):
         cookies = request.headers.get('Cookie')
-        match = re.search(r"access_token=([^;]+)", cookies)
+        match = None
+        if cookies:
+            match = re.search(r"access_token=([^;]+)", cookies)
         token = None
         if match:
             token = match.group(1)
