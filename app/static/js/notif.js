@@ -1,9 +1,6 @@
 export function add_notif(data) {
     const notifHtml = `
         <div class="ms-3 mb-4 border-0 border-bottom col-10 justify-content-between d-flex align-items-center">
-            <button id="delete-notif" class="btn btn-outline-primary col-2 col-md-2" type="button">
-                <i class="bi bi-x-lg"></i>
-            </button>
             <div class="ms-5 col-10 col-md-6">
                 <p class="mb-1"><a href="/profile/${data.sender_id}">${data.sender_username}</a> sent you a ${data.state}</p>
                 <p class="m-0 text-muted">${data.date}</p>
