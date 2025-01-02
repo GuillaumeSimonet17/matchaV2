@@ -18,14 +18,6 @@ docker compose -f $COMPOSE_FILE build
 echo "Starting Docker Compose services..."
 docker compose -f $COMPOSE_FILE up -d
 
-# Attendre que PostgreSQL soit prêt
-echo "Waiting for PostgreSQL to be ready..."
-until psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d $DB_NAME -c '\q'; do
-  echo "PostgreSQL is not ready yet. Waiting..."
-  sleep 2
-done
-echo "PostgreSQL is ready."
-
 # Créer la base de données si elle n'existe pas
 echo "Checking if database $DB_NAME exists..."
 if ! psql -h $DB_HOST -p $DB_PORT -U $DB_USER -d postgres -c "SELECT 1 FROM pg_database WHERE datname='$DB_NAME'" | grep -q 1; then
