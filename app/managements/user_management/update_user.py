@@ -1,12 +1,14 @@
 import requests
 import os
+import magic
 
 from flask import flash, render_template, session
 from werkzeug.security import generate_password_hash, check_password_hash
 
 from ORM.tables.user import User
 from ORM.tables.tag import UserTag
-import magic
+from managements.utils import get_public_ip
+
 
 API_IPFLARE_KEY = os.getenv('API_IPFLARE_KEY')
 
@@ -143,13 +145,6 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
             data['lat'] = lat
 
         if not location:
-            def get_public_ip():
-                response = requests.get('https://api.ipify.org?format=json')
-                if response.status_code == 200:
-                    return response.json()["ip"]
-                else:
-                    return "Erreur lors de la récupération de l'adresse IP publique."
-            
             ip = get_public_ip()
             header = {'X-API-Key': API_IPFLARE_KEY}
             geo = requests.get(
