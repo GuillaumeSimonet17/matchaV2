@@ -38,7 +38,6 @@ def handle_connection():
 
 @socketio.on('connect')
 def handle_connect():
-    print("Client connected")
     user_id = session.get("user_id")
     sid = request.sid
     if user_id:
@@ -58,7 +57,6 @@ def handle_disconnect():
     user_id = connected_users.pop(sid, None)
     if user_id:
         logout()
-        print(f"User {user_id} disconnected")
 
 # PROFILE/FRIENDSHIP ---------------
 @socketio.on('send_invitation')

@@ -77,7 +77,6 @@ if (btnSendUninvit) {
 // ----------------------------------- ON -----------------------------------
 
 function display_friendship_changes(data) {
-    console.log('data.state = ', data.state)
     if (data.state === 'invitation') {
         document.getElementById('btn-send-invit').remove();
 
@@ -130,7 +129,6 @@ socket.on('receive_invitation', function (data) {
         })
         .catch(error => console.error('Error fetching session data:', error));
 
-    console.log('Invitation reçue:');
 });
 
 socket.on('receive_connection', function (data) {
@@ -153,7 +151,6 @@ socket.on('receive_connection', function (data) {
         })
         .catch(error => console.error('Error fetching session data:', error));
 
-    console.log('Connection reçue:');
 });
 
 socket.on('receive_uninvitation', function (data) {
@@ -176,7 +173,6 @@ socket.on('receive_uninvitation', function (data) {
         })
         .catch(error => console.error('Error fetching session data:', error));
 
-    console.log('Uninvitation reçue:');
 });
 
 socket.on('receive_view_profile', function (data) {
