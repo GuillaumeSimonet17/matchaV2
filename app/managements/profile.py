@@ -52,8 +52,6 @@ def go_profile(profile_id: int):
 
     nb_notifs = get_numbers_of_notifs()
     nb_notifs_msg = get_numbers_of_notifs_msg()
-    
-    
 
     return render_template('profile.html', profile=profile, state=state, connected=connected,
                            profile_image_data=profile_image_data, received_invitation=received_invitation,
