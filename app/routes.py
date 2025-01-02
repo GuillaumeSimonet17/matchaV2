@@ -43,7 +43,7 @@ def handle_connect():
     if user_id:
         connected_users[sid] = user_id
         user = User._find_by_id(user_id)
-        if session.get("user_id"):
+        if user and session.get("user_id"):
             user.update({'connected': True})
         join_room(f"user_{user_id}")
 
