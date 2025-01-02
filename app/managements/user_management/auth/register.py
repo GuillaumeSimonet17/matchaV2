@@ -42,7 +42,7 @@ def is_valid_username(username):
 
 def auth_register(request, all_tags):
     valid = True
-    
+
     # --------------- RECUPERATION DES INFOS ----------------------
     username = request.form.get('username')
     last_name = request.form.get('last_name')
@@ -83,6 +83,9 @@ def auth_register(request, all_tags):
     if len(username) < 3:
         valid = False
         flash('Tu sais pas lire enfaite ? C\'est  3 lettres minimum le username...', 'danger')
+    if len(password) < 8:
+        valid = False
+        flash('Minimum 8 caractères pour le mot de passe stp cousin.', 'danger')
     if password != confirm_password:
         valid = False
         flash('T\'as pas mis les même mots de passe.. T\'es con enfaite ?', 'danger')
