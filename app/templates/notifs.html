@@ -7,9 +7,6 @@
         {% if notifs_list %}
         {% for notif in notifs_list %}
         <div class="ms-3 mb-4 border-0 border-bottom col-10 justify-content-between d-flex align-items-center">
-            <button id="delete-notif" class="btn btn-outline-primary col-2 col-md-2" type="button">
-                <i class="bi bi-x-lg"></i>
-            </button>
             <div class="ms-5 col-10 col-md-6">
                 <p class="mb-1"><a id="notif-profile" href="/profile/{{notif.sender.id}}" data-profile-id="{{ notif.sender.id }}"
                 >{{notif.sender.username}}</a> sent you a
@@ -24,7 +21,8 @@
     </div>
 
     <script>
-        document.querySelector('#notifs-container').addEventListener('click', function (event) {
+
+        document.querySelector('#notifs-container')?.addEventListener('click', function (event) {
             const target = event.target.closest('a[id="notif-profile"]');
 
             if (target) {
