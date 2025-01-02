@@ -24,7 +24,7 @@
     <script src="/static/js/profile_socket.js" type="module"></script>
 
     <script>
-        const socket = io("http://localhost:5000");
+        const socket = io({transports: ['polling']}, "http://localhost:5000");
 
         window.onbeforeunload = function () {
             socket.emit('disconnection');
