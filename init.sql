@@ -21,10 +21,14 @@ CREATE TABLE IF NOT EXISTS app_user (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE VIEW app_profile AS
-SELECT id, username, last_name, first_name, age, profile_image, bio, gender, gender_pref, fame_rate, connected,
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_views WHERE viewname = 'app_profile') THEN
+    CREATE VIEW app_profile AS
+    SELECT id, username, last_name, first_name, age, profile_image, bio, gender, gender_pref, fame_rate, connected,
        location, lng, lat, allow_geoloc
-FROM app_user;
+    FROM app_user;
+  END IF;
+END $$;
 
 -- TAGS Many2many -----------------------------------------------------------------------------------
 CREATE TABLE IF NOT EXISTS tag (
@@ -45,13 +49,14 @@ CREATE TABLE IF NOT EXISTS user_tag (
 
 INSERT INTO tag (name)
 VALUES
-('Sailing'),
-('Yacht Racing'),
-('Shipbuilding'),
-('Maritime History'),
-('Nautical Navigation'),
-('Marine Biology'),
-('Boat Maintenance');
+('Cuisine et Gastronomie'),
+('Sport et Fitness'),
+('Voyages'),
+('Musique'),
+('Cinéma et Séries'),
+('Nature et Randonnée'),
+('Jeux Vidéo'),
+('Art');
 
 
 -- FRIENDSHIP One2many -----------------------------------------------------------------------------------
