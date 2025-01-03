@@ -1,7 +1,8 @@
 import requests, os, jwt, re
 from random import choice, randint
-from flask import request, session, redirect, url_for, jsonify
-
+from flask import request, session, redirect, url_for, jsonify, make_response
+from datetime import datetime, timedelta
+from ORM.tables.user import User
 
 SECRET_KEY = os.getenv('SECRET_KEY')
 
@@ -54,7 +55,17 @@ def token_required(f):
             return redirect(url_for('main.login'))
         try:
             decoded = jwt.decode(token, SECRET_KEY, algorithms=['HS256'])
-            request.user_id = decoded['user_id']  # Ajoute des informations pour l'utilisateur courant
+            if decoded['exp'] < datetime.utcnow().timestamp() + 300: # 5 minutes
+                user = User._find_by_username(session['username'])
+                new_token = jwt.encode(
+                    {'user_id': user.id, 'exp': datetime.utcnow() + timedelta(hours=1)},
+                    SECRET_KEY,
+                    algorithm='HS256'
+                )
+                response = make_response(f(*args, **kwargs))
+                response.set_cookie('access_token', new_token, httponly=True)
+                return response
+            request.user_id = decoded['user_id']
         except jwt.ExpiredSignatureError:
             session.clear()
             return redirect(url_for('main.login'))
