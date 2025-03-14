@@ -188,6 +188,9 @@ def change_password(request):
     current_password = request.form.get('current_password')
     new_password = request.form.get('new_password')
     confirm_password = request.form.get('confirm_password')
+    if len(new_password) < 8 or len(confirm_password) < 8:
+        flash('Le nouveau mot de passe doit être avoir au moins 8 caractères.', 'danger')
+        return False
     if current_password == '' or new_password == '' or confirm_password == '':
         flash('T\'as pas tout rentré, tu vas pas nous la faire', 'danger')
         return False
@@ -203,7 +206,7 @@ def change_password(request):
                 flash('C\'est carré : update password', 'success')
                 return True
             flash('C\'est pas le bon password', 'danger')
-    
+
     else:
         flash('Tu sais pas écrire enfaite ? confirm_password ne correspond pas avec new_password', 'danger')
     return False

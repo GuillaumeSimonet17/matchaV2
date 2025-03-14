@@ -93,12 +93,11 @@ def auth_register(request, all_tags):
     # --------------- CREATE USER OR DISPLAY ERROR MESSAGE ----------------------
     if valid == True:
         hashed_password = generate_password_hash(password)
-
+        
         location = request.form.get('location')
         API_LOC_KEY = os.getenv('API_LOC_KEY')
         url = f"https://api.opencagedata.com/geocode/v1/json?q={location}&key={API_LOC_KEY}"
         response = requests.get(url)
-
         geo = response.json()
         geo = geo['results'][0]
         lng = geo['geometry']['lng']
