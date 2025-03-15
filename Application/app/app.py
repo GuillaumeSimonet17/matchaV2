@@ -28,10 +28,10 @@ app.config['POSTGRES_PASSWORD'] = os.getenv('POSTGRES_PASSWORD')
 app.config['POSTGRES_HOST'] = os.getenv('POSTGRES_HOST')
 app.config['POSTGRES_PORT'] = os.getenv('POSTGRES_PORT')
 
-app.config['MAIL_SERVER']="localhost"
+app.config['MAIL_SERVER'] = 'mailhog'
 app.config['MAIL_PORT'] = 1025
-app.config['MAIL_USERNAME'] = "guillaume@gmail.com"
-app.config['MAIL_PASSWORD'] = "your_email_password"
+app.config['MAIL_USERNAME'] = None
+app.config['MAIL_PASSWORD'] = None
 app.config['MAIL_USE_TLS'] = False
 app.config['MAIL_USE_SSL'] = False
 
