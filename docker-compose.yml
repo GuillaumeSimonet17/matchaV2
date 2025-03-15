@@ -1,5 +1,24 @@
+version: '3.8'
 
 services:
+  matcha:
+    build:
+      context: .
+      dockerfile: Application/Dockerfile
+    ports:
+      - "5000:5000"
+    environment:
+      - POSTGRES_HOST=matchadb
+      - POSTGRES_PORT=5432
+      - POSTGRES_DB=${POSTGRES_DB}
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - SECRET_KEY=${SECRET_KEY}
+      - API_LOC_KEY=${API_LOC_KEY}
+      - API_IPFLARE_KEY=${API_IPFLARE_KEY}
+    depends_on:
+      - matchadb
+
   matchadb:
     image: postgres:15
     environment:
@@ -8,9 +27,10 @@ services:
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
       - db-data:/var/lib/postgresql/data
-      - ./init.sql:/docker-entrypoint-initdb.d/dump.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./db-init:/docker-entrypoint-initdb.d
     ports:
-      - "${POSTGRES_PORT}:5432"
+      - "${POSTGRES_PORT:-5432}:5432"
 
   mailhog:
     image: mailhog/mailhog:v1.0.1
@@ -25,6 +45,8 @@ services:
       - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf
     ports:
       - "8080:80"
+    depends_on:
+      - matcha
 
 volumes:
   db-data:
