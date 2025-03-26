@@ -265,7 +265,6 @@ def apply_filters_route():
 @main.route('/', methods=['POST', 'GET'])
 @token_required
 def home():
-    print('\ncoucou\n')
     if 'username' not in session or not User._find_by_username(session['username']):
         session.clear()
         return redirect(url_for('main.login'))

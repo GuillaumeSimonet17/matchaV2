@@ -42,7 +42,7 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
         mime_type = mime.from_buffer(new_image)
     
         if not mime_type.startswith('image/'):
-            flash('C\'est pas une image, tu vas pas nous la faire !', 'danger')
+            flash('This is not an image!', 'danger')
             return render_template('user.html', user=user, profile_image_data=profile_image_data,
                                    user_tag_ids=user_tag_ids, tags=tags)
     
@@ -64,7 +64,7 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
             user_tag.create()
 
     if len(tag_ids_selected) == 0:
-        flash('Nan gros, t\'as pas compris... T\'as pas le droit à des valeurs null', 'danger')
+        flash('You must have at least one tag', 'danger')
         return render_template('user.html', user=user, profile_image_data=profile_image_data,
                                user_tag_ids=user_tag_ids, tags=tags)
 
@@ -88,11 +88,11 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
     # --------------- VERIFICATION DES INFOS ----------------------
     if user_tag_ids == [] or username == '' or last_name == '' or first_name == '' or age == '' or email == '' or bio == '' \
             or gender == '' or gender_pref == '' or location == '':
-        flash('Nan gros, t\'as pas compris... T\'as pas le droit à des valeurs null', 'danger')
+        flash('Each value must be filled in', 'danger')
         return render_template('user.html', user=user, profile_image_data=profile_image_data,
                                user_tag_ids=user_tag_ids, tags=tags)
     if int(age) < 18:
-        flash('Opopop ! Qu\'est ce que tu fais là si t\'es mineur', 'danger')
+        flash('You must be at least 18 years old', 'danger')
         return render_template('user.html', user=user, profile_image_data=profile_image_data,
                                user_tag_ids=user_tag_ids, tags=tags)
 
@@ -175,11 +175,11 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
                 user.update(data)
                 user = User._find_by_id(user.id)
                 session['username'] = user.username
-            flash('C\'est carré : update infos', 'success')
+            flash('Infos updated', 'success')
         if new_image_filename:
-            flash('C\'est carré : update image', 'success')
+            flash('Image updated', 'success')
         if not data and not new_image and no_tags_selected:
-            flash('T\'as rien changé, tu vas pas nous la faire', 'danger')
+            flash('You haven\'t changed a thing', 'danger')
 
     return render_template('user.html', user=user, profile_image_data=profile_image_data,
                            tags=tags, user_tag_ids=user_tag_ids)
@@ -189,10 +189,10 @@ def change_password(request):
     new_password = request.form.get('new_password')
     confirm_password = request.form.get('confirm_password')
     if len(new_password) < 8 or len(confirm_password) < 8:
-        flash('Le nouveau mot de passe doit être avoir au moins 8 caractères.', 'danger')
+        flash('The new password must be at least 8 characters long.', 'danger')
         return False
     if current_password == '' or new_password == '' or confirm_password == '':
-        flash('T\'as pas tout rentré, tu vas pas nous la faire', 'danger')
+        flash('Please all the fields', 'danger')
         return False
     if confirm_password == new_password:
         user = User._find_by_username(session['username'])
@@ -203,10 +203,10 @@ def change_password(request):
                     'password': hashed_new_password
                 }
                 user.update(data)
-                flash('C\'est carré : update password', 'success')
+                flash('Password updated', 'success')
                 return True
-            flash('C\'est pas le bon password', 'danger')
+            flash('This is not the good password', 'danger')
 
     else:
-        flash('Tu sais pas écrire enfaite ? confirm_password ne correspond pas avec new_password', 'danger')
+        flash('The new password does not match with the confirm password', 'danger')
     return False

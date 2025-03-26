@@ -14,7 +14,7 @@ def auth_login(request):
     if user:
         if check_password_hash(user.password, password):
             if not user.is_verified:
-                return False, 'Veuillez confirmer votre compte.'
+                return False, 'Please confirm your account.'
             session['username'] = username
             session['user_id'] = user.id
             
@@ -45,4 +45,4 @@ def auth_login(request):
                 user.update(data)
             return True, ''
     
-    return False, 'Ecris mieux stp.'
+    return False, 'User not found.'

@@ -60,7 +60,7 @@ def auth_register(request, all_tags):
     # --------------- VERIFICATION DES INFOS ----------------------
     if not image:
         valid = False
-        flash('Met une image frère', 'danger')
+        flash('Image is required', 'danger')
 
     if image and allowed_file(image.filename):
         mime = magic.Magic(mime=True)
@@ -69,26 +69,26 @@ def auth_register(request, all_tags):
 
         if not mime_type.startswith('image/'):
             valid = False
-            flash('C\'est pas une image, tu vas pas nous la faire !', 'danger')
+            flash('This is not an image', 'danger')
 
     if not is_valid_username(username):
         valid = False
-        flash('Choisi un username sans caractères spéciaux stp beau gosse', 'danger')
+        flash('Please choose a username without special characters', 'danger')
     if int(age) < 18:
         valid = False
-        flash('Qu\'est-ce tu fais là si t\'es mineur frr', 'danger')
+        flash('You must be at least 18 years old', 'danger')
     if not tags:
         valid = False
-        flash('Choisi au moins un tag khey stp', 'danger')
+        flash('Please choose at least one tag', 'danger')
     if len(username) < 3:
         valid = False
-        flash('Tu sais pas lire enfaite ? C\'est  3 lettres minimum le username...', 'danger')
+        flash('The username must be at least 3 letters long', 'danger')
     if len(password) < 8:
         valid = False
-        flash('Minimum 8 caractères pour le mot de passe stp cousin.', 'danger')
+        flash('The password must be at least 8 characters long.', 'danger')
     if password != confirm_password:
         valid = False
-        flash('T\'as pas mis les même mots de passe.. T\'es con enfaite ?', 'danger')
+        flash('The password and confirm password are not the same', 'danger')
     
     # --------------- CREATE USER OR DISPLAY ERROR MESSAGE ----------------------
     if valid == True:
@@ -140,6 +140,6 @@ def auth_register(request, all_tags):
             flash('A confirmation email has been sent to your address.', 'success')
         
         else:
-            flash('Username ou email déjà utilisé', 'danger')
+            flash('Username or email already used', 'danger')
     
     return render_template('register.html', all_tags=all_tags)

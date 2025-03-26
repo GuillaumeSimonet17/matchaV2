@@ -91,7 +91,6 @@ def handle_send_message(data):
     print( data.get('receiver_id'))
 
     if data.get('receiver_id') is None or data.get('sender_id') is None:
-        print('\nc coment\n')
         return
     
     sender_id = int(data['sender_id'])
@@ -100,7 +99,6 @@ def handle_send_message(data):
     
     if is_blocked(sender_id, receiver_id):
         return
-    print('rece === ', receiver_id)
     if receiver_id != 0:
         channel = Channel.find_channel_by_user_ids(sender_id, receiver_id)
         if not channel:
@@ -121,5 +119,4 @@ def handle_send_message(data):
         notif = Notif(None, 'message', sender_id, receiver_id, False)
         notif.create()
     
-    print('ici ', f'user_{receiver_id}')
     emit('receive_message', {'sender_id': sender_id}, room=f'user_{receiver_id}')

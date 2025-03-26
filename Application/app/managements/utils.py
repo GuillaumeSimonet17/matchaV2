@@ -11,7 +11,7 @@ def get_public_ip():
     if response.status_code == 200:
         return response.json()["ip"]
     else:
-        return "Erreur lors de la récupération de l'adresse IP publique."
+        return "Error retrieving public IP address."
 
 
 def get_random_pwd(n):
