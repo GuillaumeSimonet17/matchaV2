@@ -1,138 +1,167 @@
 {% extends "index.html" %}
 {% block content %}
 <section id="search" class="mb-5 w-100 {{ 'active' if request.path == '/' else '' }}">
-    <div class="m-0 p-0 container-fluid d-flex flex-column justify-content-center align-items-center">
-        <div class="w-100 d-flex justify-content-center align-items-center">
-            <input id="help_me" type="checkbox" checked>
-            <p class="ps-1 m-0">Suggest only good-looking people</p></input>
+    <div class="m-0 p-0 container-fluid">
+        <!-- Top filters -->
+        <div class="row mb-4">
+            <div class="col-12">
+                <div class="d-flex justify-content-between align-items-center bg-light p-3 rounded shadow-sm">
+                    <div class="d-flex align-items-center">
+                        <div class="form-check me-4">
+                            <input id="help_me" type="checkbox" class="form-check-input" checked>
+                            <label class="form-check-label" for="help_me">Suggest only good-looking people</label>
+                        </div>
+                    </div>
+                    <div class="d-flex">
+                        <!-- Sort -->
+                        <div class="dropdown me-3">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownOrder"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                Sort by
+                            </button>
+                            <ul class="dropdown-menu" aria-labelledby="dropdownFilters">
+                                <li><a class="dropdown-item" href="#" id="age-sort-asc">Age ASC</a></li>
+                                <li><a class="dropdown-item" href="#" id="age-sort-dsc">Age DSC</a></li>
+                                <li><a class="dropdown-item" href="#" id="fame-rate-sort">Fame rating</a></li>
+                                <li><a class="dropdown-item" href="#" id="common-tags-sort">Common tags</a></li>
+                                <li><a class="dropdown-item" href="#" id="location-sort">Location</a></li>
+                            </ul>
+                        </div>
+                        <!-- Filters -->
+                        <div class="dropdown">
+                            <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="dropdownFilters"
+                                    data-bs-toggle="dropdown" aria-expanded="false">
+                                Filters
+                            </button>
+                            <ul id="filters" class="dropdown-menu p-3" aria-labelledby="dropdownFilters" style="width: 300px;">
+                                <!-- Age filter -->
+                                <li class="mb-3">
+                                    <label for="ageRangeMin" class="form-label d-flex align-items-center">
+                                        <input id="age_filter_activated" type="checkbox" class="form-check form-check-inline"/>
+                                        Age Range
+                                    </label>
+                                    <div class="d-flex align-items-center">
+                                        <input type="number" id="ageMin" class="form-control me-2" style="width: 80px;"
+                                               value="18" min="18" max="100">
+                                        <span class="me-2">to</span>
+                                        <input type="number" id="ageMax" class="form-control" style="width: 80px;"
+                                               value="40" min="18" max="100">
+                                    </div>
+                                    <input type="range" class="form-range" id="ageRangeMin" min="18" max="100" value="18"
+                                           oninput="document.getElementById('ageMin').value = this.value">
+                                    <input type="range" class="form-range mt-2" id="ageRangeMax" min="18" max="100"
+                                           value="40"
+                                           oninput="document.getElementById('ageMax').value = this.value">
+                                </li>
+
+                                <!-- Location filter -->
+                                <li class="mb-3">
+                                    <label for="locationRange" class="form-label d-flex align-items-center">
+                                        <input id="location_filter_activated" type="checkbox"
+                                               class="form-check form-check-inline"/>
+                                        Location Radius (km)
+                                    </label>
+                                    <input type="number" id="locationValue" class="form-control mb-2" style="width: 100px;"
+                                           value="5" min="1" max="50">
+                                    <input type="range" class="form-range" id="locationRange" min="1" max="50" value="5"
+                                           oninput="document.getElementById('locationValue').value = this.value">
+                                </li>
+
+                                <!-- Fame Rating filter -->
+                                <li>
+                                    <label for="fameRange" class="form-label d-flex align-items-center">
+                                        <input id="fame_rate_filter_activated" type="checkbox"
+                                               class="form-check form-check-inline"/>
+                                        Fame Rating
+                                    </label>
+                                    <input type="number" id="fameValue" class="form-control mb-2" style="width: 100px;"
+                                           value="0" min="0" max="5" step="0.1">
+                                    <input type="range" class="form-range" id="fameRange" min="0" max="5" step="0.1"
+                                           value="0"
+                                           oninput="document.getElementById('fameValue').value = this.value">
+                                </li>
+
+                                {% if all_tags %}
+                                <li>
+                                    <label class="form-label d-flex align-items-center">
+                                        <input id="tags_filter_activated" type="checkbox" class="form-check form-check-inline"/>
+                                        Tags Filter
+                                    </label>
+                                    {% for tag in all_tags %}
+                                    <div id="tagList">
+                                        <div class="form-check">
+                                            <input class="form-check-input" type="checkbox" value="{{ tag.name }}"
+                                                   id="tag_{{ tag.id }}">
+                                            <label class="form-check-label" for="tag_{{ tag.id }}">
+                                                {{ tag.name }}
+                                            </label>
+                                        </div>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                                {% endif %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="row col-10 justify-content-between shadow-sm rounded mb-5 bg-light">
-            <div class="col-5 col-md-3 p-0 my-auto dropdown my-3">
-                <button style="min-width: 133px;" class="btn btn-light text-secondary dropdown-toggle" type="button"
-                        id="dropdownOrder"
-                        data-bs-toggle="dropdown" aria-expanded="false">
-                    Sort by
-                </button>
-                <ul class="dropdown-menu" aria-labelledby="dropdownFilters">
-                    <li id="age-sort-asc" class="link-sort ps-2" style="cursor: pointer">Age ASC</li>
-                    <li id="age-sort-dsc" class="link-sort ps-2" style="cursor: pointer">Age DSC</li>
-                    <li id="fame-rate-sort" class="link-sort ps-2" style="cursor: pointer">Fame rating</li>
-                    <li id="common-tags-sort" class="link-sort ps-2" style="cursor: pointer">Common tags</li>
-                    <li id="location-sort" class="link-sort ps-2" style="cursor: pointer">Location</li>
-                </ul>
-            </div>
-            <div class="col-5 col-md-3 d-flex mb-4 p-0 mt-4 d-flex justify-content-around">
-
-                <div class="my-auto dropdown my-3">
-                    <button style="min-width: 123px;" class="btn btn-light text-secondary dropdown-toggle"
-                            type="button"
-                            id="dropdownFilters"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                        Filters
-                    </button>
-                    <ul id="filters" class="dropdown-menu p-3" aria-labelledby="dropdownFilters"
-                        style="width: 300px;">
-                        <!-- Filtre par âge -->
-                        <li class="mb-3">
-                            <label for="ageRangeMin" class="form-label d-flex align-items-center">
-                                <input id="age_filter_activated" type="checkbox" class="form-check form-check-inline"/>
-                                Age Range
-                            </label>
-                            <div class="d-flex align-items-center">
-                                <input type="number" id="ageMin" class="form-control me-2" style="width: 80px;"
-                                       value="18" min="18" max="100">
-                                <span class="me-2">to</span>
-                                <input type="number" id="ageMax" class="form-control" style="width: 80px;"
-                                       value="40" min="18" max="100">
-                            </div>
-                            <input type="range" class="form-range" id="ageRangeMin" min="18" max="100" value="18"
-                                   oninput="document.getElementById('ageMin').value = this.value">
-                            <input type="range" class="form-range mt-2" id="ageRangeMax" min="18" max="100"
-                                   value="40"
-                                   oninput="document.getElementById('ageMax').value = this.value">
-                        </li>
-
-                        <!-- Filtre par localisation -->
-                        <li class="mb-3">
-                            <label for="locationRange" class="form-label d-flex align-items-center">
-                                <input id="location_filter_activated" type="checkbox"
-                                       class="form-check form-check-inline"/>
-                                Location Radius (km)
-                            </label>
-                            <input type="number" id="locationValue" class="form-control mb-2" style="width: 100px;"
-                                   value="5" min="1" max="50">
-                            <input type="range" class="form-range" id="locationRange" min="1" max="50" value="5"
-                                   oninput="document.getElementById('locationValue').value = this.value">
-                        </li>
-
-                        <!-- Filtre par Fame Rating -->
-                        <li>
-                            <label for="fameRange" class="form-label d-flex align-items-center">
-                                <input id="fame_rate_filter_activated" type="checkbox"
-                                       class="form-check form-check-inline"/>
-                                Fame Rating
-                            </label>
-                            <input type="number" id="fameValue" class="form-control mb-2" style="width: 100px;"
-                                   value="0" min="0" max="5" step="0.1">
-                            <input type="range" class="form-range" id="fameRange" min="0" max="5" step="0.1"
-                                   value="0"
-                                   oninput="document.getElementById('fameValue').value = this.value">
-                        </li>
-
-                        {% if all_tags %}
-                        <li>
-                            <label class="form-label d-flex align-items-center">
-                                <input id="tags_filter_activated" type="checkbox" class="form-check form-check-inline"/>
-                                Tags Filter
-                            </label>
-                            {% for tag in all_tags %}
-                            <div id="tagList">
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="{{ tag.name }}"
-                                           id="tag_{{ tag.id }}">
-                                    <label class="form-check-label" for="tag_{{ tag.id }}">
-                                        {{ tag.name }}
-                                    </label>
+        <!-- Profile list -->
+        <div class="row" id="profile-list">
+            {% for profile in filtered_profiles %}
+            <div class="col-12 col-md-6 col-lg-4 mb-4">
+                <a href="/profile/{{ profile.id }}" class="text-decoration-none text-dark">
+                    <div class="card h-100 border-0 shadow-sm hover-shadow" data-profile="{{ profile }}">
+                        <!-- Main image and info -->
+                        <div class="row g-0">
+                            <div class="col-4">
+                                <div class="ratio ratio-1x1">
+                                    <img src="data:image/png;base64, {{ profile.profile_image }}"
+                                         class="img-fluid rounded-start object-fit-cover" alt="{{ profile.username }}">
                                 </div>
                             </div>
-                        </li>
-                        {% endfor %}
-                        {% endif %}
-                    </ul>
-                </div>
+                            <div class="col-8">
+                                <div class="card-body">
+                                    <h5 class="card-title mb-1">{{ profile.username }}</h5>
+                                    {% if profile.location %}
+                                    <p class="card-text text-muted mb-2">
+                                        <i class="bi bi-geo-alt me-1"></i> {{ profile.location }}
+                                    </p>
+                                    {% endif %}
+                                    <div class="d-flex align-items-center mb-2">
+                                        <div class="me-3">
+                                            <span class="fw-bold">{{ profile.fame_rate }}</span>
+                                            <i class="bi bi-star-fill text-warning"></i>
+                                        </div>
+                                        <div>
+                                            <span class="text-muted">Age: {{ profile.age }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
 
-                <span class="d-none" id="user-tags" data-user-tags="{{ user_tags }}"></span>
-                <span class="d-none" id="location" data-user-lat="{{ user_lat }}"
-                      data-user-lng="{{ user_lng }}"></span>
-
+                        <!-- Tags -->
+                        <div class="card-footer bg-white border-0 pt-0">
+                            <div class="d-flex flex-wrap gap-2">
+                                {% for tag in profile.tags[:3] %}
+                                <span class="badge bg-light text-dark">{{ tag }}</span>
+                                {% endfor %}
+                                {% if profile.tags|length > 3 %}
+                                <span class="badge bg-light text-dark">+{{ profile.tags|length - 3 }}</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </a>
             </div>
-        </div>
-
-        <div class="row p-0 m-0 flex-row justify-content-center col-12 gap-1" id="profile-list">
-            {% for profile in filtered_profiles %}
-
-            <a id="view-profile" href="/profile/{{ profile.id }}"
-               class="col-12 col-md-4 card shadow p-2 d-flex justify-content-between border-0"
-               style="min-height: 300px; max-width: 420px;"
-               data-profile="{{ profile }}">
-
-                <div style="max-height: 200px; overflow: hidden;">
-                    <img class="img-fluid" id="profile_image" src="data:image/png;base64, {{ profile.profile_image }}"
-                         alt="Profile Image">
-                </div>
-
-                <p class="m-0 mt-2 fw-bold">{{ profile.username }}</p>
-                <p class="m-0 mt-2 fw-bold">{{ profile.age }}</p>
-
-            </a>
-
             {% endfor %}
-
         </div>
     </div>
-    <script>
 
+    <!-- Existing scripts -->
+    <script>
         document.querySelector('#profile-list')?.addEventListener('click', function (event) {
             const target = event.target.closest('a[id="view-profile"]');
 
@@ -248,9 +277,9 @@
                 userLongitude = parseFloat(userLongitude.getAttribute('data-user-lng'));
             }
 
-            // Fonction pour calculer la distance entre deux points (en km)
+            // Sort profiles based on distance to user
             function calculateDistance(lat1, lon1, lat2, lon2) {
-                const R = 6371; // Rayon de la Terre en km
+                const R = 6371; // Earth's radius in km
                 const phi1 = lat1 * 0.01745329;
                 const phi2 = lat2 * 0.01745329;
                 const deltaPhi = (lat2 - lat1) * 0.01745329;
@@ -264,7 +293,7 @@
                 return R * c;
             }
 
-            // Trier les profils en fonction de la distance à l'utilisateur
+            // Sort profiles from closest to farthest
             profiles?.sort((a, b) => {
                 const profile_a = a.getAttribute('data-profile');
                 const fixedProfile_a = profile_a.replace(/'/g, '"');
@@ -282,10 +311,10 @@
                 const distanceA = calculateDistance(userLatitude, userLongitude, latA, lonA);
                 const distanceB = calculateDistance(userLatitude, userLongitude, latB, lonB);
 
-                return distanceA - distanceB; // Trier du plus proche au plus éloigné
+                return distanceA - distanceB; // Sort from closest to farthest
             });
 
-            // Réinsérer les profils triés dans le DOM
+            // Reinsert sorted profiles into the DOM
             const container = document.getElementById('profile-list');
             profiles.forEach(profile => container.appendChild(profile));
         });
@@ -347,22 +376,54 @@
                     container.innerHTML = '';
 
                     data.filtered_profiles?.forEach(profile => {
-                        const profileCard = document.createElement('a');
-                        profileCard.href = `/profile/${profile.id}`;
-                        profileCard.className = 'col-12 col-md-4 card shadow p-2 d-flex justify-content-between border-0';
-                        profileCard.style = 'min-height: 300px; max-width: 420px;';
-                        profileCard.setAttribute('data-profile', JSON.stringify(profile));
-
-                        profileCard.innerHTML = `
-                            <div style="max-height: 200px; overflow: hidden;">
-                                <img class="img-fluid" id="profile_image" src="data:image/png;base64, ${profile.profile_image}"
-                                     alt="Profile Image">
-                            </div>
-                            <p class="m-0 mt-2 fw-bold">${profile.username}</p>
-                            <p class="m-0 mt-2 fw-bold">${profile.age}</p>
+                        const profileDiv = document.createElement('div');
+                        profileDiv.className = 'col-12 col-md-6 col-lg-4 mb-4';
+                        
+                        profileDiv.innerHTML = `
+                            <a href="/profile/${profile.id}" class="text-decoration-none text-dark">
+                                <div class="card h-100 border-0 shadow-sm hover-shadow" data-profile='${JSON.stringify(profile)}'>
+                                    <div class="row g-0">
+                                        <div class="col-4">
+                                            <div class="ratio ratio-1x1">
+                                                <img src="data:image/png;base64, ${profile.profile_image}"
+                                                     class="img-fluid rounded-start object-fit-cover" alt="${profile.username}">
+                                            </div>
+                                        </div>
+                                        <div class="col-8">
+                                            <div class="card-body">
+                                                <h5 class="card-title mb-1">${profile.username}</h5>
+                                                ${profile.location ? `
+                                                <p class="card-text text-muted mb-2">
+                                                    <i class="bi bi-geo-alt me-1"></i> ${profile.location}
+                                                </p>
+                                                ` : ''}
+                                                <div class="d-flex align-items-center mb-2">
+                                                    <div class="me-3">
+                                                        <span class="fw-bold">${profile.fame_rate}</span>
+                                                        <i class="bi bi-star-fill text-warning"></i>
+                                                    </div>
+                                                    <div>
+                                                        <span class="text-muted">Age: ${profile.age}</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="card-footer bg-white border-0 pt-0">
+                                        <div class="d-flex flex-wrap gap-2">
+                                            ${profile.tags?.slice(0, 3).map(tag => `
+                                                <span class="badge bg-light text-dark">${tag}</span>
+                                            `).join('')}
+                                            ${profile.tags?.length > 3 ? `
+                                                <span class="badge bg-light text-dark">+${profile.tags.length - 3}</span>
+                                            ` : ''}
+                                        </div>
+                                    </div>
+                                </div>
+                            </a>
                         `;
 
-                        container.appendChild(profileCard);
+                        container.appendChild(profileDiv);
                     });
                 })
                 .catch(error => console.error('Error:', error));
@@ -375,7 +436,16 @@
         document.querySelector('#help_me').addEventListener('change', function () {
             display_filtered_list()
         })
-
     </script>
+
+    <style>
+        .object-fit-cover {
+            object-fit: cover;
+        }
+        
+        .bg-primary.bg-opacity-10 {
+            background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+        }
+    </style>
 </section>
 {% endblock %}

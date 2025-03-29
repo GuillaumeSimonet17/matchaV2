@@ -16,14 +16,12 @@ if (btnSendInvit) {
 
         this.remove();
         document.getElementById('alert-invitation-sent').classList.remove('d-none');
-
     };
 }
 
 const btnSendBlock = document.getElementById('btn-send-block')
 if (btnSendBlock) {
     btnSendBlock.onclick = function () {
-
         const receiver_id = this.getAttribute('data-profile-id');
 
         socket.emit('send_block', {
@@ -32,7 +30,7 @@ if (btnSendBlock) {
 
         this.remove();
         const p_balise_block = `
-            <p id="alert-block-sent" class="row alert alert-success">Vous venez de bloquer ce bateau</p>
+            <p id="alert-block-sent" class="row alert alert-success">You have blocked this profile</p>
             `
         document.getElementById('friendship-btn-container').insertAdjacentHTML('afterbegin', p_balise_block);
 
@@ -46,7 +44,6 @@ if (btnSendBlock) {
 const btnSendConnect = document.getElementById('btn-send-connect')
 if (btnSendConnect) {
     btnSendConnect.onclick = function () {
-
         const receiver_id = this.getAttribute('data-profile-id');
 
         socket.emit('send_connection', {
@@ -55,14 +52,12 @@ if (btnSendConnect) {
 
         this.remove();
         document.getElementById('alert-connection-sent').classList.remove('d-none');
-
     };
 }
 
 const btnSendUninvit = document.getElementById('btn-send-uninvit')
 if (btnSendUninvit) {
     btnSendUninvit.onclick = function () {
-
         const receiver_id = this.getAttribute('data-profile-id');
 
         socket.emit('send_uninvitation', {
@@ -70,7 +65,6 @@ if (btnSendUninvit) {
         });
 
         this.remove();
-
     };
 }
 
@@ -81,7 +75,7 @@ function display_friendship_changes(data) {
         document.getElementById('btn-send-invit').remove();
 
         const p_balise = `
-            <p id="alert-invitation-received" class="row alert alert-success">Invitation reçu</p>
+            <p id="alert-invitation-received" class="row alert alert-success">Invitation received</p>
             `
         document.getElementById('friendship-btn-container').insertAdjacentHTML('afterbegin', p_balise);
     }

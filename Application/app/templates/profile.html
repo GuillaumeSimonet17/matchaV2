@@ -1,90 +1,140 @@
 {% extends "index.html" %}
 {% block content %}
-<section id="profile"
-         class="my-4 d-flex flex-column justify-content-center align-items-center{{ 'active' if request.path == '/' else '' }}"
-         style="height: 100vh">
+<section id="profile" class="container py-4">
+    <!-- Profile header -->
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+        <!-- Banner and profile picture -->
+        <div class="position-relative">
+            <!-- Blue banner -->
+            <div class="bg-primary" style="height: 200px; background-color: #9cc2ff;"></div>
+            
+            <!-- Overlaid profile picture -->
+            <div class="position-absolute" style="bottom: -75px; left: 50px;">
+                <div class="rounded-circle border border-4 border-white shadow-sm overflow-hidden" style="width: 150px; height: 150px;">
+                    <img class="w-100 h-100 object-fit-cover" src="data:image/png;base64, {{ profile_image_data }}" alt="{{ profile.username }}">
+                </div>
+            </div>
 
-    <div class="mt-3 p-2 row d-flex col-12">
-        <div class="d-flex">
-            <h2 class="pt-3">{{ profile.username }}</h2>
-            <div style="width: 15px;">
+            <!-- Status indicator -->
+            <div class="position-absolute" style="bottom: -65px; left: 170px;">
                 {% if online %}
-                    <img src="/static/img/Green_Light_Icon.svg" alt="Online" width="15" height="15">
-                {% elif not online %}
-                    <img src="/static/img/Red_Light_Icon.svg" alt="Online" width="15" height="15">
+                    <div class="bg-success rounded-circle border border-2 border-white" style="width: 20px; height: 20px;" title="Online"></div>
+                {% else %}
+                    <div class="bg-danger rounded-circle border border-2 border-white" style="width: 20px; height: 20px;" title="Offline"></div>
                 {% endif %}
             </div>
         </div>
-        <div class="col-12 col-md-6">
-            <img class="img-fluid" src="data:image/png;base64, {{ profile_image_data }}" alt="Profile Image">
-        </div>
-        <div class="col-12 col-md-6">
-            <div class="pt-2">
-                {% if profile.allow_geoloc %}
-                <p>{{ profile.location }}</p>
-                {% endif %}
-                <p class="fw-bold">{{ profile.first_name }} {{ profile.last_name }}, {{ profile.gender }}, {{ profile.age }} yo</p>
-                <p><strong>Interested in:</strong> {{ profile.gender_pref }}</p>
-                <p>{{ profile.bio }}</p>
-                <p><strong>Fame Rate:</strong> {{ profile.fame_rate }}</p>
+
+        <!-- Main information -->
+        <div class="card-body pt-5 mt-4">
+            <div class="d-flex justify-content-between align-items-start mb-4">
+                <div>
+                    <h1 class="h2 mb-1">{{ profile.username }}</h1>
+                    <p class="text-muted mb-2">{{ profile.first_name }} {{ profile.last_name }}</p>
+                    {% if profile.allow_geoloc %}
+                    <p class="text-muted mb-0">
+                        <i class="bi bi-geo-alt"></i> {{ profile.location }}
+                    </p>
+                    {% endif %}
+                </div>
+
+                <!-- Actions -->
+                <div class="d-flex gap-2">
+                    {% if state != 'uninvitation' %}
+                    <div id="friendship-btn-container">
+                        {% if not connected %}
+                        <button id="btn-send-block" class="btn btn-outline-danger" type="button" data-profile-id="{{ profile.id }}" title="Block">
+                            <i class="bi bi-ban"></i>
+                        </button>
+                        {% endif %}
+
+                        {% if not state %}
+                        <button id="btn-send-invit" class="btn btn-primary" type="button" data-profile-id="{{ profile.id }}">
+                            <i class="bi bi-heart me-1"></i> Invite
+                        </button>
+                        {% endif %}
+
+                        {% if received_invitation %}
+                        <button id="btn-send-connect" class="btn btn-success" type="button" data-profile-id="{{ profile.id }}">
+                            <i class="bi bi-heart-half me-1"></i> Accept
+                        </button>
+                        {% endif %}
+
+                        {% if connected %}
+                        <button id="btn-send-uninvit" class="btn btn-outline-danger" type="button" data-profile-id="{{ profile.id }}">
+                            <i class="bi bi-heartbreak-fill me-1"></i> Unsubscribe
+                        </button>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
             </div>
 
-            <div class="col-12">
-                {% for tag in user_tags %}
-                <p class="fw-bold bg-secondary text-light rounded p-1 px-2 d-inline-block">{{ tag.name }}</p>
-                {% endfor %}
-            </div>
-
-            {% if state != 'uninvitation' %}
-            <div id="friendship-btn-container" class="col-12 mt-2">
-
+            <!-- Alerts -->
+            <div class="mb-4">
                 <p id="alert-invitation-sent" class="d-none alert alert-success">Invitation sent</p>
-                <p id="alert-connection-sent" class="d-none alert alert-success">You are connected and can now chat</p>
-
-                <!--       block the bitch         -->
-                {% if not connected %}
-                <button id="btn-send-block" class="btn btn-outline-primary col-2 col-md-3" type="button"
-                        data-profile-id="{{ profile.id }}">
-                    <i class="bi bi-ban"></i>
-                </button>
-                {% endif %}
-
+                <p id="alert-connection-sent" class="d-none alert alert-success">You are now connected and can chat</p>
                 {% if sent_invitation %}
                 <p id="alert-invitation-received" class="alert alert-success">Invitation sent</p>
                 {% endif %}
+            </div>
 
-                {% if not state %}
-                <!--       to send invitation         -->
-                <button id="btn-send-invit" class="btn btn-outline-primary col-2 col-md-3" type="button"
-                        data-profile-id="{{ profile.id }}">
-                    <i class="bi bi-heart"></i>
-                </button>
-                {% endif %}
+            <!-- Statistics -->
+            <div class="row g-3 mb-4">
+                <div class="col-auto">
+                    <div class="px-3 py-2 bg-light rounded-3">
+                        <p class="mb-0"><strong>{{ profile.age }}</strong> <small class="text-muted">years old</small></p>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="px-3 py-2 bg-light rounded-3">
+                        <p class="mb-0"><strong>{{ profile.gender }}</strong></p>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="px-3 py-2 bg-light rounded-3">
+                        <p class="mb-0"><i class="bi bi-star-fill text-warning me-1"></i> <strong>{{ profile.fame_rate }}</strong></p>
+                    </div>
+                </div>
+                <div class="col-auto">
+                    <div class="px-3 py-2 bg-light rounded-3">
+                        <p class="mb-0">Interested in: <strong>{{ profile.gender_pref }}</strong></p>
+                    </div>
+                </div>
+            </div>
 
-                {% if received_invitation %}
-                <!--       to send connection         -->
-                <button id="btn-send-connect" class="btn btn-outline-primary col-2 col-md-3" type="button"
-                        data-profile-id="{{ profile.id }}">
-                    <i class="bi bi-heart-half"></i>
-                </button>
-                {% endif %}
-                <!--       to send uninvitation         -->
-                {% if connected %}
-                <button id="btn-send-uninvit" class="btn btn-outline-primary col-2 col-md-3" type="button"
-                        data-profile-id="{{ profile.id }}">
-                    <i class="bi bi-heartbreak-fill"></i>
-                </button>
-                {% endif %}
+            <!-- Bio -->
+            {% if profile.bio %}
+            <div class="mb-4">
+                <h3 class="h5 mb-3">About</h3>
+                <p class="text-muted mb-0">{{ profile.bio }}</p>
             </div>
             {% endif %}
 
-            <a href="#" class="btn btn-danger mt-5" id="report-button">Report a fake account</a>
-            <div class="alert alert-success d-none mt-3" role="alert" id="confirmation-label">Sent !</div>
+            <!-- Tags -->
+            {% if user_tags %}
+            <div class="mb-4">
+                <h3 class="h5 mb-3">Interests</h3>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for tag in user_tags %}
+                    <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">{{ tag.name }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
 
+            <!-- Report button -->
+            <div class="mt-5 pt-3 border-top">
+                <button class="btn btn-link text-danger p-0" id="report-button">
+                    <i class="bi bi-flag me-1"></i> Report fake account
+                </button>
+                <div class="alert alert-success d-none mt-3" role="alert" id="confirmation-label">Report sent!</div>
+            </div>
         </div>
     </div>
 
     <script>
+        // Script for reporting
         const reportButton = document.getElementById('report-button');
         const confirmationLabel = document.getElementById('confirmation-label');
 
@@ -102,24 +152,31 @@
                     action: 'report_fake_account'
                 })
             })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        confirmationLabel.classList.remove('d-none');
-
-                        setTimeout(function () {
-                            confirmationLabel.classList.add('d-none');
-                        }, 5000);
-                    } else {
-                        console.log('Error:', data.message);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error:', error);
-                });
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    confirmationLabel.classList.remove('d-none');
+                    setTimeout(function () {
+                        confirmationLabel.classList.add('d-none');
+                    }, 5000);
+                } else {
+                    console.log('Error:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
         });
     </script>
 
+    <style>
+        .object-fit-cover {
+            object-fit: cover;
+        }
+        
+        .bg-primary.bg-opacity-10 {
+            background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+        }
+    </style>
 </section>
-
 {% endblock %}
