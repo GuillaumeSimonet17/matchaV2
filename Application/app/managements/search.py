@@ -28,7 +28,7 @@ def filtered_gender_profiles(user, all_profiles):
     for profile in all_profiles:
         if user.gender_pref == 'unspecified' and profile.gender_pref == 'unspecified':
             gendered_profiles.append(profile)
-        if user.gender_pref == 'unspecified' and profile.gender == user.gender or profile.gender == 'unspecified':
+        if user.gender_pref == 'unspecified' and (profile.gender == user.gender or profile.gender == 'unspecified'):
             gendered_profiles.append(profile)
 
         if (user.gender_pref != 'unspecified' and
@@ -106,7 +106,7 @@ def get_profiles_list(is_suggestion_list=True):
 
     profile_list = profile_filtered_blocked_ids
     print(len(profile_list))
-    
+
     if is_suggestion_list:
         gendered_profiles = filtered_gender_profiles(user, profile_filtered_blocked_ids)
         print(len(gendered_profiles))
