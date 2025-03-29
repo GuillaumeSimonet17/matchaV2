@@ -238,7 +238,8 @@
 
         document.querySelector('#common-tags-sort')?.addEventListener('click', function (event) {
             let profiles = Array.from(document.querySelectorAll('#profile-list .card'));
-            let user_tags = document.querySelector('#user-tags').getAttribute('data-user-tags');
+            // let user_tags = document.querySelector('#user-tags').getAttribute('data-user-tags');
+            let user_tags = "{{ user_tags }}";
 
             function countCommonTags(profileTags) {
                 return profileTags.filter(tag => user_tags.includes(tag)).length;
@@ -320,15 +321,11 @@
         });
 
         function display_filtered_list() {
-            let userLatitude = document.querySelector('#location');
+            let userLatitude = parseFloat("{{ user_lat }}");
 
-            if (userLatitude) {
-                userLatitude = parseFloat(userLatitude.getAttribute('data-user-lat'));
-            }
-            let userLongitude = document.querySelector('#location');
-            if (userLongitude) {
-                userLongitude = parseFloat(userLongitude.getAttribute('data-user-lng'));
-            }
+
+            let userLongitude = parseFloat("{{ user_lng }}");
+
             const ageMin = document.getElementById('ageMin')?.value;
             const ageMax = document.getElementById('ageMax')?.value;
             const locationRadius = document.getElementById('locationValue')?.value;
@@ -392,7 +389,7 @@
                                         <div class="col-8">
                                             <div class="card-body">
                                                 <h5 class="card-title mb-1">${profile.username}</h5>
-                                                ${profile.location ? `
+                                                ${profile.location && profile.allow_geoloc ? `
                                                 <p class="card-text text-muted mb-2">
                                                     <i class="bi bi-geo-alt me-1"></i> ${profile.location}
                                                 </p>

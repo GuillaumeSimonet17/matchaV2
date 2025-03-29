@@ -105,17 +105,13 @@ def get_profiles_list(is_suggestion_list=True):
     profile_filtered_blocked_ids = filtered_blocked_profiles(user.id, all_profiles_without_me)
 
     profile_list = profile_filtered_blocked_ids
-    print(len(profile_list))
-
+    
     if is_suggestion_list:
         gendered_profiles = filtered_gender_profiles(user, profile_filtered_blocked_ids)
-        print(len(gendered_profiles))
 
         sorted_profiles_by_tags_and_location = sort_profiles_by_tags_and_location(tag_ids, location, gendered_profiles)
-        print(len(sorted_profiles_by_tags_and_location))
 
         profile_list = sorted_profiles_by_tags_and_location
-        print(len(profile_list))
 
 
     if all_profiles:
@@ -141,6 +137,7 @@ def get_profiles_list(is_suggestion_list=True):
                 'lng': profile.lng,
                 'lat': profile.lat,
                 'tags': profile_tags,
+                'location': profile.location,
             })
     return final_profiles, user, user_tags, tag_ids, location, user_lat, user_lng
 
