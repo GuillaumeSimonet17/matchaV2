@@ -137,6 +137,7 @@ def get_profiles_list(is_suggestion_list=True):
                 'lng': profile.lng,
                 'lat': profile.lat,
                 'tags': profile_tags,
+                'allow_geoloc': profile.allow_geoloc,
                 'location': profile.location,
             })
     return final_profiles, user, user_tags, tag_ids, location, user_lat, user_lng
