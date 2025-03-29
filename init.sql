@@ -10,7 +10,7 @@ CREATE TABLE IF NOT EXISTS app_user (
     profile_image BYTEA,
     bio TEXT,
     gender VARCHAR(255) NOT NULL,
-    gender_pref VARCHAR(10) NOT NULL,
+    gender_pref VARCHAR(100) NOT NULL,
     fame_rate DOUBLE PRECISION,
     connected BOOLEAN DEFAULT FALSE,
     lng DOUBLE PRECISION,

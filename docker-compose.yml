@@ -18,6 +18,7 @@ services:
       - API_IPFLARE_KEY=${API_IPFLARE_KEY}
     depends_on:
       - matchadb
+      - nginx
     networks:
       - el_network
 
@@ -28,7 +29,7 @@ services:
       - POSTGRES_USER=${POSTGRES_USER}
       - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
     volumes:
-      - ./db-data8:/var/lib/postgresql/data
+      - ./db-data:/var/lib/postgresql/data
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       # - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
     ports:
@@ -51,7 +52,7 @@ services:
     ports:
       - "8080:8080"
     depends_on:
-      - matcha
+      - matchadb
     networks:
       - el_network
 
