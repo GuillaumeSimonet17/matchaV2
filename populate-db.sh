@@ -90,6 +90,6 @@ export POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
 
 # Exécuter le script
 echo "Exécution du script pour créer 500 utilisateurs..."
-python3.12 generate_users.py
+python3 generate_users.py
 
 echo "=== Script de peuplement terminé ===" 

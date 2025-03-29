@@ -11,4 +11,4 @@ echo "Vérification de la structure de la base de données..."
 psql -v ON_ERROR_STOP=1 --username "$POSTGRES_USER" --dbname "$POSTGRES_DB" -c "\dt"
 
 echo "=== Initialisation de la base de données terminée ==="
-echo "Vous pouvez maintenant exécuter ./populate-db.sh pour ajouter 500 utilisateurs fictifs." 
+echo "Vous pouvez maintenant exécuter ./populate-db.sh pour ajouter 500 utilisateurs fictifs."

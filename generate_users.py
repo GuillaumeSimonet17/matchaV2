@@ -26,8 +26,8 @@ NUM_USERS = 500
 PASSWORD_HASH = hashlib.sha256("Password123!".encode()).hexdigest()
 MIN_AGE = 18
 MAX_AGE = 65
-GENDERS = ["Male", "Female", "Non-binary"]
-GENDER_PREFS = ["Male", "Female", "Both"]
+GENDERS = ["male", "female", "unspecified"]
+GENDER_PREFS = ["male", "female", "unspecified"]
 FRANCE_LAT_BOUNDS = (42.0, 51.0)
 FRANCE_LNG_BOUNDS = (-5.0, 8.0)
 
@@ -110,51 +110,11 @@ def generate_users(num_users):
     num_images = len(ALL_PROFILE_IMAGES)
     print(f"Nombre d'images disponibles: {num_images}")
     
-    # D'abord, créer un utilisateur pour chaque image disponible
-    for i, image_url in enumerate(ALL_PROFILE_IMAGES):
-        # Télécharger l'image
-        print(f"Téléchargement de l'image {i+1}/{num_images}: {image_url}")
-        image_data = download_image(image_url)
-        
-        # Déterminer le genre en fonction de l'origine de l'image
-        if i < len(PROFILE_IMAGES[0]):
-            gender = "Male"
-            first_name = fake.first_name_male()
-        elif i < len(PROFILE_IMAGES[0]) + len(PROFILE_IMAGES[1]):
-            gender = "Female"
-            first_name = fake.first_name_female()
-        else:
-            gender = "Non-binary"
-            first_name = fake.first_name()
-        
-        last_name = fake.last_name()
-        age = random.randint(MIN_AGE, MAX_AGE)
-        
-        user = {
-            "username": f"{first_name.lower()}_{last_name.lower()}_{random.randint(1, 999)}",
-            "last_name": last_name,
-            "first_name": first_name,
-            "age": age,
-            "password": PASSWORD_HASH,
-            "email": fake.email(),
-            "profile_image": image_data,  # Données binaires de l'image
-            "bio": fake.paragraph(nb_sentences=3),
-            "gender": gender,
-            "gender_pref": random.choice(GENDER_PREFS),
-            "fame_rate": random.randint(0, 500),
-            "connected": random.choice([True, False]),
-            "lng": random.uniform(*FRANCE_LNG_BOUNDS),
-            "lat": random.uniform(*FRANCE_LAT_BOUNDS),
-            "location": fake.city(),
-            "allow_geoloc": random.choice([True, False]),
-            "is_verified": True,
-            "tags": random.sample(INTERESTS, random.randint(1, min(5, len(INTERESTS))))
-        }
-        users.append(user)
+    image_data = download_image("https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&q=80")
+
     
     # Ensuite, créer le reste des utilisateurs sans photo
-    remaining_users = num_users - num_images
-    for i in range(remaining_users):
+    for i in range(num_users):
         gender_index = random.randint(0, len(GENDERS) - 1)
         gender = GENDERS[gender_index]
         
@@ -175,7 +135,7 @@ def generate_users(num_users):
             "age": age,
             "password": PASSWORD_HASH,
             "email": fake.email(),
-            "profile_image": None,  # Pas de photo
+            "profile_image": image_data,  # Pas de photo
             "bio": fake.paragraph(nb_sentences=3),
             "gender": gender,
             "gender_pref": random.choice(GENDER_PREFS),
@@ -190,7 +150,7 @@ def generate_users(num_users):
         }
         users.append(user)
     
-    print(f"Généré {len(users)} utilisateurs ({num_images} avec photo, {remaining_users} sans photo)")
+    print(f"Généré {len(users)} utilisateurs ({num_images} avec photo,  sans photo)")
     return users
 
 def seed_users(users):
