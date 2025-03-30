@@ -102,9 +102,6 @@
                     </ul>
                 </div>
 
-                <span class="d-none" id="user-tags" data-user-tags="{{ user_tags }}"></span>
-                <span class="d-none" id="location" data-user-lat="{{ user_lat }}"
-                      data-user-lng="{{ user_lng }}"></span>
 
             </div>
         </div>
@@ -209,7 +206,7 @@
 
         document.querySelector('#common-tags-sort')?.addEventListener('click', function (event) {
             let profiles = Array.from(document.querySelectorAll('#profile-list .card'));
-            let user_tags = document.querySelector('#user-tags').getAttribute('data-user-tags');
+            let user_tags = '{{ user_tags }}'
 
             function countCommonTags(profileTags) {
                 return profileTags.filter(tag => user_tags.includes(tag)).length;
@@ -239,14 +236,9 @@
         document.querySelector('#location-sort')?.addEventListener('click', function (event) {
             let profiles = Array.from(document.querySelectorAll('#profile-list .card'));
 
-            let userLatitude = document.querySelector('#location');
-            if (userLatitude) {
-                userLatitude = parseFloat(userLatitude.getAttribute('data-user-lat'));
-            }
-            let userLongitude = document.querySelector('#location');
-            if (userLongitude) {
-                userLongitude = parseFloat(userLongitude.getAttribute('data-user-lng'));
-            }
+            let userLatitude = '{{ user_lat }}';
+            let userLongitude = '{{ user_lat }}';
+
 
             // Fonction pour calculer la distance entre deux points (en km)
             function calculateDistance(lat1, lon1, lat2, lon2) {
@@ -291,15 +283,9 @@
         });
 
         function display_filtered_list() {
-            let userLatitude = document.querySelector('#location');
+            let userLatitude = '{{ user_lat }}'
+            let userLongitude = '{{ user_lng }}'
 
-            if (userLatitude) {
-                userLatitude = parseFloat(userLatitude.getAttribute('data-user-lat'));
-            }
-            let userLongitude = document.querySelector('#location');
-            if (userLongitude) {
-                userLongitude = parseFloat(userLongitude.getAttribute('data-user-lng'));
-            }
             const ageMin = document.getElementById('ageMin')?.value;
             const ageMax = document.getElementById('ageMax')?.value;
             const locationRadius = document.getElementById('locationValue')?.value;
