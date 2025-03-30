@@ -103,6 +103,5 @@ def fame_rate_calcul(user_id):
         (nb_blocks * coef_block) +
         (nb_uninvitations * coef_uninvitations)
     )
-    print('fame_rate = ', fame_rate)
     user = User._find_by_id(user_id)
     user.update({'fame_rate': fame_rate})

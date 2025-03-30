@@ -12,6 +12,8 @@ from ORM.tables.tag import UserTag
 from flask_mail import Message
 from app import mail, serializer
 
+MAX_FILE_SIZE = 5 * 1024 * 1024
+
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ['jpg', 'jpeg', 'png', 'webp']
@@ -62,14 +64,21 @@ def auth_register(request, all_tags):
         valid = False
         flash('Image is required', 'danger')
 
-    if image and allowed_file(image.filename):
-        mime = magic.Magic(mime=True)
-        image = image.read()
-        mime_type = mime.from_buffer(image)
+    if len(image.read()) > MAX_FILE_SIZE:
+        valid = False
+        flash('File is too large', 'danger')
 
-        if not mime_type.startswith('image/'):
-            valid = False
-            flash('This is not an image', 'danger')
+    if not allowed_file(image.filename):
+        valid = False
+        flash('Invalid image extension', 'danger')
+
+    mime = magic.Magic(mime=True)
+    image.seek(0)
+    mime_type = mime.from_buffer(image.read())
+
+    if not mime_type.startswith('image/'):
+        valid = False
+        flash('This is not an image', 'danger')
 
     if not is_valid_username(username):
         valid = False

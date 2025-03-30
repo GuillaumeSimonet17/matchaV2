@@ -32,8 +32,10 @@ if (btnSendBlock) {
 
         this.remove();
         const p_balise_block = `
-            <p id="alert-block-sent" class="row alert alert-success">Vous venez de bloquer ce bateau</p>
+            <p id="alert-block-sent" class="row alert alert-success">You blocked that account</p>
             `
+        document.getElementById('alert-invitation-sent').hidden = true
+            
         document.getElementById('friendship-btn-container').insertAdjacentHTML('afterbegin', p_balise_block);
 
         const btnInvit = document.getElementById('btn-send-invit')
