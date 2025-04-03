@@ -43,7 +43,6 @@ def go_chat():
             
             profile_selected = Profile._find_by_id(profile_id)
 
-            # Récupérer les messages entre user_id et profile_id
             messages = Message.find_messages_by_channel_id(channel_id)
             if messages:
                 messages_data = [{"receiver_id": msg.receiver_id, "sender_id": msg.sender_id, "content": msg.content,
@@ -88,7 +87,6 @@ def handle_get_messages(data):
          room=request.sid)
 
 def handle_send_message(data):
-    print( data.get('receiver_id'))
 
     if data.get('receiver_id') is None or data.get('sender_id') is None:
         return

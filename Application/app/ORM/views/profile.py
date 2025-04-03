@@ -35,7 +35,7 @@ class Profile(Model):
             results = cls.get_all_dicts()
             return [cls(**row) for row in results]
         except Exception as e:
-            print(f"Erreur dans la methode all de Profile: {e}")
+            print(f"Error in  Profile's method all: {e}")
             return None
 
     @classmethod

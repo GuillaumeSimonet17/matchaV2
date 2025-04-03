@@ -52,7 +52,7 @@ fi
 echo "Starting Flask application..."
 export FLASK_APP=./app/app.py     # Remplace 'app.py' par le fichier de ton application Flask
 export FLASK_ENV=development  # Utilise 'production' si tu veux déployer en mode production
-flask run --host=0.0.0.0 --port=5000 --debug
+flask run --host=0.0.0.0 --port=5000
 
 # Fin du script
 echo "Flask app is running on http://localhost:5000"

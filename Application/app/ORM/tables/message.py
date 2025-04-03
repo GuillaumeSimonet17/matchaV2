@@ -43,8 +43,7 @@ class Message(Model):
             if unread_messages_ids:
                 cls.mark_as_read(unread_messages_ids)
 
-    # get last message => et ainsi vérifier "read"
-    # si sender_id c'est moi, alors pas de notif, si receiver_id c'est moi et read=False, alors notif
+
     @classmethod
     def find_last_message_by_channel_id(cls, channel_id: int, columns: list[str] = None):
         columns = cls.get_all_column_names(columns)

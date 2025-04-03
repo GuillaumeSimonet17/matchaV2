@@ -49,13 +49,13 @@ CREATE TABLE IF NOT EXISTS user_tag (
 
 INSERT INTO tag (name)
 VALUES
-('Cuisine et Gastronomie'),
-('Sport et Fitness'),
-('Voyages'),
-('Musique'),
-('Cinéma et Séries'),
-('Nature et Randonnée'),
-('Jeux Vidéo'),
+('Cooking and Gastronomy'),
+('Sport and Fitness'),
+('Travel'),
+('Music'),
+('Cinema and Series'),
+('Nature and Hiking'),
+('Video Games'),
 ('Art');
 
 

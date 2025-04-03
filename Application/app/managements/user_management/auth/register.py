@@ -74,7 +74,8 @@ def auth_register(request, all_tags):
 
     mime = magic.Magic(mime=True)
     image.seek(0)
-    mime_type = mime.from_buffer(image.read())
+    image = image.read()
+    mime_type = mime.from_buffer(image)
 
     if not mime_type.startswith('image/'):
         valid = False
@@ -141,7 +142,6 @@ def auth_register(request, all_tags):
             token = serializer.dumps(email, salt='email-confirm')
             
             confirm_url = url_for('main.confirm_email', token=token, _external=True)
-            
             msg = Message("Confirm Your Account", recipients=[email], sender='gui_le_boat@gmail.com')
             msg.body = f"Hello, please confirm your account by clicking on the link: {confirm_url}"
             mail.send(msg)

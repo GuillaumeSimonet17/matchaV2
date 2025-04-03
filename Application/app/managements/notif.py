@@ -32,7 +32,6 @@ def go_notif():
 
         notifs = [notif for notif in notifs if notif.state != 'message']
         notifs = sorted(notifs, key=lambda x: x.created_at, reverse=True)
-        # set all notifs as read where read=False
         Notif.mark_notifs_by_user_id_as_read(user_id)
 
         for notif in notifs:

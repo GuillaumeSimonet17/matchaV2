@@ -27,7 +27,6 @@ class Notif(Model):
             raise e
         return None
     
-    # si une notif existe deja même state et les memes ids dans l'ordre
     @classmethod
     def find_notif(cls, state: str, sender_id: int, receiver_id: int):
         if state not in cls.possible_states:

@@ -135,8 +135,6 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
                 city = ''
             country = geo['components']['country']
             location = city + country
-            print('location = '
-                  '', location)
 
             lng = geo['geometry']['lng']
             lat = geo['geometry']['lat']
@@ -160,8 +158,6 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
                 city = ''
             country = geo['country_name']
             location = city + country
-            print('location = '
-                  '', location)
 
             lng = geo['longitude']
             lat = geo['latitude']
@@ -171,7 +167,6 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
 
         if data or not no_tags_selected:
             if data:
-                print('\n', data)
                 user.update(data)
                 user = User._find_by_id(user.id)
                 session['username'] = user.username

@@ -63,12 +63,12 @@ ALL_PROFILE_IMAGES = [img for gender_imgs in PROFILE_IMAGES for img in gender_im
 
 # Intérêts prédéfinis (à partir des tags existants dans init.sql)
 INTERESTS = [
-    'Cuisine et Gastronomie', 'Sport et Fitness', 'Voyages', 'Musique', 
-    'Cinéma et Séries', 'Nature et Randonnée', 'Jeux Vidéo', 'Art'
+  'Cooking and Gastronomy', 'Sport and Fitness', 'Travel', 'Music',
+    'Cinema and Series', 'Nature and Hiking', 'Video Games', 'Art'
 ]
 
 def get_db_connection():
-    """Établit une connexion à la base de données PostgreSQL"""
+    """Establishes a connection to the PostgreSQL"""
     # Récupérer les variables d'environnement
     db_host = os.environ.get('POSTGRES_HOST', 'localhost')
     db_port = os.environ.get('POSTGRES_PORT', '5432')
@@ -77,7 +77,7 @@ def get_db_connection():
     db_password = os.environ.get('POSTGRES_PASSWORD', 'admin')
     
     # Afficher les paramètres de connexion (sans le mot de passe)
-    print(f"Connexion à PostgreSQL: {db_host}:{db_port}/{db_name} (utilisateur: {db_user})")
+    print(f"Connexion to PostgreSQL: {db_host}:{db_port}/{db_name} (user: {db_user})")
     
     try:
         conn = psycopg2.connect(
@@ -89,26 +89,24 @@ def get_db_connection():
         )
         return conn
     except Exception as e:
-        print(f"Erreur de connexion à la base de données: {e}")
+        print(f"Database connection error: {e}")
         sys.exit(1)
 
 def download_image(url):
-    """Télécharge une image depuis une URL et la retourne sous forme de bytes"""
     try:
         response = requests.get(url, timeout=10)
         response.raise_for_status()  # Vérifier si la requête a réussi
         return response.content
     except Exception as e:
-        print(f"Erreur lors du téléchargement de l'image {url}: {e}")
+        print(f"Error while uploading the image {url}: {e}")
         return None
 
 def generate_users(num_users):
-    """Génère une liste d'utilisateurs fictifs"""
     users = []
     
     # Nombre total d'images disponibles
     num_images = len(ALL_PROFILE_IMAGES)
-    print(f"Nombre d'images disponibles: {num_images}")
+    print(f"Number of available images: {num_images}")
     
     image_data = download_image("https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&q=80")
 
@@ -150,17 +148,16 @@ def generate_users(num_users):
         }
         users.append(user)
     
-    print(f"Généré {len(users)} utilisateurs ({num_images} avec photo,  sans photo)")
+    print(f"Generated {len(users)} users ({num_images} with photo)")
     return users
 
 def seed_users(users):
-    """Insère les utilisateurs dans la base de données"""
     conn = get_db_connection()
     cur = conn.cursor()
     
     try:
         # 1. Insérer les utilisateurs
-        print("Insertion des utilisateurs dans la base de données...")
+        print("Inserting users into the database...")
         
         for i, user in enumerate(users):
             try:
@@ -218,21 +215,21 @@ def seed_users(users):
                 
                 # Afficher la progression
                 if (i + 1) % 50 == 0:
-                    print(f"Progrès: {i + 1}/{len(users)} utilisateurs insérés")
+                    print(f"Progrss: {i + 1}/{len(users)} insert users")
                     # Valider régulièrement pour éviter de perdre tout en cas d'erreur
                     conn.commit()
             
             except Exception as e:
-                print(f"Erreur lors de l'insertion de l'utilisateur {user['username']}: {e}")
+                print(f"Error while inserting the user {user['username']}: {e}")
                 conn.rollback()  # Annuler cette transaction
                 continue
         
         # Valider les insertions d'utilisateurs
         conn.commit()
         
-        print("Tous les utilisateurs ont été insérés avec succès.")
-        print("Création de relations entre utilisateurs...")
-        
+        print("All users have been inserted successfully.")  
+        print("Creating relationships between users...")
+
         try:
             # Récupérer tous les IDs d'utilisateurs
             cur.execute("SELECT id FROM app_user")
@@ -259,12 +256,12 @@ def seed_users(users):
                         SET updated_at = EXCLUDED.updated_at
                     """, (sender_id, receiver_id, created_at))
                 except Exception as e:
-                    print(f"Erreur lors de l'insertion d'une visite: {e}")
+                    print(f"Error when insert a visit: {e}")
                     continue
             
             # Validation après les visites
             conn.commit()
-            print(f"Visites créées: {len(visit_pairs)}")
+            print(f"Visits created: {len(visit_pairs)}")
         
             # Éliminer les doublons dans les amitiés
             friendship_data = []
@@ -290,15 +287,15 @@ def seed_users(users):
                         ON CONFLICT (sender_id, receiver_id) DO NOTHING
                     """, (state, sender_id, receiver_id))
                 except Exception as e:
-                    print(f"Erreur lors de l'insertion d'une amitié: {e}")
+                    print(f"Error when inserting the friendship: {e}")
                     continue
             
             # Validation après les amitiés
             conn.commit()
-            print(f"Amitiés créées: {len(friendship_data)}")
+            print(f"Friendships created: {len(friendship_data)}")
             
             # Créer des canaux de discussion et messages pour les amitiés acceptées
-            print("Création de canaux de discussion et messages...")
+            print("Creation chat channel and messages...")
             
             # Récupérer les amitiés acceptées
             cur.execute("SELECT sender_id, receiver_id FROM friendship WHERE state = 'accepted'")
@@ -336,28 +333,27 @@ def seed_users(users):
                                 VALUES (%s, %s, %s, %s, %s)
                             """, (channel_id, msg_sender, msg_receiver, content, read))
                 except Exception as e:
-                    print(f"Erreur lors de la création d'un canal ou message: {e}")
+                    print(f"Error when inserting channel or message: {e}")
                     continue
             
             # Validation finale
             conn.commit()
-            print(f"Canaux de discussion créés: {len(accepted_friendships)}")
+            print(f"Chat channel created: {len(accepted_friendships)}")
             
         except Exception as e:
             conn.rollback()
-            print(f"Erreur lors de la création des relations: {e}")
+            print(f"Error when creation relationships: {e}")
         
-        print(f"Insertion réussie de {len(users)} utilisateurs avec leurs relations!")
+        print(f"Successful insertion of {len(users)} users with their relationships.")
     
     except Exception as e:
         conn.rollback()
-        print(f"Erreur lors de l'insertion des données: {e}")
+        print(f"Error when inserting datas: {e}")
     finally:
         cur.close()
         conn.close()
 
 def count_existing_users():
-    """Compte les utilisateurs existants dans la base de données"""
     conn = get_db_connection()
     cur = conn.cursor()
     
@@ -366,26 +362,24 @@ def count_existing_users():
         count = cur.fetchone()[0]
         return count
     except Exception as e:
-        print(f"Erreur lors du comptage des utilisateurs: {e}")
+        print(f"Error while counting users : {e}")
         return 0
     finally:
         cur.close()
         conn.close()
 
 if __name__ == "__main__":
-    print("==== Script de génération d'utilisateurs fictifs ====")
-    
     # Compter les utilisateurs existants
     existing_users = count_existing_users()
-    print(f"Nombre d'utilisateurs existants: {existing_users}")
+    print(f"Number of existing users.: {existing_users}")
     
     # Calculer combien d'utilisateurs nous devons créer
     users_to_create = max(0, NUM_USERS - existing_users)
     
     if users_to_create > 0:
-        print(f"Génération de {users_to_create} nouveaux utilisateurs...")
+        print(f"Generating {users_to_create} new users...")
         users = generate_users(users_to_create)
         seed_users(users)
     else:
-        print(f"La base de données contient déjà {existing_users} utilisateurs, ce qui est suffisant.")
-        print(f"Minimum requis: {NUM_USERS}") 
+        print(f"The database already contains {existing_users} users, which is sufficient.")
+        print(f"Minimum required: {NUM_USERS}")

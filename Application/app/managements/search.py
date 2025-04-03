@@ -62,22 +62,19 @@ def sort_profiles_by_tags_and_location(user_tags, user_location, profiles):
     user_lat, user_lon = user_location
 
     def compute_profile_score(profile):
-        # Nombre de tags en commun
+        # Number of common tags
         profile_tag_ids = UserTag.find_tags_by_user_id(profile.id)
         common_tags_count = 0
         if profile_tag_ids:
             profile_tags = [tag_id.tag_id for tag_id in profile_tag_ids]
             common_tags_count = len(set(profile_tags) & set(user_tags))
 
-        # Distance géographique
         profile_lat = profile.lat
         profile_lon = profile.lng
 
         distance = calculate_distance(user_lat, user_lon, profile_lat, profile_lon)
-        # Retourne les deux critères pour le tri
-        return (-common_tags_count, distance)  # Note : -common_tags_count pour un tri décroissant
+        return (-common_tags_count, distance)  # Note : -common_tags_count for DSC
 
-    # Trier les profils en fonction des critères
     return sorted(profiles, key=compute_profile_score)
 
 def get_profiles_list(is_suggestion_list=True):
@@ -105,17 +102,13 @@ def get_profiles_list(is_suggestion_list=True):
     profile_filtered_blocked_ids = filtered_blocked_profiles(user.id, all_profiles_without_me)
 
     profile_list = profile_filtered_blocked_ids
-    print(len(profile_list))
 
     if is_suggestion_list:
         gendered_profiles = filtered_gender_profiles(user, profile_filtered_blocked_ids)
-        print(len(gendered_profiles))
 
         sorted_profiles_by_tags_and_location = sort_profiles_by_tags_and_location(tag_ids, location, gendered_profiles)
-        print(len(sorted_profiles_by_tags_and_location))
 
         profile_list = sorted_profiles_by_tags_and_location
-        print(len(profile_list))
 
 
     if all_profiles:

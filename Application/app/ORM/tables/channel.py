@@ -21,7 +21,7 @@ class Channel(Model):
             results = cls.get_all_dicts()
             return [cls(**row) for row in results]
         except Exception as e:
-            print(f"Erreur dans la methode all de User: {e}")
+            print(f"Error in User's all method: {e}")
             return None
 
     @classmethod
@@ -30,7 +30,7 @@ class Channel(Model):
             res = cls.get_dict_by_id(int(id))
             return cls(**res)
         except Exception as e:
-            print(f"Erreur dans la methode find_by_id de User: {e}")
+            print(f"Error in the find_by_id method of User: {e}")
             return None
 
     @classmethod

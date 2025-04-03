@@ -25,7 +25,7 @@ class Model:
             db.execute(query, values, fetch=False)
             return True
         except Exception as e:
-            logger.error("Erreur lors de l'insertion dans la table %s: %s", self.table_name, e)
+            logger.error("Error while inserting into the table %s: %s", self.table_name, e)
             raise RuntimeError(f"Failed to insert data into table {self.table_name}.") from e
     
     # ------------------------------------ READ
@@ -51,7 +51,7 @@ class Model:
         try:
             return db.execute(query)
         except Exception as e:
-            logger.error("Erreur lors de la récupération des données de la table '%s': %s", cls.table_name, e)
+            logger.error("Error while retrieving data from the table '%s': %s", cls.table_name, e)
             raise RuntimeError(f"Failed to fetch data from table {cls.table_name}.") from e
     
     @classmethod
@@ -95,7 +95,7 @@ class Model:
             if res:
                 return res[0]
         except Exception as e:
-            logger.error("Erreur lors de la récupération de l'enregistrement avec ID '%s' dans '%s': %s",
+            logger.error("Error while retrieving record with ID '%s' in '%s': %s",
                          id, cls.table_name, e)
             raise RuntimeError(f"Failed to fetch record with ID {id} from table {cls.table_name}.") from e
 
@@ -137,7 +137,7 @@ class Model:
                 if datas:
                     return [cls(**row) for row in datas]
         except Exception as e:
-            logger.error("Erreur lors de la recherche dans la table %s avec %s = %s : %s",
+            logger.error("Error while searching in the table %s avec %s = %s : %s",
                          cls.table_name, y_name, y, e)
             raise RuntimeError(f"Failed to fetch records from {cls.table_name}.") from e
         return None
