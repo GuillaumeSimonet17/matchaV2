@@ -141,7 +141,7 @@ def auth_register(request, all_tags):
 
             token = serializer.dumps(email, salt='email-confirm')
             
-            confirm_url = url_for('main.confirm_email', token=token, _external=True)
+            confirm_url = f"http://localhost:8080{url_for('main.confirm_email', token=token)}"
             msg = Message("Confirm Your Account", recipients=[email], sender='gui_le_boat@gmail.com')
             msg.body = f"Hello, please confirm your account by clicking on the link: {confirm_url}"
             mail.send(msg)
