@@ -1,186 +1,199 @@
 {% extends "index.html" %}
 {% block content %}
-<section id="profile" class="container py-4">
-    <!-- Profile header -->
-    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
-        <!-- Banner and profile picture -->
-        <div class="position-relative">
-            <!-- Blue banner -->
-            <div class="bg-primary" style="height: 200px; background-color: #9cc2ff;"></div>
-            
-            <!-- Overlaid profile picture -->
-            <div class="position-absolute" style="bottom: -75px; left: 50px;">
-                <div class="rounded-circle border border-4 border-white shadow-sm overflow-hidden" style="width: 150px; height: 150px;">
-                    <img class="w-100 h-100 object-fit-cover" src="data:image/png;base64, {{ profile_image_data }}" alt="{{ profile.username }}">
-                </div>
-                <p class="">
-                    {{ profile.last_connection }}
-                </p>
+    <section id="profile" class="container py-4">
+        <!-- Profile header -->
+        <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+            <!-- Banner and profile picture -->
+            <div class="position-relative">
+                <!-- Blue banner -->
+                <div class="bg-primary" style="height: 200px; background-color: #9cc2ff;"></div>
 
-            </div>
-
-            <!-- Status indicator -->
-            <div class="position-absolute" style="bottom: -65px; left: 170px;">
-                {% if online %}
-                    <div class="bg-success rounded-circle border border-2 border-white" style="width: 20px; height: 20px;" title="Online"></div>
-                {% else %}
-                    <div class="bg-danger rounded-circle border border-2 border-white" style="width: 20px; height: 20px;" title="Offline"></div>
-                {% endif %}
-            </div>
-        </div>
-
-        <!-- Main information -->
-        <div class="card-body pt-5 mt-4">
-            <div class="d-flex justify-content-between align-items-start mb-4">
-                <div>
-                    <h1 class="h2 mb-1">{{ profile.username }}</h1>
-                    <p class="text-muted mb-2">{{ profile.first_name }} {{ profile.last_name }}</p>
-                    {% if profile.allow_geoloc %}
-                    <p class="text-muted mb-0">
-                        <i class="bi bi-geo-alt"></i> {{ profile.location }}
+                <!-- Overlaid profile picture -->
+                <div class="position-absolute" style="bottom: -75px; left: 50px;">
+                    <div class="rounded-circle border border-4 border-white shadow-sm overflow-hidden"
+                         style="width: 150px; height: 150px;">
+                        <img class="w-100 h-100 object-fit-cover" src="data:image/png;base64, {{ profile_image_data }}"
+                             alt="{{ profile.username }}">
+                    </div>
+                    <p class="">
+                        {{ profile.last_connection }}
                     </p>
-                    {% endif %}
+
                 </div>
 
-                <!-- Actions -->
-                <div class="d-flex gap-2">
-                    {% if state != 'uninvitation' %}
-                    <div id="friendship-btn-container">
-                        {% if not connected %}
-                        <button id="btn-send-block" class="btn btn-outline-danger" type="button" data-profile-id="{{ profile.id }}" title="Block">
-                            <i class="bi bi-ban"></i>
-                        </button>
-                        {% endif %}
-
-                        {% if not state %}
-                        <button id="btn-send-invit" class="btn btn-primary" type="button" data-profile-id="{{ profile.id }}">
-                            <i class="bi bi-heart me-1"></i> Invite
-                        </button>
-                        {% endif %}
-
-                        {% if received_invitation %}
-                        <button id="btn-send-connect" class="btn btn-success" type="button" data-profile-id="{{ profile.id }}">
-                            <i class="bi bi-heart-half me-1"></i> Accept
-                        </button>
-                        {% endif %}
-
-                        {% if connected %}
-                        <button id="btn-send-uninvit" class="btn btn-outline-danger" type="button" data-profile-id="{{ profile.id }}">
-                            <i class="bi bi-heartbreak-fill me-1"></i> Unsubscribe
-                        </button>
-                        {% endif %}
-                    </div>
+                <!-- Status indicator -->
+                <div class="position-absolute" style="bottom: -65px; left: 170px;">
+                    {% if online %}
+                        <div class="bg-success rounded-circle border border-2 border-white"
+                             style="width: 20px; height: 20px;" title="Online"></div>
+                    {% else %}
+                        <div class="bg-danger rounded-circle border border-2 border-white"
+                             style="width: 20px; height: 20px;" title="Offline"></div>
                     {% endif %}
                 </div>
             </div>
 
-            <!-- Alerts -->
-            <div class="mb-4">
-                <p id="alert-invitation-sent" class="d-none alert alert-success">Invitation sent</p>
-                <p id="alert-connection-sent" class="d-none alert alert-success">You are now connected and can chat</p>
-                {% if sent_invitation %}
-                <p id="alert-invitation-received" class="alert alert-success">Invitation received</p>
+            <!-- Main information -->
+            <div class="card-body pt-5 mt-4">
+                <div class="d-flex justify-content-between align-items-start mb-4">
+                    <div>
+                        <h1 class="h2 mb-1">{{ profile.username }}</h1>
+                        <p class="text-muted mb-2">{{ profile.first_name }} {{ profile.last_name }}</p>
+                        {% if profile.allow_geoloc %}
+                            <p class="text-muted mb-0">
+                                <i class="bi bi-geo-alt"></i> {{ profile.location }}
+                            </p>
+                        {% endif %}
+                    </div>
+
+                    <!-- Actions -->
+                    <div class="d-flex gap-2">
+                        {% if state != 'uninvitation' %}
+                            <div id="friendship-btn-container">
+                                {% if not connected %}
+                                    <button id="btn-send-block" class="btn btn-outline-danger" type="button"
+                                            data-profile-id="{{ profile.id }}" title="Block">
+                                        <i class="bi bi-ban"></i>
+                                    </button>
+                                {% endif %}
+
+                                {% if not state %}
+                                    <button id="btn-send-invit" class="btn btn-primary" type="button"
+                                            data-profile-id="{{ profile.id }}">
+                                        <i class="bi bi-heart me-1"></i> Invite
+                                    </button>
+                                {% endif %}
+
+                                {% if received_invitation %}
+                                    <button id="btn-send-connect" class="btn btn-success" type="button"
+                                            data-profile-id="{{ profile.id }}">
+                                        <i class="bi bi-heart-half me-1"></i> Accept
+                                    </button>
+                                {% endif %}
+
+                                {% if connected %}
+                                    <button id="btn-send-uninvit" class="btn btn-outline-danger" type="button"
+                                            data-profile-id="{{ profile.id }}">
+                                        <i class="bi bi-heartbreak-fill me-1"></i> Unsubscribe
+                                    </button>
+                                {% endif %}
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Alerts -->
+                <div class="mb-4">
+                    <p id="alert-invitation-sent" class="d-none alert alert-success">Invitation sent</p>
+                    <p id="alert-connection-sent" class="d-none alert alert-success">You are now connected and can
+                        chat</p>
+                    {% if sent_invitation %}
+                        <p id="alert-invitation-received" class="alert alert-success">Invitation received</p>
+                    {% endif %}
+                </div>
+
+                <!-- Statistics -->
+                <div class="row g-3 mb-4">
+                    <div class="col-auto">
+                        <div class="px-3 py-2 bg-light rounded-3">
+                            <p class="mb-0"><strong>{{ profile.age }}</strong> <small class="text-muted">years
+                                old</small></p>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <div class="px-3 py-2 bg-light rounded-3">
+                            <p class="mb-0"><strong>{{ profile.gender }}</strong></p>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <div class="px-3 py-2 bg-light rounded-3">
+                            <p class="mb-0"><i class="bi bi-star-fill text-warning me-1"></i>
+                                <strong>{{ profile.fame_rate }}</strong></p>
+                        </div>
+                    </div>
+                    <div class="col-auto">
+                        <div class="px-3 py-2 bg-light rounded-3">
+                            <p class="mb-0">Interested in: <strong>{{ profile.gender_pref }}</strong></p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Bio -->
+                {% if profile.bio %}
+                    <div class="mb-4">
+                        <h3 class="h5 mb-3">About</h3>
+                        <p class="text-muted mb-0">{{ profile.bio }}</p>
+                    </div>
                 {% endif %}
-            </div>
 
-            <!-- Statistics -->
-            <div class="row g-3 mb-4">
-                <div class="col-auto">
-                    <div class="px-3 py-2 bg-light rounded-3">
-                        <p class="mb-0"><strong>{{ profile.age }}</strong> <small class="text-muted">years old</small></p>
+                <!-- Tags -->
+                {% if user_tags %}
+                    <div class="mb-4">
+                        <h3 class="h5 mb-3">Interests</h3>
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for tag in user_tags %}
+                                <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">{{ tag.name }}</span>
+                            {% endfor %}
+                        </div>
                     </div>
-                </div>
-                <div class="col-auto">
-                    <div class="px-3 py-2 bg-light rounded-3">
-                        <p class="mb-0"><strong>{{ profile.gender }}</strong></p>
-                    </div>
-                </div>
-                <div class="col-auto">
-                    <div class="px-3 py-2 bg-light rounded-3">
-                        <p class="mb-0"><i class="bi bi-star-fill text-warning me-1"></i> <strong>{{ profile.fame_rate }}</strong></p>
-                    </div>
-                </div>
-                <div class="col-auto">
-                    <div class="px-3 py-2 bg-light rounded-3">
-                        <p class="mb-0">Interested in: <strong>{{ profile.gender_pref }}</strong></p>
-                    </div>
-                </div>
-            </div>
+                {% endif %}
 
-            <!-- Bio -->
-            {% if profile.bio %}
-            <div class="mb-4">
-                <h3 class="h5 mb-3">About</h3>
-                <p class="text-muted mb-0">{{ profile.bio }}</p>
-            </div>
-            {% endif %}
-
-            <!-- Tags -->
-            {% if user_tags %}
-            <div class="mb-4">
-                <h3 class="h5 mb-3">Interests</h3>
-                <div class="d-flex flex-wrap gap-2">
-                    {% for tag in user_tags %}
-                    <span class="badge bg-primary bg-opacity-10 text-primary px-3 py-2 rounded-pill">{{ tag.name }}</span>
-                    {% endfor %}
+                <!-- Report button -->
+                <div class="mt-5 pt-3 border-top">
+                    <button class="btn btn-link text-danger p-0" id="report-button">
+                        <i class="bi bi-flag me-1"></i> Report fake account
+                    </button>
+                    <div class="alert alert-success d-none mt-3" role="alert" id="confirmation-label">Report sent!</div>
                 </div>
-            </div>
-            {% endif %}
-
-            <!-- Report button -->
-            <div class="mt-5 pt-3 border-top">
-                <button class="btn btn-link text-danger p-0" id="report-button">
-                    <i class="bi bi-flag me-1"></i> Report fake account
-                </button>
-                <div class="alert alert-success d-none mt-3" role="alert" id="confirmation-label">Report sent!</div>
             </div>
         </div>
-    </div>
 
-    <script>
-        // Script for reporting
-        const reportButton = document.getElementById('report-button');
-        const confirmationLabel = document.getElementById('confirmation-label');
+        <script>
+            // Script for reporting
+            const reportButton = document.getElementById('report-button');
+            const confirmationLabel = document.getElementById('confirmation-label');
 
-        reportButton.addEventListener('click', function (e) {
-            e.preventDefault();
-            const profileId = '{{ profile.id }}';
+            reportButton.addEventListener('click', function (e) {
+                e.preventDefault();
+                const profileId = '{{ profile.id }}';
 
-            fetch(`/report-fake-account/${profileId}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                    profile_id: profileId,
-                    action: 'report_fake_account'
+                fetch(`/report-fake-account/${profileId}`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        profile_id: profileId,
+                        action: 'report_fake_account'
+                    })
                 })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.status === 'success') {
-                    confirmationLabel.classList.remove('d-none');
-                    setTimeout(function () {
-                        confirmationLabel.classList.add('d-none');
-                    }, 5000);
-                } else {
-                    console.log('Error:', data.message);
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            if (confirmationLabel) {
+                                confirmationLabel.classList.remove('d-none');
+                                setTimeout(function () {
+                                    confirmationLabel.classList.add('d-none');
+                                }, 5000);
+                            }
+                        } else {
+                            console.log('Error:', data.message);
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                    });
             });
-        });
-    </script>
+        </script>
 
-    <style>
-        .object-fit-cover {
-            object-fit: cover;
-        }
-        
-        .bg-primary.bg-opacity-10 {
-            background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
-        }
-    </style>
-</section>
+        <style>
+            .object-fit-cover {
+                object-fit: cover;
+            }
+
+            .bg-primary.bg-opacity-10 {
+                background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+            }
+        </style>
+    </section>
 {% endblock %}

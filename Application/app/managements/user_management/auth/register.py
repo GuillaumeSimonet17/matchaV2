@@ -2,6 +2,7 @@ import requests
 import re
 import os
 import magic
+from flask import abort
 
 from flask import flash, render_template, session, redirect, url_for
 from werkzeug.security import generate_password_hash
@@ -108,12 +109,15 @@ def auth_register(request, all_tags):
         
         location = request.form.get('location')
         API_LOC_KEY = os.getenv('API_LOC_KEY')
-        url = f"https://api.opencagedata.com/geocode/v1/json?q={location}&key={API_LOC_KEY}"
-        response = requests.get(url)
-        geo = response.json()
-        geo = geo['results'][0]
-        lng = geo['geometry']['lng']
-        lat = geo['geometry']['lat']
+        try:
+            url = f"https://api.opencagedata.com/geocode/v1/json?q={location}&key={API_LOC_KEY}"
+            response = requests.get(url)
+            geo = response.json()
+            geo = geo['results'][0]
+            lng = geo['geometry']['lng']
+            lat = geo['geometry']['lat']
+        except Exception as e:
+            raise e
 
         data = {
             'username': username,

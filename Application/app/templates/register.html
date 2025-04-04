@@ -71,13 +71,17 @@
                         const reader = new FileReader();
 
                         reader.onload = function (e) {
-                            preview.src = e.target.result;
-                            preview.style.display = 'block'; // Affiche l'image
+                            if (preview) {
+                                preview.srcreportButton = e.target.result;
+                                preview.style.display = 'block';
+                            }
                         }
 
-                        reader.readAsDataURL(input.files[0]); // Lit le fichier image comme une URL
+                        reader.readAsDataURL(input.files[0]);
                     } else {
-                        preview.style.display = 'none'; // Cache l'image si aucun fichier sélectionné
+                        if (preview) {
+                            preview.style.display = 'none';
+                        }
                     }
                 }
             </script>
@@ -177,7 +181,10 @@
                     <input required type="text" class="form-control d-none" id="location" name="location"
                        name="location" value="${location_name}">
                     `
-                document.getElementById('form-register').insertAdjacentHTML('afterbegin', location_balise);
+                const formRegister = document.getElementById('form-register')
+                if (formRegister) {
+                    formRegister.insertAdjacentHTML('afterbegin', location_balise);
+                }
 
                 data['location'] = location
                 data['lng'] = data.longitude

@@ -121,26 +121,30 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
 
         if allow_geoloc and location:
             API_LOC_KEY = os.getenv('API_LOC_KEY')
-            url = f"https://api.opencagedata.com/geocode/v1/json?q={location}&key={API_LOC_KEY}"
-            response = requests.get(url)
-            geo = response.json()
+            try:
+                url = f"https://api.opencagedata.com/geocode/v1/json?q={location}&key={API_LOC_KEY}"
+                response = requests.get(url)
+                geo = response.json()
 
-            geo = geo['results'][0]
+                geo = geo['results'][0]
 
-            if geo['components'].get('city'):
-                city = geo['components']['city'] + ', '
-            elif geo['components'].get('county'):
-                city = geo['components']['county'] + ', '
-            else:
-                city = ''
-            country = geo['components']['country']
-            location = city + country
+                if geo['components'].get('city'):
+                    city = geo['components']['city'] + ', '
+                elif geo['components'].get('county'):
+                    city = geo['components']['county'] + ', '
+                else:
+                    city = ''
+                country = geo['components']['country']
+                location = city + country
 
-            lng = geo['geometry']['lng']
-            lat = geo['geometry']['lat']
-            data['location'] = location
-            data['lng'] = lng
-            data['lat'] = lat
+                lng = geo['geometry']['lng']
+                lat = geo['geometry']['lat']
+                data['location'] = location
+                data['lng'] = lng
+                data['lat'] = lat
+            except Exception as e:
+                return render_template('user.html', user=user, profile_image_data=profile_image_data,
+                                       tags=tags, user_tag_ids=user_tag_ids)
 
         if not location:
             ip = get_public_ip()

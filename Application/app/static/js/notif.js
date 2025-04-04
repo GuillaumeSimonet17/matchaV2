@@ -8,7 +8,10 @@ export function add_notif(data) {
         </div>
     `;
 
-    document.getElementById('notifs-container').insertAdjacentHTML('afterbegin', notifHtml);
+    const notifsContainer = document.getElementById('notifs-container')
+    if (notifsContainer) {
+        notifsContainer.insertAdjacentHTML('afterbegin', notifHtml);
+    }
 }
 
 export function incrementBadgeNotif() {

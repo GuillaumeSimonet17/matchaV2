@@ -140,13 +140,16 @@ def mark_notifs_as_read(data):
 # --------------------------- HTTP ---------------------------
 @main.route('/get_location', methods=['GET'])
 def get_location():
-    ip = get_public_ip()
-    header = {'X-API-Key': API_IPFLARE_KEY}
-    response = requests.get(
-        f"https://api.ipflare.io/{ip}",
-        headers=header,
-    )
-    return response.json()
+    try:
+        ip = get_public_ip()
+        header = {'X-API-Key': API_IPFLARE_KEY}
+        response = requests.get(
+            f"https://api.ipflare.io/{ip}",
+            headers=header,
+        )
+        return response.json()
+    except requests.exceptions.RequestException as e:
+        return jsonify({'error': 'Impossible de récupérer la localisation'}), 503
 
 @main.route('/report-fake-account/<int:profile_id>', methods=['POST'])
 @token_required
@@ -186,7 +189,12 @@ def get_current_page():
 @main.route('/login', methods=['GET', 'POST'])
 def login():
     if request.method == 'POST':
-        res, msg = auth_login(request)
+        try:
+            res, msg = auth_login(request)
+        except Exception as e:
+            flash('Please, connect to internet', 'danger')
+            return render_template('login.html')
+
         if res:
             user = User._find_by_username(session['username'])
             user.update({'connected': True, 'last_connection': datetime.datetime.now()})
@@ -231,7 +239,11 @@ def register():
     all_tags = Tag._all()
     
     if request.method == 'POST':
-        return auth_register(request, all_tags)
+        try:
+            return auth_register(request, all_tags)
+        except Exception as e:
+            flash('Please, connect to internet', 'danger')
+            return render_template('register.html', all_tags=all_tags)
     else:
         if 'username' in session:
             session['current_page'] = 'home'

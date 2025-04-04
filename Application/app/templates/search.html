@@ -146,7 +146,6 @@
 
         document.querySelector('#age-sort-asc')?.addEventListener('click', function (event) {
             let profiles = Array.from(document.querySelectorAll('#profile-list .card'));
-
             profiles.sort((a, b) => {
                 const profile_a = a.getAttribute('data-profile');
                 const fixedProfile_a = profile_a.replace(/'/g, '"');
@@ -161,7 +160,9 @@
             });
 
             const container = document.getElementById('profile-list');
-            profiles.forEach(profile => container.appendChild(profile));
+            if (container) {
+                profiles.forEach(profile => container.appendChild(profile));
+            }
         })
 
         document.querySelector('#age-sort-dsc')?.addEventListener('click', function (event) {
@@ -181,7 +182,9 @@
             });
 
             const container = document.getElementById('profile-list');
-            profiles.forEach(profile => container.appendChild(profile));
+            if (container) {
+                profiles.forEach(profile => container.appendChild(profile));
+            }
         })
 
         document.querySelector('#fame-rate-sort')?.addEventListener('click', function (event) {
@@ -201,7 +204,9 @@
             });
 
             const container = document.getElementById('profile-list');
-            profiles.forEach(profile => container.appendChild(profile));
+            if (container) {
+                profiles.forEach(profile => container.appendChild(profile));
+            }
         })
 
         document.querySelector('#common-tags-sort')?.addEventListener('click', function (event) {
@@ -230,7 +235,9 @@
             });
 
             const container = document.getElementById('profile-list');
-            profiles.forEach(profile => container.appendChild(profile));
+            if (container) {
+                profiles.forEach(profile => container.appendChild(profile));
+            }
         })
 
         document.querySelector('#location-sort')?.addEventListener('click', function (event) {
@@ -279,7 +286,9 @@
 
             // Réinsérer les profils triés dans le DOM
             const container = document.getElementById('profile-list');
-            profiles.forEach(profile => container.appendChild(profile));
+            if (container) {
+                profiles.forEach(profile => container.appendChild(profile));
+            }
         });
 
         function display_filtered_list() {
@@ -305,7 +314,7 @@
             const fame_rate_filter_activated = document.getElementById('fame_rate_filter_activated')?.checked;
             const tags_filter_activated = document.getElementById('tags_filter_activated')?.checked;
 
-            const help = document.getElementById('help_me').checked;
+            const help = document.getElementById('help_me')?.checked ?? false;
 
             fetch('/apply_filters', {
                 method: 'POST',
@@ -330,7 +339,9 @@
                 })
                 .then(data => {
                     const container = document.getElementById('profile-list');
-                    container.innerHTML = '';
+                    if (container) {
+                        container.innerHTML = '';
+                    }
 
                     data.filtered_profiles?.forEach(profile => {
                         const profileCard = document.createElement('a');
@@ -347,8 +358,9 @@
                             <p class="m-0 mt-2 fw-bold">${profile.username}</p>
                             <p class="m-0 mt-2 fw-bold">${profile.age}</p>
                         `;
-
-                        container.appendChild(profileCard);
+                        if (container) {
+                            container.appendChild(profileCard);
+                        }
                     });
                 })
                 .catch(error => console.error('Error:', error));

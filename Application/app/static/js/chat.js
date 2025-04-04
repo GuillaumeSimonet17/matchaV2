@@ -43,25 +43,32 @@ if (btnSend) {
     btnSend.addEventListener('click', function (event) {
 
         let message = document.querySelector('#input-msg')
-        if (message.value !== '') {
-            socket.emit('send_message', {
-                content: message.value,
-                sender_id: currentUserId,
-                receiver_id: currentProfileId
-            });
+        if (message && message.value !== '') {
+            if (currentUserId) {
+                socket.emit('send_message', {
+                    content: message.value,
+                    sender_id: currentUserId,
+                    receiver_id: currentProfileId
+                });
+            }
 
             const chatContainer = document.querySelector('#chat-container');
 
             const msgElement = document.createElement('div');
-            msgElement.classList.add('d-flex', 'flex-column', 'align-items-center', 'mt-2', 'px-3', 'w-100');
-            msgElement.innerHTML = `
-                    <p class="text-dark p-2 px-3 m-0 text-start text-break rounded me-auto my-msg">${message.value}</p>
-                    <small class="text-muted text-start text-break me-auto">Now</small>
-                `;
-            chatContainer.appendChild(msgElement);
+            if (msgElement) {
 
-            message.value = '';
-            chatContainer.scrollTop = chatContainer.scrollHeight;
+                msgElement.classList.add('d-flex', 'flex-column', 'align-items-center', 'mt-2', 'px-3', 'w-100');
+                msgElement.innerHTML = `
+                        <p class="text-dark p-2 px-3 m-0 text-start text-break rounded me-auto my-msg">${message.value}</p>
+                        <small class="text-muted text-start text-break me-auto">Now</small>
+                    `;
+            }
+
+            if (chatContainer && msgElement) {
+                chatContainer.appendChild(msgElement);
+                message.value = '';
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
 
         }
     })
@@ -90,30 +97,35 @@ socket.on('display_messages', function (data) {
     const chatContainer = document.querySelector('#chat-container');
     if (chatContainer) {
         chatContainer.innerHTML = '';
+
+        if (data.messages.length === 0) {
+            const msgElement = document.createElement('div');
+            if (msgElement) {
+                msgElement.innerHTML = `<p>No messages</p>`;
+                chatContainer.appendChild(msgElement);
+            }
+        }
     }
 
-    if (data.messages.length === 0) {
-        const msgElement = document.createElement('div');
-        msgElement.innerHTML = `<p>No messages</p>`;
-        chatContainer.appendChild(msgElement);
-    }
 
     data.messages.forEach(msg => {
         const msgElement = document.createElement('div');
-
-        msgElement.classList.add('d-flex', 'flex-column', 'align-items-center', 'rounded', 'mt-2', 'px-3', 'w-100');
-        if (msg.sender_id == currentUserId)
-            msgElement.innerHTML = `
+        if (msgElement) {
+            msgElement.classList.add('d-flex', 'flex-column', 'align-items-center', 'rounded', 'mt-2', 'px-3', 'w-100');
+            if (msg.sender_id == currentUserId)
+                msgElement.innerHTML = `
                 <p class="text-dark p-2 px-3 m-0 text-start text-break rounded me-auto my-msg">${msg.content}</p>
                 <small class="text-muted text-start text-break me-auto">${msg.created_at}</small>
             `;
-        else
-            msgElement.innerHTML = `
+            else
+                msgElement.innerHTML = `
                 <p class="text-dark p-2 px-3 m-0 text-start text-break rounded ms-auto border">${msg.content}</p>
                 <small class="text-muted text-start text-break ms-auto">${msg.created_at}</small>
             `;
-
-        chatContainer.appendChild(msgElement);
+            if (chatContainer) {
+                chatContainer.appendChild(msgElement);
+            }
+        }
 
     });
     if (chatContainer) {

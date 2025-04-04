@@ -1,7 +1,7 @@
 import {incrementBadgeNotif, add_notif} from './notif.js';
 
-const currentUserIdElement = document.getElementById('current-user');
-const currentUserId = currentUserIdElement ? currentUserIdElement.getAttribute('data-current-user-id') : null;
+// const currentUserIdElement = document.getElementById('current-user');
+// const currentUserId = currentUserIdElement ? currentUserIdElement.getAttribute('data-current-user-id') : null;
 
 // ----------------------------------- EMIT -----------------------------------
 
@@ -15,7 +15,7 @@ if (btnSendInvit) {
         });
 
         this.remove();
-        document.getElementById('alert-invitation-sent').classList.remove('d-none');
+        document.getElementById('alert-invitation-sent')?.classList.remove('d-none');
 
     };
 }
@@ -34,9 +34,15 @@ if (btnSendBlock) {
         const p_balise_block = `
             <p id="alert-block-sent" class="row alert alert-success">You blocked that account</p>
             `
-        document.getElementById('alert-invitation-sent').hidden = true
-            
-        document.getElementById('friendship-btn-container').insertAdjacentHTML('afterbegin', p_balise_block);
+        const alertInvitationSent = document.getElementById('alert-invitation-sent')
+        if (alertInvitationSent) {
+            alertInvitationSent.hidden = true
+        }
+
+        const friendshipBtnContainer = document.getElementById('friendship-btn-container')
+        if (friendshipBtnContainer) {
+            friendshipBtnContainer.insertAdjacentHTML('afterbegin', p_balise_block);
+        }
 
         const btnInvit = document.getElementById('btn-send-invit')
         if (btnInvit) {
@@ -56,7 +62,10 @@ if (btnSendConnect) {
         });
 
         this.remove();
-        document.getElementById('alert-connection-sent').classList.remove('d-none');
+        const alertConnectionSent = document.getElementById('alert-connection-sent')
+        if (alertConnectionSent) {
+            alertConnectionSent.classList.remove('d-none');
+        }
 
     };
 }
@@ -80,12 +89,18 @@ if (btnSendUninvit) {
 
 function display_friendship_changes(data) {
     if (data.state === 'invitation') {
-        document.getElementById('btn-send-invit').remove();
+        const btnSendInvit = document.getElementById('btn-send-invit')
+        if (btnSendInvit) {
+            btnSendInvit.remove();
+        }
 
         const p_balise = `
             <p id="alert-invitation-received" class="row alert alert-success">Invitation reçu</p>
             `
-        document.getElementById('friendship-btn-container').insertAdjacentHTML('afterbegin', p_balise);
+        const friendshipBtnContainer = document.getElementById('friendship-btn-container')
+        if (friendshipBtnContainer) {
+            friendshipBtnContainer.insertAdjacentHTML('afterbegin', p_balise);
+        }
     }
     if (data.state === 'uninvitation') {
         const newAlert = `
@@ -95,13 +110,20 @@ function display_friendship_changes(data) {
         if (btn) {
             btn.remove();
         }
-        document.getElementById('friendship-btn-container').insertAdjacentHTML('afterbegin', newAlert);
+        const friendshipBtnContainer = document.getElementById('friendship-btn-container')
+        if (friendshipBtnContainer) {
+            friendshipBtnContainer.insertAdjacentHTML('afterbegin', newAlert);
+        }
+
     }
     if (data.state === 'connected') {
         const p_balise2 = `
             <p id="alert-connection-received" class="alert alert-success">You are connected and can now chat</p>
             `
-        document.getElementById('friendship-btn-container').insertAdjacentHTML('afterbegin', p_balise2);
+        const friendshipBtnContainer = document.getElementById('friendship-btn-container')
+        if (friendshipBtnContainer) {
+            friendshipBtnContainer.insertAdjacentHTML('afterbegin', p_balise2);
+        }
         const btn2 = document.getElementById('alert-invitation-received')
         if (btn2) {
             btn2.remove();
