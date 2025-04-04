@@ -18,6 +18,7 @@ CREATE TABLE IF NOT EXISTS app_user (
     location VARCHAR(255),
     allow_geoloc BOOLEAN DEFAULT TRUE,
     is_verified BOOL DEFAULT FALSE,
+    last_connection TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -25,7 +26,7 @@ DO $$ BEGIN
   IF NOT EXISTS (SELECT 1 FROM pg_views WHERE viewname = 'app_profile') THEN
     CREATE VIEW app_profile AS
     SELECT id, username, last_name, first_name, age, profile_image, bio, gender, gender_pref, fame_rate, connected,
-       location, lng, lat, allow_geoloc
+       location, lng, lat, last_connection, allow_geoloc
     FROM app_user;
   END IF;
 END $$;

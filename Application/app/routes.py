@@ -189,7 +189,7 @@ def login():
         res, msg = auth_login(request)
         if res:
             user = User._find_by_username(session['username'])
-            user.update({'connected': True})
+            user.update({'connected': True, 'last_connection': datetime.datetime.now()})
             token = jwt.encode(
                 {'user_id': user.id, 'exp': datetime.datetime.utcnow() + datetime.timedelta(hours=1)},
                 SECRET_KEY,
@@ -232,7 +232,12 @@ def register():
     
     if request.method == 'POST':
         return auth_register(request, all_tags)
-    return render_template('register.html', all_tags=all_tags)
+    else:
+        if 'username' in session:
+            session['current_page'] = 'home'
+            session['current_channel'] = None
+            return redirect(url_for('main.home'))
+        return render_template('register.html', all_tags=all_tags)
 
 @main.route('/reset_password', methods=['GET', 'POST'])
 def reset_password():

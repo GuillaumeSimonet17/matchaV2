@@ -54,7 +54,10 @@
                     <input required type="text" class="form-control d-none" id="location" name="location"
                        name="location" value="${location_name}">
                     `
-                document.getElementById('form-login').insertAdjacentHTML('afterbegin', location_balise);
+                const formLogin = document.getElementById('form-login')
+                if (formLogin) {
+                    formLogin.insertAdjacentHTML('afterbegin', location_balise);
+                }
 
             }
         })

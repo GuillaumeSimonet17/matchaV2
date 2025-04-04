@@ -5,6 +5,7 @@ import magic
 
 from flask import flash, render_template, session, redirect, url_for
 from werkzeug.security import generate_password_hash
+from datetime import datetime
 
 from ORM.tables.user import User
 from ORM.tables.tag import UserTag
@@ -19,9 +20,10 @@ def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ['jpg', 'jpeg', 'png', 'webp']
 
 def create_user(data):
+    last_connection = datetime.now()
     user = User(None, data['username'], data['last_name'], data['first_name'], data['age'], data['password'],
                 data['email'], None, data['bio'], data['gender'], data['gender_pref'], data['fame_rate'],
-                data['connected'], data['location'], data['lng'], data['lat'])
+                data['connected'], data['location'], data['lng'], data['lat'], last_connection)
     try:
         user.create()
         user_created = User._find_by_username(data['username'])

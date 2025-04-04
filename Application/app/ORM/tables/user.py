@@ -8,12 +8,12 @@ class User(Model):
     table_name = 'app_user'
     column_names = ['id', 'username', 'last_name', 'first_name', 'age', 'password', 'email',
                     'profile_image', 'bio', 'gender', 'gender_pref', 'fame_rate', 'connected',
-                    'location', 'lng', 'lat', 'allow_geoloc', 'is_verified', 'created_at']
+                    'location', 'lng', 'lat', 'last_connection', 'allow_geoloc', 'is_verified', 'created_at']
 
 
     def __init__(self, id, username, last_name, first_name, age, password,
                  email, profile_image, bio, gender, gender_pref, fame_rate,
-                 connected, location, lng, lat, allow_geoloc=True, is_verified=False,
+                 connected, location, lng, lat, last_connection, allow_geoloc=True, is_verified=False,
                  created_at=None):
 
         self.id = id
@@ -32,6 +32,7 @@ class User(Model):
         self.location = location
         self.lng = lng
         self.lat = lat
+        self.last_connection = last_connection
         self.allow_geoloc = allow_geoloc
         self.is_verified = is_verified
         self.created_at = created_at

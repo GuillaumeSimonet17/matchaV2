@@ -6,10 +6,13 @@ import os
 from ORM.tables.user import User
 
 def auth_login(request):
-    username = request.form['username']
-    password = request.form['password']
-    location = request.form['location']
-    
+    username = request.form.get('username')
+    password = request.form.get('password')
+    location = request.form.get('location')
+
+    if username is None or password is None or location is None:
+        return False, 'All fields are required'
+
     user = User._find_by_username(username)
     if user:
         if check_password_hash(user.password, password):

@@ -134,6 +134,7 @@ def get_profiles_list(is_suggestion_list=True):
                 'lng': profile.lng,
                 'lat': profile.lat,
                 'tags': profile_tags,
+                'last_connection': profile.last_connection,
             })
     return final_profiles, user, user_tags, tag_ids, location, user_lat, user_lng
 
