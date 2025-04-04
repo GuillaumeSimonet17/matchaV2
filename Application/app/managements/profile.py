@@ -12,6 +12,9 @@ from managements.notif import get_numbers_of_notifs, get_numbers_of_notifs_msg
 
 def go_profile(profile_id: int):
     user_id = session['user_id']
+    if profile_id == user_id:
+        return redirect(url_for('main.home'))
+
     session['profile_id'] = profile_id
 
     profile = Profile._find_by_id(profile_id)
@@ -52,8 +55,8 @@ def go_profile(profile_id: int):
 
     nb_notifs = get_numbers_of_notifs()
     nb_notifs_msg = get_numbers_of_notifs_msg()
-
-    return render_template('profile.html', profile=profile, state=state, connected=connected,
+    last_connection = profile.last_connection.strftime("%Y-%m-%d %H:%M")
+    return render_template('profile.html', profile=profile, last_connection=last_connection, state=state, connected=connected,
                            profile_image_data=profile_image_data, received_invitation=received_invitation,
                            sent_invitation=sent_invitation, user_tags=user_tags, user_id=user_id,
                            nb_notifs=nb_notifs, nb_notifs_msg=nb_notifs_msg, online=online)

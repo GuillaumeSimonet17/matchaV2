@@ -15,14 +15,14 @@
                         <img class="w-100 h-100 object-fit-cover" src="data:image/png;base64, {{ profile_image_data }}"
                              alt="{{ profile.username }}">
                     </div>
-                    <p class="">
-                        {{ profile.last_connection }}
+                    <p class="text-center">
+                        {{ last_connection }}
                     </p>
 
                 </div>
 
                 <!-- Status indicator -->
-                <div class="position-absolute" style="bottom: -65px; left: 170px;">
+                <div class="position-absolute" style="bottom: -55px; left: 10px;">
                     {% if online %}
                         <div class="bg-success rounded-circle border border-2 border-white"
                              style="width: 20px; height: 20px;" title="Online"></div>
