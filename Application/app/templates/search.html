@@ -160,6 +160,7 @@
             });
 
             const container = document.getElementById('profile-list');
+            container.innerHTML = '';
             if (container) {
                 profiles.forEach(profile => container.appendChild(profile));
             }
@@ -182,6 +183,7 @@
             });
 
             const container = document.getElementById('profile-list');
+            container.innerHTML = '';
             if (container) {
                 profiles.forEach(profile => container.appendChild(profile));
             }
@@ -204,6 +206,7 @@
             });
 
             const container = document.getElementById('profile-list');
+            container.innerHTML = '';
             if (container) {
                 profiles.forEach(profile => container.appendChild(profile));
             }
@@ -235,6 +238,7 @@
             });
 
             const container = document.getElementById('profile-list');
+            container.innerHTML = '';
             if (container) {
                 profiles.forEach(profile => container.appendChild(profile));
             }
@@ -284,8 +288,8 @@
                 return distanceA - distanceB; // Trier du plus proche au plus éloigné
             });
 
-            // Réinsérer les profils triés dans le DOM
             const container = document.getElementById('profile-list');
+            container.innerHTML = '';
             if (container) {
                 profiles.forEach(profile => container.appendChild(profile));
             }
