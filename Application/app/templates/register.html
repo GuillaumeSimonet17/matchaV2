@@ -9,8 +9,9 @@
         <div class="col-12 col-md-5">
             <!-- Username -->
             <div class="mb-3">
-                <label for="username" class="form-label d-flex">Username*<p class="alert alert-info py-0 ms-1">At least 3 letters
-                    </p></label>
+                <label for="username" class="form-label d-flex">Username*<p class="alert alert-info py-0 ms-1">At
+                    least 3 letters
+                </p></label>
                 <input required type="text" class="form-control" id="username" name="username">
             </div>
             <!-- Last Name -->
@@ -30,8 +31,9 @@
             </div>
             <!-- Password -->
             <div class="mb-3">
-                <label for="password" class="form-label d-flex">Password*<p class="alert alert-info py-0 ms-1">At least 8 characters
-                    </p></label>
+                <label for="password" class="form-label d-flex">Password*<p class="alert alert-info py-0 ms-1">At
+                    least 8 characters
+                </p></label>
                 <input required type="password" autocomplete="password" class="form-control" id="password"
                        name="password">
             </div>
@@ -67,22 +69,18 @@
                     const input = event.target;
                     const preview = document.getElementById('image_preview');
 
-                    if (input.files && input.files[0]) {
-                        const reader = new FileReader();
+                        if (input.files && input.files[0]) {
+                            const reader = new FileReader();
 
-                        reader.onload = function (e) {
-                            if (preview) {
-                                preview.srcreportButton = e.target.result;
+                            reader.onload = function (e) {
+                                preview.src = e.target.result;
                                 preview.style.display = 'block';
                             }
-                        }
 
-                        reader.readAsDataURL(input.files[0]);
-                    } else {
-                        if (preview) {
+                            reader.readAsDataURL(input.files[0]);
+                        } else {
                             preview.style.display = 'none';
                         }
-                    }
                 }
             </script>
             <!-- Bio -->
@@ -124,13 +122,14 @@
                         <div class="accordion-body">
                             <!-- Example of tag checkboxes -->
                             {% for tag in all_tags %}
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" name="tags[]" value="{{ tag.id }}"
-                                       id="{{ tag.id }}">
-                                <label class="form-check-label" for="{{ tag.id }}">
-                                    {{ tag.name }}
-                                </label>
-                            </div>
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" name="tags[]"
+                                           value="{{ tag.id }}"
+                                           id="{{ tag.id }}">
+                                    <label class="form-check-label" for="{{ tag.id }}">
+                                        {{ tag.name }}
+                                    </label>
+                                </div>
                             {% endfor %}
                         </div>
                     </div>
@@ -141,15 +140,15 @@
 
         <!-- Section pour les messages flash -->
         {% with messages = get_flashed_messages(with_categories=True) %}
-        {% if messages %}
-        <div class="alert-container mt-3  col-12 col-md-6 d-flex justify-content-center">
-            {% for category, message in messages %}
-            <div class="alert alert-{{ category }}" role="alert">
-                {{ message }}
-            </div>
-            {% endfor %}
-        </div>
-        {% endif %}
+            {% if messages %}
+                <div class="alert-container mt-3  col-12 col-md-6 d-flex justify-content-center">
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% endif %}
         {% endwith %}
 
         <!-- Submit Button -->
@@ -178,9 +177,9 @@
                 }
 
                 const location_balise = `
-                    <input required type="text" class="form-control d-none" id="location" name="location"
-                       name="location" value="${location_name}">
-                    `
+                <input required type="text" class="form-control d-none" id="location" name="location"
+                   name="location" value="${location_name}">
+                `
                 const formRegister = document.getElementById('form-register')
                 if (formRegister) {
                     formRegister.insertAdjacentHTML('afterbegin', location_balise);

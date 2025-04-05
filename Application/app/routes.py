@@ -1,4 +1,4 @@
-import os, requests, jwt, datetime
+import os, requests, jwt, datetime, re
 from flask import Blueprint, flash, request, render_template, session, redirect, url_for, jsonify, make_response
 from flask_socketio import emit, join_room
 from flask_mail import Message
@@ -251,13 +251,18 @@ def register():
             return redirect(url_for('main.home'))
         return render_template('register.html', all_tags=all_tags)
 
+
+def is_valid_email(email):
+    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    return re.match(pattern, email) is not None
+
 @main.route('/reset_password', methods=['GET', 'POST'])
 def reset_password():
     if request.method == 'GET':
         return render_template('reset_password.html')
     if request.method == 'POST':
         email = request.form.get('email')
-        if email:
+        if email and is_valid_email(email):
             reset_password = get_random_pwd(20)
             reset_hashed_password = generate_password_hash(reset_password)
 
@@ -266,13 +271,15 @@ def reset_password():
                 flash('Email not found', 'danger')
             else:
                 user.update({'password': reset_hashed_password})
-    
+
                 msg = Message("Reset Password", recipients=[email], sender='gui_le_boat@gmail.com')
                 msg.body = (f"Hello, here is your new password: {reset_password}\n"
                             f"Don't forget to change it once you're logged in.")
                 mail.send(msg)
                 flash('Mail sent', 'success')
             return render_template('reset_password.html')
+        flash('You need to enter your mail address', 'success')
+        return render_template('reset_password.html')
 
 @main.route('/apply_filters', methods=['POST'])
 @token_required

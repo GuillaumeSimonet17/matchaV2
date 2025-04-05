@@ -8,9 +8,18 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from ORM.tables.user import User
 from ORM.tables.tag import UserTag
 from managements.utils import get_public_ip
+import re
 
 
 API_IPFLARE_KEY = os.getenv('API_IPFLARE_KEY')
+GENDERS = ['male', 'female', 'unspecified']
+VALID_TAGS = [
+    '1', '2', '3', '4', '5', '6', '7', '8'
+]
+
+def is_valid_email(email):
+    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    return re.match(pattern, email) is not None
 
 def update_user_infos(request, profile_image_data, user_tag_ids, tags):
 
@@ -33,7 +42,13 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
     gender_pref = request.form.get('gender_pref')
     tag_ids_selected = request.form.getlist('tags[]')
     new_image = request.files.get('new_profile_image')
-    
+
+    # --------------- VERIFICATION DES INFOS ----------------------
+    if not is_valid_email(email):
+        flash('Email must be valid', 'danger')
+        return render_template('user.html', user=user, profile_image_data=profile_image_data,
+                               user_tag_ids=user_tag_ids, tags=tags)
+
     new_image_filename = False
     if new_image:
         new_image_filename = new_image.filename
@@ -56,17 +71,23 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
     if allow_geoloc == 'on':
         allow_geoloc = True
 
+    if len(tag_ids_selected) == 0:
+        flash('You must have at least one tag', 'danger')
+        return render_template('user.html', user=user, profile_image_data=profile_image_data,
+                               user_tag_ids=user_tag_ids, tags=tags)
+
+    invalid_tags = [tag for tag in tag_ids_selected if tag not in VALID_TAGS]
+    if invalid_tags:
+        flash('Please don\'t change tags bro !', 'danger')
+        return render_template('user.html', user=user, profile_image_data=profile_image_data,
+                               user_tag_ids=user_tag_ids, tags=tags)
+
     new_tags = []
     for tag_id_selected in tag_ids_selected:
         if int(tag_id_selected) not in user_tag_ids:
             new_tags.append(int(tag_id_selected))
             user_tag = UserTag(None, user.id, tag_id_selected)
             user_tag.create()
-
-    if len(tag_ids_selected) == 0:
-        flash('You must have at least one tag', 'danger')
-        return render_template('user.html', user=user, profile_image_data=profile_image_data,
-                               user_tag_ids=user_tag_ids, tags=tags)
 
     tag_ids_selected = [int(tag_id_selected) for tag_id_selected in tag_ids_selected]
     tags_to_delete = set(user_tag_ids) - set(tag_ids_selected)
@@ -85,12 +106,23 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
     else:
         user_tag_ids = []
 
-    # --------------- VERIFICATION DES INFOS ----------------------
     if user_tag_ids == [] or username == '' or last_name == '' or first_name == '' or age == '' or email == '' or bio == '' \
             or gender == '' or gender_pref == '' or location == '':
         flash('Each value must be filled in', 'danger')
         return render_template('user.html', user=user, profile_image_data=profile_image_data,
                                user_tag_ids=user_tag_ids, tags=tags)
+
+    if gender not in GENDERS or gender_pref not in GENDERS:
+        flash('Gender or gender preference not accepted', 'danger')
+        return render_template('user.html', user=user, profile_image_data=profile_image_data,
+                               user_tag_ids=user_tag_ids, tags=tags)
+    try:
+        int(age)
+    except ValueError:
+        flash('Age must be an integer.', 'danger')
+        return render_template('user.html', user=user, profile_image_data=profile_image_data,
+                               user_tag_ids=user_tag_ids, tags=tags)
+
     if int(age) < 18:
         flash('You must be at least 18 years old', 'danger')
         return render_template('user.html', user=user, profile_image_data=profile_image_data,
@@ -101,6 +133,10 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
     if user:
         data = {}
         if username != user.username:
+            if User._find_by_username(username):
+                flash('Username already used', 'danger')
+                return render_template('user.html', user=user, profile_image_data=profile_image_data,
+                                       user_tag_ids=user_tag_ids, tags=tags)
             data['username'] = username
         if last_name != user.last_name:
             data['last_name'] = last_name
@@ -109,6 +145,10 @@ def update_user_infos(request, profile_image_data, user_tag_ids, tags):
         if int(age) != user.age:
             data['age'] = age
         if email != user.email:
+            if User._find_by_email(email):
+                flash('Email already used', 'danger')
+                return render_template('user.html', user=user, profile_image_data=profile_image_data,
+                                       user_tag_ids=user_tag_ids, tags=tags)
             data['email'] = email
         if bio != user.bio:
             data['bio'] = bio

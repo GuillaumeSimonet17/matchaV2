@@ -15,7 +15,14 @@ from flask_mail import Message
 from app import mail, serializer
 
 MAX_FILE_SIZE = 5 * 1024 * 1024
+GENDERS = ['male', 'female', 'unspecified']
+VALID_TAGS = [
+'1', '2', '3', '4', '5', '6', '7', '8'
+]
 
+def is_valid_email(email):
+    pattern = r'^[\w\.-]+@[\w\.-]+\.\w+$'
+    return re.match(pattern, email) is not None
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ['jpg', 'jpeg', 'png', 'webp']
@@ -87,12 +94,36 @@ def auth_register(request, all_tags):
     if not is_valid_username(username):
         valid = False
         flash('Please choose a username without special characters', 'danger')
+    try:
+        int(age)
+    except ValueError:
+        flash('Age must be at an integer', 'danger')
+        return render_template('register.html', all_tags=all_tags)
+
     if int(age) < 18:
         valid = False
         flash('You must be at least 18 years old', 'danger')
+
+    if not is_valid_email(email):
+        flash('Email must be valid', 'danger')
+        return render_template('register.html', all_tags=all_tags)
+
     if not tags:
-        valid = False
         flash('Please choose at least one tag', 'danger')
+        return render_template('register.html', all_tags=all_tags)
+
+    invalid_tags = [tag for tag in tags if tag not in VALID_TAGS]
+    if invalid_tags:
+        print(VALID_TAGS)
+        print(tags)
+        print(invalid_tags)
+        flash('Please don\'t change tags bro !', 'danger')
+        return render_template('register.html', all_tags=all_tags)
+
+    if gender not in GENDERS or gender_pref not in GENDERS:
+        flash('Gender or gender preference not accepted', 'danger')
+        return render_template('register.html', all_tags=all_tags)
+
     if len(username) < 3:
         valid = False
         flash('The username must be at least 3 letters long', 'danger')
