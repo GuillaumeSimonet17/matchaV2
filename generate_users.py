@@ -144,6 +144,7 @@ def generate_users(num_users):
             "location": fake.city(),
             "allow_geoloc": random.choice([True, False]),
             "is_verified": True,
+            "last_connection": datetime.datetime.now(),
             "tags": random.sample(INTERESTS, random.randint(1, min(5, len(INTERESTS))))
         }
         users.append(user)
@@ -168,17 +169,17 @@ def seed_users(users):
                             username, last_name, first_name, age, password, 
                             email, bio, gender, gender_pref, fame_rate, 
                             connected, lng, lat, location, allow_geoloc, is_verified,
-                            profile_image
+                            profile_image, last_connection
                         ) VALUES (
                             %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s,
-                            %s
+                            %s, %s
                         ) RETURNING id
                     """, (
                         user["username"], user["last_name"], user["first_name"], user["age"],
                         user["password"], user["email"], user["bio"], user["gender"],
                         user["gender_pref"], user["fame_rate"], user["connected"],
                         user["lng"], user["lat"], user["location"], user["allow_geoloc"],
-                        user["is_verified"], psycopg2.Binary(user["profile_image"])
+                        user["is_verified"], psycopg2.Binary(user["profile_image"]), user['last_connection']
                     ))
                 else:
                     cur.execute("""
@@ -187,7 +188,7 @@ def seed_users(users):
                             email, bio, gender, gender_pref, fame_rate, 
                             connected, lng, lat, location, allow_geoloc, is_verified
                         ) VALUES (
-                            %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
+                            %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s
                         ) RETURNING id
                     """, (
                         user["username"], user["last_name"], user["first_name"], user["age"],
