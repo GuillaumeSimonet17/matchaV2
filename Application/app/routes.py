@@ -347,10 +347,7 @@ def profile(profile_id):
     if 'username' not in session or not User._find_by_username(session['username']):
         session.clear()
         return redirect(url_for('main.login'))
-    
-    if session.get('current_page') == 'notifs' and session['user_id']:
-        Notif.mark_notifs_by_user_id_as_read(session['user_id'])
-    
+
     session['current_page'] = 'profile'
     return go_profile(profile_id)
 

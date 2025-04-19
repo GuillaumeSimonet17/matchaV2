@@ -140,7 +140,6 @@
                 const profileObj = JSON.parse(fixedProfile);
                 profileId = profileObj.id;
 
-                socket.emit('view_profile', {'receiver_id': profileId});
             }
         });
 

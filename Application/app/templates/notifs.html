@@ -20,17 +20,5 @@
         {% endif %}
     </div>
 
-    <script>
-
-        document.querySelector('#notifs-container')?.addEventListener('click', function (event) {
-            const target = event.target.closest('a[id="notif-profile"]');
-
-            if (target) {
-                const profileId = target.getAttribute('data-profile-id');
-                socket.emit('view_profile', {'receiver_id': profileId});
-            }
-        });
-
-    </script>
 </section>
 {% endblock %}

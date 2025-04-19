@@ -1,4 +1,5 @@
 from flask import render_template, session, redirect, url_for
+from app import socketio
 
 from ORM.tables.user import User
 from ORM.views.profile import Profile
@@ -52,6 +53,11 @@ def go_profile(profile_id: int):
 
     notif = Notif(None, 'view', user_id, profile_id, False)
     notif.create()
+    user = User._find_by_id(user_id)
+    
+    socketio.emit('receive_view_profile',
+         {'receiver_id': profile_id, 'sender_id': user_id, 'sender_username': user.username},
+         room=f'user_{profile_id}')
 
     nb_notifs = get_numbers_of_notifs()
     nb_notifs_msg = get_numbers_of_notifs_msg()
